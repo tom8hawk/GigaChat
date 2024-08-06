@@ -97,11 +97,9 @@ public class ChatListener implements Listener {
     private void sendHover(Player p, String[] replacementList, String format, List<Player> recipients, String chatMessage) {
         String hovertext = StringUtils.colorize(Utils.replacePlaceholders(p, StringUtils.replaceEach(pluginConfig.hoverMessage, searchList, replacementList)));
         HoverEvent hover = new HoverEvent(Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hovertext)));
-        int length = format.replace("<message>", "").replace("%", "%%").length();
         BaseComponent[] comp = TextComponent.fromLegacyText(format.replace("<message>", chatMessage).replace("%", "%%"));
-        // Применяем HoverEvent только к первым элементам, а не ко всему сообщению
-        for (int i = 0; i < length; i++) {
-            comp[i].setHoverEvent(hover);
+        for (BaseComponent component : comp) {
+            component.setHoverEvent(hover);
         }
         for (Player ps : recipients) {
             ps.spigot().sendMessage(comp);

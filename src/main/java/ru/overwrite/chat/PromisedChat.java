@@ -40,7 +40,6 @@ public final class PromisedChat extends JavaPlugin {
         pm.registerEvents(new CommandListener(this), this);
         new AutoMessages(this).startMSG(getConfig());
         getCommand("promisedchat").setExecutor(new CommandClass(this));
-        ;
         new Metrics(this, 20699);
         long endTime = System.currentTimeMillis();
         getLogger().info("Plugin started in " + (endTime - startTime) + " ms");
