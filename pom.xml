@@ -97,9 +97,9 @@
       <dependency>
           <groupId>ru.overwrite</groupId>
           <artifactId>OverwriteAPI</artifactId>
-          <version>1.0</version>
+          <version>1.0.2</version>
           <scope>system</scope>
-          <systemPath>${project.basedir}/OverwriteAPI-1.0.jar</systemPath>
+          <systemPath>${project.basedir}/OverwriteAPI-1.0.2.jar</systemPath>
       </dependency>
   </dependencies>
 </project>

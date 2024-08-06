@@ -52,7 +52,7 @@ public class AutoMessages {
                     }
                 }
             }
-        }).runTaskTimerAsynchronously(instance, 20L, config.getInt("autoMessage.messageInterval") * 20);
+        }).runTaskTimerAsynchronously(instance, 20L, config.getInt("autoMessage.messageInterval") * 20L);
     }
 
     private <K, V> K getRandomKey(Set<K> keySet) {

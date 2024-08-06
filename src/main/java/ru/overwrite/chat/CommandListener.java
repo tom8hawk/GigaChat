@@ -19,19 +19,20 @@ public class CommandListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void playerCommand(PlayerCommandPreprocessEvent e) {
-        if (pluginConfig.newbieChat) {
-            Player player = e.getPlayer();
-            String[] message = e.getMessage().split(" ");
-            String command = message[0];
-            long time = (System.currentTimeMillis() - player.getFirstPlayed()) / 1000;
-            if (!player.hasPermission("pchat.bypass.newbie") && time <= pluginConfig.newbieCooldown) {
-                for (String cmd : pluginConfig.newbieCommands) {
-                    if (command.startsWith(cmd + " ") || command.equalsIgnoreCase(cmd)) {
-                        String cd = TimeUtils.getTime((int) (pluginConfig.newbieCooldown - time), " ч. ", " мин. ", " сек. ");
-                        player.sendMessage(pluginConfig.newbieMessage.replace("%time%", cd));
-                        e.setCancelled(true);
-                        return;
-                    }
+        if (!pluginConfig.newbieChat) {
+            return;
+        }
+        Player player = e.getPlayer();
+        String[] message = e.getMessage().split(" ");
+        String command = message[0];
+        long time = (System.currentTimeMillis() - player.getFirstPlayed()) / 1000;
+        if (!player.hasPermission("pchat.bypass.newbie") && time <= pluginConfig.newbieCooldown) {
+            for (String cmd : pluginConfig.newbieCommands) {
+                if (command.startsWith(cmd + " ") || command.equalsIgnoreCase(cmd)) {
+                    String cd = TimeUtils.getTime((int) (pluginConfig.newbieCooldown - time), " ч. ", " мин. ", " сек. ");
+                    player.sendMessage(pluginConfig.newbieMessage.replace("%time%", cd));
+                    e.setCancelled(true);
+                    return;
                 }
             }
         }

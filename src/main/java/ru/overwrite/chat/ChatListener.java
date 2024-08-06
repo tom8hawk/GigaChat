@@ -2,10 +2,7 @@ package ru.overwrite.chat;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -62,16 +59,16 @@ public class ChatListener implements Listener {
         String prefix = instance.getChat().getPlayerPrefix(p);
         String suffix = instance.getChat().getPlayerSuffix(p);
         String globalMessage = removeGlobalPrefix(message);
+        String[] replacementList = {name, prefix, suffix, getDonatePlaceholder(p)};
         if (pluginConfig.forceGlobal || (message.split("")[0].equals("!") && !globalMessage.isBlank())) {
             if (processCooldown(e, p, name, globalCooldowns, pluginConfig.globalRateLimit)) {
                 return;
             }
-            String[] replacementList = {name, prefix, suffix, getDonatePlaceholder(p)};
             String gf = StringUtils.colorize(Utils.replacePlaceholders(p, StringUtils.replaceEach(pluginConfig.globalFormat, searchList, replacementList)));
             String chatMessage = Utils.formatByPerm(p, globalMessage);
             if (pluginConfig.hoverText) {
                 e.setCancelled(true);
-                sendHover(p, searchList, replacementList, gf, new ArrayList<>(Bukkit.getOnlinePlayers()), chatMessage);
+                sendHover(p, replacementList, gf, new ArrayList<>(Bukkit.getOnlinePlayers()), chatMessage);
             } else {
                 e.setFormat(gf.replace("<message>", chatMessage).replace("%", "%%"));
             }
@@ -80,7 +77,6 @@ public class ChatListener implements Listener {
         if (processCooldown(e, p, name, localCooldowns, pluginConfig.localRateLimit)) {
             return;
         }
-        String[] replacementList = {name, prefix, suffix, getDonatePlaceholder(p)};
         String lf = StringUtils.colorize(Utils.replacePlaceholders(p, StringUtils.replaceEach(pluginConfig.localFormat, searchList, replacementList)));
         e.getRecipients().clear();
         e.getRecipients().add(p);
@@ -92,18 +88,20 @@ public class ChatListener implements Listener {
         if (pluginConfig.hoverText) {
             radiusInfo.add(p);
             e.setCancelled(true);
-            sendHover(p, searchList, replacementList, lf, radiusInfo, chatMessage);
+            sendHover(p, replacementList, lf, radiusInfo, chatMessage);
         } else {
             e.setFormat(lf.replace("<message>", chatMessage).replace("%", "%%"));
         }
     }
 
-    private void sendHover(Player p, String[] searchList, String[] replacementList, String format, List<Player> recipients, String chatMessage) {
+    private void sendHover(Player p, String[] replacementList, String format, List<Player> recipients, String chatMessage) {
         String hovertext = StringUtils.colorize(Utils.replacePlaceholders(p, StringUtils.replaceEach(pluginConfig.hoverMessage, searchList, replacementList)));
         HoverEvent hover = new HoverEvent(Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hovertext)));
+        int length = format.replace("<message>", "").replace("%", "%%").length();
         BaseComponent[] comp = TextComponent.fromLegacyText(format.replace("<message>", chatMessage).replace("%", "%%"));
-        for (BaseComponent component : comp) {
-            component.setHoverEvent(hover);
+        // Применяем HoverEvent только к первым элементам, а не ко всему сообщению
+        for (int i = 0; i < length; i++) {
+            comp[i].setHoverEvent(hover);
         }
         for (Player ps : recipients) {
             ps.spigot().sendMessage(comp);
