@@ -118,6 +118,6 @@ public final class MyChat extends JavaPlugin {
     }
 
     public void setColorizer(FileConfiguration config, ServerInfos infos) {
-        colorizer = config.getBoolean("use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
+        colorizer = config.getBoolean("messages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
     }
 }

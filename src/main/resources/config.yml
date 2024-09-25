@@ -142,6 +142,8 @@ privateMessages:
   sound: block_brewing_stand_brew;1.0;1.0
 
 messages:
+  # Использовать ли формат <color></color> для сообщений?
+  use-minimessage: false
   player-only: "&cДанная команда доступна только игрокам!"
   no-perm: "&cУ вас нет прав на использование данной команды!"
   # {time} - время перезагрузки
