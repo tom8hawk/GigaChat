@@ -1,8 +1,7 @@
 package groundbreaking.mychat.automessages;
 
 import groundbreaking.mychat.MyChat;
-import groundbreaking.mychat.utils.Config;
-import groundbreaking.mychat.utils.colorizer.IColorizer;
+import groundbreaking.mychat.utils.ConfigValues;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -15,19 +14,17 @@ import java.util.concurrent.ThreadLocalRandom;
 public class AutoMessages {
 
     private final MyChat plugin;
-    private final Config pluginConfig;
-    private final IColorizer colorizer;
+    private final ConfigValues configValues;
 
     public AutoMessages(MyChat plugin) {
         this.plugin = plugin;
-        this.pluginConfig = plugin.getPluginConfig();
-        this.colorizer = plugin.getColorizer();
+        this.configValues = plugin.getPluginConfig();
     }
 
     public void startMSG(FileConfiguration config) {
-        (new BukkitRunnable() {
+        new BukkitRunnable() {
             public void run() {
-                if (!pluginConfig.isAutoMessageEnable()) {
+                if (!configValues.isAutoMessageEnable()) {
                     return;
                 }
 
@@ -41,20 +38,20 @@ public class AutoMessages {
                     }
                 }
             }
-        }).runTaskTimerAsynchronously(plugin, 20L, config.getInt("autoMessage.messageInterval") * 20L);
+        }.runTaskTimerAsynchronously(plugin, 20L, config.getInt("autoMessage.messageInterval") * 20L);
     }
 
     private int i = 0;
 
     private List<String> getAutoMessage() {
-        if (pluginConfig.isAutoMessagesRandom()) {
-            return pluginConfig.getAutoMessages().get(getRandomKey(pluginConfig.getAutoMessages().keySet()));
+        if (configValues.isAutoMessagesRandom()) {
+            return configValues.getAutoMessages().get(getRandomKey(configValues.getAutoMessages().keySet()));
         }
-        if (i++ >= pluginConfig.getAutoMessages().keySet().size()) {
+        if (i++ >= configValues.getAutoMessages().keySet().size()) {
             i = 0;
         }
 
-        return pluginConfig.getAutoMessages().get(i);
+        return configValues.getAutoMessages().get(i);
     }
 
     private int getRandomKey(IntSet intSet) {

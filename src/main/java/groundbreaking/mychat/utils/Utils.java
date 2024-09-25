@@ -151,14 +151,14 @@ public class Utils {
         final StringBuilder result = new StringBuilder();
 
         if (hours > 0) {
-            result.append(hours).append(Config.getHoursText());
+            result.append(hours).append(ConfigValues.getHoursText());
         }
 
         if (minutes > 0 || hours > 0) {
-            result.append(minutes).append(Config.getMinutesText());
+            result.append(minutes).append(ConfigValues.getMinutesText());
         }
 
-        result.append(seconds).append(Config.getSecondsText());
+        result.append(seconds).append(ConfigValues.getSecondsText());
 
         return result.toString();
     }

@@ -1,7 +1,7 @@
 package groundbreaking.mychat.commands;
 
 import groundbreaking.mychat.MyChat;
-import groundbreaking.mychat.utils.Config;
+import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.Utils;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import org.bukkit.Bukkit;
@@ -21,7 +21,7 @@ import java.util.Set;
 public class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final MyChat plugin;
-    private final Config pluginConfig;
+    private final ConfigValues pluginConfig;
     private final IColorizer colorizer;
 
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}", "{message}" };
@@ -37,7 +37,7 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!sender.hasPermission("chat.privatemessage")) {
+        if (!sender.hasPermission("mychat.privatemessage")) {
             sender.sendMessage(pluginConfig.getNoPermissionMessage());
             return true;
         }
@@ -87,7 +87,9 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         sender.sendMessage(colorizer.colorize(Utils.replaceEach(pluginConfig.getPmSenderFormat(), placeholders, replacementList)));
         recipient.sendMessage(colorizer.colorize(Utils.replaceEach(pluginConfig.getPmRecipientFormat(), placeholders, replacementList)));
 
-        recipient.playSound(recipient, pluginConfig.getPmSound(), pluginConfig.getPmSoundVolume(), pluginConfig.getPmSoundPitch());
+        if (pluginConfig.isPmSoundEnabled()) {
+            recipient.playSound(recipient, pluginConfig.getPmSound(), pluginConfig.getPmSoundVolume(), pluginConfig.getPmSoundPitch());
+        }
 
         processSocialSpy(replacementList);
 

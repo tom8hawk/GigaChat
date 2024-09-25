@@ -1,8 +1,7 @@
 package groundbreaking.mychat.commands;
 
 import groundbreaking.mychat.MyChat;
-import groundbreaking.mychat.utils.Config;
-import groundbreaking.mychat.utils.colorizer.IColorizer;
+import groundbreaking.mychat.utils.ConfigValues;
 import lombok.Getter;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -18,29 +17,25 @@ import java.util.List;
 
 public class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
 
-    private final MyChat plugin;
-    private final Config pluginConfig;
-    private final IColorizer colorizer;
+    private final ConfigValues configValues;
 
     @Getter
     private static final List<String> listening = new ArrayList<>();
 
     public SocialSpyCommandExecutor(MyChat plugin) {
-        this.plugin = plugin;
-        this.pluginConfig = plugin.getPluginConfig();
-        this.colorizer = plugin.getColorizer();
+        this.configValues = plugin.getPluginConfig();
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         if (!(sender instanceof Player)) {
-            sender.sendMessage(pluginConfig.getPlayerOnly());
+            sender.sendMessage(configValues.getPlayerOnly());
             return true;
         }
 
         if (!sender.hasPermission("chat.socialspy")) {
-            sender.sendMessage(pluginConfig.getNoPermissionMessage());
+            sender.sendMessage(configValues.getNoPermissionMessage());
             return true;
         }
 
@@ -48,11 +43,11 @@ public class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
 
         if (listening.contains(senderName)) {
             listening.remove(sender.getName());
-            sender.sendMessage(pluginConfig.getSocialspyDisabled());
+            sender.sendMessage(configValues.getSocialspyDisabled());
         }
         else {
             listening.add(sender.getName());
-            sender.sendMessage(pluginConfig.getSocialspyEnabled());
+            sender.sendMessage(configValues.getSocialspyEnabled());
         }
 
         return true;

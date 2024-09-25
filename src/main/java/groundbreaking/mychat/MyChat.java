@@ -5,7 +5,7 @@ import groundbreaking.mychat.commands.*;
 import groundbreaking.mychat.listeners.ChatListener;
 import groundbreaking.mychat.listeners.CommandListener;
 import groundbreaking.mychat.listeners.DisconnectListener;
-import groundbreaking.mychat.utils.Config;
+import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.ServerInfos;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import groundbreaking.mychat.utils.colorizer.LegacyColorizer;
@@ -33,7 +33,7 @@ public final class MyChat extends JavaPlugin {
     private Permission perms;
 
     @Getter
-    private final Config pluginConfig = new Config(this);
+    private final ConfigValues pluginConfig = new ConfigValues();
 
     @Getter
     private final Logger logger = getLogger();
@@ -58,9 +58,8 @@ public final class MyChat extends JavaPlugin {
         }
 
         saveDefaultConfig();
-        this.setColorizer(getConfig(), infos);
-
-        setupConfig();
+        final FileConfiguration config = getConfig();
+        this.setColorizer(config, infos);
 
         ServicesManager servicesManager = getServer().getServicesManager();
         setupChat(servicesManager);
@@ -68,9 +67,9 @@ public final class MyChat extends JavaPlugin {
 
         registerEvents();
 
-        new AutoMessages(this).startMSG(getConfig());
+        new AutoMessages(this).startMSG(config);
 
-        getCommand("promisedchat").setExecutor(new MainCommandExecutor(this));
+        getCommand("mychat").setExecutor(new MainCommandExecutor(this));
         registerCommands();
 
         long endTime = System.currentTimeMillis();
@@ -115,12 +114,7 @@ public final class MyChat extends JavaPlugin {
     }
 
     public void setupConfig() {
-        FileConfiguration config = getConfig();
-        pluginConfig.setupMessages(config);
-        pluginConfig.setupFormats(config);
-        pluginConfig.setupHover(config);
-        pluginConfig.setupNewbie(config);
-        pluginConfig.setupAutoMessage(config);
+        pluginConfig.setupValues(colorizer, getConfig(), logger);
     }
 
     public void setColorizer(FileConfiguration config, ServerInfos infos) {
