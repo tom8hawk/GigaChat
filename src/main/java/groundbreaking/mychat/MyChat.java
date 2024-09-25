@@ -96,6 +96,8 @@ public final class MyChat extends JavaPlugin {
         registerCommands.registerCommand(pmMessages.getString("pm-command"), pmMessages.getStringList("pm-aliases"), pmExecutor, pmExecutor);
         IgnoreCommandExecutor ignoreExecutor = new IgnoreCommandExecutor(this);
         registerCommands.registerCommand(pmMessages.getString("ignore-command"), pmMessages.getStringList("ignore-aliases"), ignoreExecutor, ignoreExecutor);
+        ReplyCommandExecutor replyExecutor = new ReplyCommandExecutor(this);
+        registerCommands.registerCommand(pmMessages.getString("reply-command"), pmMessages.getStringList("reply-aliases"), replyExecutor, replyExecutor);
         SocialSpyCommandExecutor socialspyExecutor = new SocialSpyCommandExecutor(this);
         registerCommands.registerCommand(pmMessages.getString("socialspy-command"), pmMessages.getStringList("socialspy-aliases"), socialspyExecutor, socialspyExecutor);
     }
