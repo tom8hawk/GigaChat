@@ -8,7 +8,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="PromisedChat" />
+        <module name="MyChat" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="PromisedChat" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

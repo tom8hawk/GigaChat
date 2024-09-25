@@ -12,10 +12,10 @@ public class ServerInfos {
     private final boolean isPapiExist = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 
     @Getter
-    private final int subVersion = extractMainVersion();
+    private final int subVersion;
 
     @Getter
-    private final boolean isAbove16 = subVersion >= 16;
+    private final boolean isAbove16;
 
     @Getter
     private final boolean isPaperOrFork = checkIsPaperOrFork();
@@ -27,6 +27,8 @@ public class ServerInfos {
     public ServerInfos(Server server, Logger logger) {
         this.server = server;
         this.logger = logger;
+        subVersion = extractMainVersion();
+        isAbove16 = subVersion >= 16;
     }
 
     public int extractMainVersion() {

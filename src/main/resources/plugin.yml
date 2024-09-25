@@ -89,5 +89,8 @@ permissions:
   mychat.bypass.newbie.commands:
     default: op
 
+  mychat.privatemessage:
+    default: op
+
   mychat.automessages:
     default: op

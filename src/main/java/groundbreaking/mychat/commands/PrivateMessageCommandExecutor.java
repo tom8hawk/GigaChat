@@ -4,11 +4,9 @@ import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.Utils;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
+import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,34 +17,42 @@ import java.util.List;
 public class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final MyChat plugin;
-    private final ConfigValues pluginConfig;
+    private final ConfigValues configValues;
     private final IColorizer colorizer;
+    private final ConsoleCommandSender consoleSender;
 
+    @Getter
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}", "{message}" };
 
     public PrivateMessageCommandExecutor(MyChat plugin) {
         this.plugin = plugin;
-        this.pluginConfig = plugin.getPluginConfig();
+        this.configValues = plugin.getPluginConfig();
         this.colorizer = plugin.getColorizer();
+        this.consoleSender = plugin.getServer().getConsoleSender();
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
         if (!sender.hasPermission("mychat.privatemessage")) {
-            sender.sendMessage(pluginConfig.getNoPermissionMessage());
+            sender.sendMessage(configValues.getNoPermissionMessage());
+            return true;
+        }
+
+        if (args.length < 2) {
+            sender.sendMessage(configValues.getPmUsageError());
             return true;
         }
 
         final Player recipient = Bukkit.getPlayer(args[0]);
 
         if (recipient == null) {
-            sender.sendMessage(pluginConfig.getPlayerNotFoundMessage());
+            sender.sendMessage(configValues.getPlayerNotFoundMessage());
             return true;
         }
 
         if (recipient == sender) {
-            sender.sendMessage(pluginConfig.getCannotPmSelf());
+            sender.sendMessage(configValues.getCannotPmSelf());
             return true;
         }
 
@@ -54,12 +60,12 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         final String recipientName = recipient.getName();
 
         if (!IgnoreCommandExecutor.ignores(recipientName, senderName)) {
-            sender.sendMessage(pluginConfig.getRecipientIgnoresSender());
+            sender.sendMessage(configValues.getRecipientIgnoresSender());
             return true;
         }
 
         if (!IgnoreCommandExecutor.ignores(senderName, recipientName)) {
-            sender.sendMessage(pluginConfig.getSenderIgnoresRecipient());
+            sender.sendMessage(configValues.getSenderIgnoresRecipient());
             return true;
         }
 
@@ -80,24 +86,30 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
 
         final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, builder.toString().trim()};
 
-        sender.sendMessage(colorizer.colorize(Utils.replaceEach(pluginConfig.getPmSenderFormat(), placeholders, replacementList)));
-        recipient.sendMessage(colorizer.colorize(Utils.replaceEach(pluginConfig.getPmRecipientFormat(), placeholders, replacementList)));
+        sender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSenderFormat(), placeholders, replacementList)));
+        recipient.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmRecipientFormat(), placeholders, replacementList)));
 
-        if (pluginConfig.isPmSoundEnabled()) {
-            recipient.playSound(recipient, pluginConfig.getPmSound(), pluginConfig.getPmSoundVolume(), pluginConfig.getPmSoundPitch());
+        ReplyCommandExecutor.getReply().put(recipientName, senderName);
+
+        if (configValues.isPmSoundEnabled()) {
+            recipient.playSound(recipient, configValues.getPmSound(), configValues.getPmSoundVolume(), configValues.getPmSoundPitch());
         }
 
-        processSocialSpy(replacementList);
+        if (configValues.isPrintPmToConsole() && !(sender instanceof ConsoleCommandSender)) {
+            consoleSender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmConsoleFormat(), placeholders, replacementList)));
+        }
+
+        processSocialspy(replacementList);
 
         return true;
     }
 
-    private void processSocialSpy(String[] replacementList) {
+    private void processSocialspy(String[] replacementList) {
         final List<String> players = SocialSpyCommandExecutor.getListening();
         for (int i = 0; i < players.size(); i++) {
             final Player player = Bukkit.getPlayer(players.get(i));
             if (player != null) {
-                player.sendMessage(colorizer.colorize(Utils.replaceEach(pluginConfig.getPmSocialSpyFormat(), placeholders, replacementList)));
+                player.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSocialSpyFormat(), placeholders, replacementList)));
             }
         }
     }

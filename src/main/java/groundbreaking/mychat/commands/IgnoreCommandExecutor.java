@@ -39,6 +39,11 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             return true;
         }
 
+        if (args.length != 2) {
+            sender.sendMessage(configValues.getIgnoreUsageError());
+            return true;
+        }
+
         final Player target = Bukkit.getPlayer(args[0]);
 
         if (target == null) {

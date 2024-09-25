@@ -39,6 +39,11 @@ public class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
             return true;
         }
 
+        if (args.length != 0) {
+            sender.sendMessage(configValues.getSocialspyUsageError());
+            return true;
+        }
+
         final String senderName = sender.getName();
 
         if (listening.contains(senderName)) {

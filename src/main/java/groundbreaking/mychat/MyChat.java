@@ -43,7 +43,7 @@ public final class MyChat extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        long startTime = System.currentTimeMillis();
+        final long startTime = System.currentTimeMillis();
 
         final ServerInfos infos = new ServerInfos(getServer(), logger);
         if (!infos.isPaperOrFork()) {
@@ -59,20 +59,21 @@ public final class MyChat extends JavaPlugin {
 
         saveDefaultConfig();
         final FileConfiguration config = getConfig();
-        this.setColorizer(config, infos);
+        setColorizer(config, infos);
+        setupConfig();
 
-        ServicesManager servicesManager = getServer().getServicesManager();
+        final ServicesManager servicesManager = getServer().getServicesManager();
         setupChat(servicesManager);
         setupPerms(servicesManager);
 
-        registerEvents();
+        this.registerEvents();
 
         new AutoMessages(this).startMSG(config);
 
         getCommand("mychat").setExecutor(new MainCommandExecutor(this));
         registerCommands();
 
-        long endTime = System.currentTimeMillis();
+        final long endTime = System.currentTimeMillis();
         getLogger().info("Plugin started in " + (endTime - startTime) + " ms");
     }
 

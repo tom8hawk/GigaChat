@@ -19,7 +19,8 @@ public class ConfigValues {
             globalFormat,
             pmSenderFormat,
             pmRecipientFormat,
-            pmSocialSpyFormat;
+            pmSocialSpyFormat,
+            pmConsoleFormat;
 
     @Getter
     private int
@@ -37,6 +38,7 @@ public class ConfigValues {
             newbieCommandsEnable,
             autoMessageEnable,
             isAutoMessagesRandom,
+            printPmToConsole,
             pmSoundEnabled = true;
 
     @Getter
@@ -78,7 +80,11 @@ public class ConfigValues {
             socialspyEnabled,
             socialspyDisabled,
             isNowIgnoring,
-            IsNotMoreIgnored;
+            isNotMoreIgnored,
+            pmUsageError,
+            socialspyUsageError,
+            ignoreUsageError,
+            replyUsageError;
 
     @Getter
     private static String
@@ -235,6 +241,8 @@ public class ConfigValues {
             pmSenderFormat = privateMessages.getString("sender-format");
             pmRecipientFormat = privateMessages.getString("recipient-format");
             pmSocialSpyFormat = privateMessages.getString("socialspy-format");
+            pmConsoleFormat = privateMessages.getString("console-format");
+            printPmToConsole = privateMessages.getBoolean("print-to-console");
             final String soundString = privateMessages.getString("sound");
             if (soundString == null) {
                 logger.warning("\u001b[91mFailed to load sound for private messages from \"privateMessages.sound\". Sounds for private messages will be disabled!\u001b[0m");
@@ -243,9 +251,9 @@ public class ConfigValues {
                 pmSoundEnabled = false;
             } else {
                 final String[] params = soundString.split(";");
-                pmSound = Sound.valueOf(params[0]);
-                pmSoundVolume = Float.parseFloat(params[1]);
-                pmSoundPitch = Float.parseFloat(params[0]);
+                pmSound = params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+                pmSoundVolume = params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+                pmSoundPitch = params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
             }
         }
         else {
@@ -268,7 +276,11 @@ public class ConfigValues {
             socialspyEnabled = colorizer.colorize(messages.getString("socialspy-enabled"));
             socialspyDisabled = colorizer.colorize(messages.getString("socialspy-disabled"));
             isNowIgnoring = colorizer.colorize(messages.getString("ignore-enabled"));
-            IsNotMoreIgnored = colorizer.colorize(messages.getString("ignore-disabled"));
+            isNotMoreIgnored = colorizer.colorize(messages.getString("ignore-disabled"));
+            pmUsageError = colorizer.colorize(messages.getString("pm-usage-error"));
+            socialspyUsageError = colorizer.colorize(messages.getString("socialspy-usage-error"));
+            ignoreUsageError = colorizer.colorize(messages.getString("ignore-usage-error"));
+            replyUsageError = colorizer.colorize(messages.getString("reply-usage-error"));
             hoursText = messages.getString("time.hours");
             minutesText = messages.getString("time.minutes");
             secondsText = messages.getString("time.seconds");

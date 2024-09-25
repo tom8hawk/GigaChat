@@ -129,6 +129,8 @@ privateMessages:
   socialspy-aliases:
     - "spy"
 
+  print-to-console: true
+
   # Сообщение, которое увидит игрок использовавший /msg <ник>
   sender-format: "&d[ЛС] &f[&dя &f-> {to-prefix}{to-name}&f] &r{message}"
   # Сообщение, которое увидит получивший игрок
@@ -136,6 +138,7 @@ privateMessages:
 
   # Сообщение, которое увидит игрок прослушивающий сообщения (Написавший /socialspy)
   socialspy-format: "&6* &f[&r{sender_prefix}{sender}{sender_suffix} &f-> &r{target_prefix}{target}{target_suffix}&f] &r{message}"
+  console-format: "&f[&r{sender_prefix}{sender}{sender_suffix} &f-> &r{target_prefix}{target}{target_suffix}&f] &r{message}"
 
   # Звук, который проиграется получателю личного сообщения
   # Оставь "disabled", чтобы отключить
@@ -151,16 +154,20 @@ messages:
   player-not-found: "&cУказанный игрок не найден!"
   # {time} - время до окончания задержки
   cooldown-message: "&e[♻]&f Вы слишком быстро пишите! Подождите еще {time}."
+  pm-usage-error: "&cВы неправильно ввели команду! Используйте: /msg <ник> <сообщение>"
   cannot-pm-self: "&cВы не можете отправить сообщение самому себе!"
   cannot-ignore-self: "&cВы не можете игнорировать самого себя!"
   recipient-ignores-sender: "&cЭтот игрок игнорирует вас!"
   sender-ignores-recipient: "&cВы не можете написать игроку которого игнорируете!"
   socialspy-enabled: "&aТеперь вы прослушиваете личные сообщения!"
   socialspy-disabled: "&aВы больше не прослушиваете личные сообщения!"
+  socialspy-usage-error: "&cВы неправильно ввели команду! Используйте: /socialspy"
   # {player} - ник указанного игрока
   ignore-enabled: "&cВы больше не будете получать сообщения от {player}."
   # {player} - ник указанного игрока
   ignore-disabled: "&cТеперь вы получаете сообщения от {player}."
+  ignore-usage-error: "&cВы неправильно ввели команду! Используйте: /ignore <ник>"
+  reply-usage-error: "&cВы неправильно ввели команду! Используйте: /reply <сообщение>"
 
   time:
     hours: "ч. "
