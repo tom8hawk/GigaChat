@@ -20,7 +20,7 @@
 # Настройки локального чата
 local:
   # Формат сообщений
-  format: "&aⓁ&f <prefix> &8⋆&f <player>&7:<color> <message>"
+  format: "&aⓁ&f {prefix}{player}{suffix} &7: {local-color}{message}"
   # Дистанция на которой будет отображаться сообщение
   distance: 100
   # Задержка на чат (указывать в миллисекундах)
@@ -29,7 +29,7 @@ local:
 # Настройки глобального чата
 global:
   # Формат сообщений
-  format: "&cⒼ&f <prefix> &8⋆&f <player>&7:<color> <message>"
+  format: "&6Ⓖ&f {prefix}{player}{suffix} &7: {global-color}{message}"
   # Символ который нужно писать для использования глоб. чата (ПИСАТЬ 1 СИМВОЛ И НЕ БОЛЬШЕ!)
   symbol: '!'
   # Нужно ли использовать глобальный чат как основной?
