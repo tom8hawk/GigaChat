@@ -23,7 +23,7 @@ public class CommandListener implements Listener {
         }
 
         final Player player = e.getPlayer();
-        if (player.hasPermission("pchat.bypass.newbie")) {
+        if (player.hasPermission("mychat.bypass.newbie.commands")) {
             return;
         }
 

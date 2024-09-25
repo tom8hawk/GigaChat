@@ -34,7 +34,7 @@ public class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (!sender.hasPermission("chat.socialspy")) {
+        if (!sender.hasPermission("mychat.socialspy")) {
             sender.sendMessage(configValues.getNoPermissionMessage());
             return true;
         }

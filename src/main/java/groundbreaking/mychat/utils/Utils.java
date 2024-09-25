@@ -26,28 +26,28 @@ public class Utils {
     private static final char COLOR_CHAR = '&';
 
     static {
-        colorCodesPermissions.put("pchat.color.black", ChatColor.BLACK);
-        colorCodesPermissions.put("pchat.color.dark_blue", ChatColor.DARK_BLUE);
-        colorCodesPermissions.put("pchat.color.dark_green", ChatColor.DARK_GREEN);
-        colorCodesPermissions.put("pchat.color.dark_aqua", ChatColor.DARK_AQUA);
-        colorCodesPermissions.put("pchat.color.dark_red", ChatColor.DARK_RED);
-        colorCodesPermissions.put("pchat.color.dark_purple", ChatColor.DARK_PURPLE);
-        colorCodesPermissions.put("pchat.color.gold", ChatColor.GOLD);
-        colorCodesPermissions.put("pchat.color.gray", ChatColor.GRAY);
-        colorCodesPermissions.put("pchat.color.dark_gray", ChatColor.DARK_GRAY);
-        colorCodesPermissions.put("pchat.color.blue", ChatColor.BLUE);
-        colorCodesPermissions.put("pchat.color.green", ChatColor.GREEN);
-        colorCodesPermissions.put("pchat.color.aqua", ChatColor.AQUA);
-        colorCodesPermissions.put("pchat.color.red", ChatColor.RED);
-        colorCodesPermissions.put("pchat.color.light_purple", ChatColor.LIGHT_PURPLE);
-        colorCodesPermissions.put("pchat.color.yellow", ChatColor.YELLOW);
-        colorCodesPermissions.put("pchat.color.white", ChatColor.WHITE);
-        colorStylesPermissions.put("pchat.style.obfuscated", ChatColor.MAGIC);
-        colorStylesPermissions.put("pchat.style.bold", ChatColor.BOLD);
-        colorStylesPermissions.put("pchat.style.strikethrough", ChatColor.STRIKETHROUGH);
-        colorStylesPermissions.put("pchat.style.underline", ChatColor.UNDERLINE);
-        colorStylesPermissions.put("pchat.style.italic", ChatColor.ITALIC);
-        colorStylesPermissions.put("pchat.style.reset", ChatColor.RESET);
+        colorCodesPermissions.put("mychat.color.black", ChatColor.BLACK);
+        colorCodesPermissions.put("mychat.color.dark_blue", ChatColor.DARK_BLUE);
+        colorCodesPermissions.put("mychat.color.dark_green", ChatColor.DARK_GREEN);
+        colorCodesPermissions.put("mychat.color.dark_aqua", ChatColor.DARK_AQUA);
+        colorCodesPermissions.put("mychat.color.dark_red", ChatColor.DARK_RED);
+        colorCodesPermissions.put("mychat.color.dark_purple", ChatColor.DARK_PURPLE);
+        colorCodesPermissions.put("mychat.color.gold", ChatColor.GOLD);
+        colorCodesPermissions.put("mychat.color.gray", ChatColor.GRAY);
+        colorCodesPermissions.put("mychat.color.dark_gray", ChatColor.DARK_GRAY);
+        colorCodesPermissions.put("mychat.color.blue", ChatColor.BLUE);
+        colorCodesPermissions.put("mychat.color.green", ChatColor.GREEN);
+        colorCodesPermissions.put("mychat.color.aqua", ChatColor.AQUA);
+        colorCodesPermissions.put("mychat.color.red", ChatColor.RED);
+        colorCodesPermissions.put("mychat.color.light_purple", ChatColor.LIGHT_PURPLE);
+        colorCodesPermissions.put("mychat.color.yellow", ChatColor.YELLOW);
+        colorCodesPermissions.put("mychat.color.white", ChatColor.WHITE);
+        colorStylesPermissions.put("mychat.style.obfuscated", ChatColor.MAGIC);
+        colorStylesPermissions.put("mychat.style.bold", ChatColor.BOLD);
+        colorStylesPermissions.put("mychat.style.strikethrough", ChatColor.STRIKETHROUGH);
+        colorStylesPermissions.put("mychat.style.underline", ChatColor.UNDERLINE);
+        colorStylesPermissions.put("mychat.style.italic", ChatColor.ITALIC);
+        colorStylesPermissions.put("mychat.style.reset", ChatColor.RESET);
 
         colorCodesMap.put("0", "black");
         colorCodesMap.put("1", "dark_blue");
@@ -82,15 +82,15 @@ public class Utils {
     }
 
     public static String formatByPerm(Player player, String message) {
-        if (player.hasPermission("pchat.style.hex")) {
+        if (player.hasPermission("mychat.style.hex")) {
             return LEGACY_COLORIZER.colorize(message);
         }
         Matcher matcher = colorPattern.matcher(message);
 
         while (matcher.find()) {
             String code = matcher.group(1);
-            String colorPerm = "pchat.color." + colorCodesMap.get(code);
-            String stylePerm = "pchat.style." + colorStylesMap.get(code);
+            String colorPerm = "mychat.color." + colorCodesMap.get(code);
+            String stylePerm = "mychat.style." + colorStylesMap.get(code);
             ChatColor color = colorCodesPermissions.get(colorPerm);
             ChatColor style = colorStylesPermissions.get(stylePerm);
 
@@ -124,22 +124,6 @@ public class Utils {
             }
         } else {
             return text;
-        }
-    }
-
-    public static boolean isNumeric(@Nullable CharSequence cs) {
-        if (cs != null && !cs.isEmpty()) {
-            int sz = cs.length();
-
-            for(int i = 0; i < sz; ++i) {
-                if (!Character.isDigit(cs.charAt(i))) {
-                    return false;
-                }
-            }
-
-            return true;
-        } else {
-            return false;
         }
     }
 

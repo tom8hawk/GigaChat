@@ -14,9 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 public class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -25,8 +23,6 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
     private final IColorizer colorizer;
 
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}", "{message}" };
-
-    private final HashMap<String, Set<String>> ignored = new HashMap<>();
 
     public PrivateMessageCommandExecutor(MyChat plugin) {
         this.plugin = plugin;

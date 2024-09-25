@@ -30,7 +30,7 @@ public class AutoMessages {
 
                 List<String> amsg = getAutoMessage();
                 for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.hasPermission("pchat.automessages")) {
+                    if (p.hasPermission("mychat.automessages")) {
                         continue;
                     }
                     for (String message : amsg) {
@@ -38,7 +38,7 @@ public class AutoMessages {
                     }
                 }
             }
-        }.runTaskTimerAsynchronously(plugin, 20L, config.getInt("autoMessage.messageInterval") * 20L);
+        }.runTaskTimerAsynchronously(plugin, 20L, config.getInt("autoMessage.send-interval") * 20L);
     }
 
     private int i = 0;

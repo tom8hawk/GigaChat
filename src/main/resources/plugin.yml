@@ -2,48 +2,92 @@ name: MyChat
 version: ${project.version}
 main: groundbreaking.mychat.MyChat
 api-version: 1.13
-folia-supported: true
+folia-supported:
 depend: [ PlaceholderAPI, Vault, LuckPerms ]
 authors: [ Groundbreaking, OverwriteMC ]
 
 commands:
-  promisedchat:
-    aliases: [ pchat ]
+  mychat:
+    aliases: [ mychat ]
 
 permissions:
-  pchat.color.*:
-    children:
-      pchat.color.black: true
-      pchat.color.dark_blue: true
-      pchat.color.dark_green: true
-      pchat.color.dark_aqua: true
-      pchat.color.dark_red: true
-      pchat.color.dark_purple: true
-      pchat.color.gold: true
-      pchat.color.gray: true
-      pchat.color.dark_gray: true
-      pchat.color.blue: true
-      pchat.color.green: true
-      pchat.color.aqua: true
-      pchat.color.red: true
-      pchat.color.light_purple: true
-      pchat.color.yellow: true
-      pchat.color.white: true
+  mychat.color.black:
+    default: op
 
-  pchat.style.*:
-    children:
-      pchat.style.obfuscated: true
-      pchat.style.bold: true
-      pchat.style.strikethrough: true
-      pchat.style.underline: true
-      pchat.style.italic: true
-      pchat.style.reset: true
-      pchat.style.hex: true
+  mychat.color.dark_blue:
+    default: op
 
-  pchat.bypass.*:
-    children:
-      pchat.bypass.cooldown: true
-      pchat.bypass.newbie: true
+  mychat.color.dark_green:
+    default: op
 
-  pchat.automessage:
-    default: true
+  mychat.color.dark_aqua:
+    default: op
+
+  mychat.color.dark_red:
+    default: op
+
+  mychat.color.dark_purple:
+    default: op
+
+  mychat.color.gold:
+    default: op
+
+  mychat.color.gray:
+    default: op
+
+  mychat.color.dark_gray:
+    default: op
+
+  mychat.color.blue:
+    default: op
+
+  mychat.color.green:
+    default: op
+
+  mychat.color.aqua:
+    default: op
+
+  mychat.color.red:
+    default: op
+
+  mychat.color.light_purple:
+    default: op
+
+  mychat.color.yellow:
+    default: op
+
+  mychat.color.white:
+    default: op
+  
+  mychat.style.obfuscated:
+    default: op
+
+  mychat.style.bold:
+    default: op
+
+  mychat.style.strikethrough:
+    default: op
+
+  mychat.style.underline:
+    default: op
+
+  mychat.style.italic:
+    default: op
+
+  mychat.style.reset:
+    default: op
+
+  mychat.style.hex:
+    default: op
+
+  mychat.bypass.cooldown:
+    default: op
+
+  mychat.bypass.newbie.chat:
+    default: op
+
+  mychat.bypass.newbie.commands:
+    default: op
+
+  mychat.automessages:
+    default: op
