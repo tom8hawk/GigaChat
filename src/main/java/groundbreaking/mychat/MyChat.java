@@ -36,7 +36,7 @@ public final class MyChat extends JavaPlugin {
     private final ConfigValues pluginConfig = new ConfigValues();
 
     @Getter
-    private final Logger logger = getLogger();
+    private Logger logger;
 
     @Getter
     private IColorizer colorizer;
@@ -44,6 +44,7 @@ public final class MyChat extends JavaPlugin {
     @Override
     public void onEnable() {
         long startTime = System.currentTimeMillis();
+        logger = getLogger();
 
         final ServerInfos infos = new ServerInfos(getServer(), logger);
         if (!infos.isPaperOrFork()) {
