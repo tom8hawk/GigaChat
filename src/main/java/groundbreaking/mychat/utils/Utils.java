@@ -82,7 +82,7 @@ public class Utils {
     }
 
     public static String formatByPerm(Player player, String message) {
-        if (player.hasPermission("mychat.style.hex")) {
+        if (player.hasPermission("mychat.hex")) {
             return LEGACY_COLORIZER.colorize(message);
         }
         Matcher matcher = colorPattern.matcher(message);

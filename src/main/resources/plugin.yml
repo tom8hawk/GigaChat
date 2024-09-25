@@ -77,7 +77,7 @@ permissions:
   mychat.style.reset:
     default: op
 
-  mychat.style.hex:
+  mychat.hex:
     default: op
 
   mychat.bypass.cooldown:
