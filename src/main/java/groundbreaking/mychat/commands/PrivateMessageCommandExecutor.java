@@ -59,14 +59,16 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         final String senderName = sender.getName();
         final String recipientName = recipient.getName();
 
-        if (!IgnoreCommandExecutor.ignores(recipientName, senderName)) {
-            sender.sendMessage(configValues.getRecipientIgnoresSender());
-            return true;
-        }
+        if (sender instanceof Player) {
+            if (!IgnoreCommandExecutor.ignores(recipientName, senderName)) {
+                sender.sendMessage(configValues.getRecipientIgnoresSender());
+                return true;
+            }
 
-        if (!IgnoreCommandExecutor.ignores(senderName, recipientName)) {
-            sender.sendMessage(configValues.getSenderIgnoresRecipient());
-            return true;
+            if (!IgnoreCommandExecutor.ignores(senderName, recipientName)) {
+                sender.sendMessage(configValues.getSenderIgnoresRecipient());
+                return true;
+            }
         }
 
         String senderPrefix = "", senderSuffix = "";
@@ -89,14 +91,16 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         sender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSenderFormat(), placeholders, replacementList)));
         recipient.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmRecipientFormat(), placeholders, replacementList)));
 
-        ReplyCommandExecutor.getReply().put(recipientName, senderName);
-
         if (configValues.isPmSoundEnabled()) {
             recipient.playSound(recipient, configValues.getPmSound(), configValues.getPmSoundVolume(), configValues.getPmSoundPitch());
         }
 
-        if (configValues.isPrintPmToConsole() && !(sender instanceof ConsoleCommandSender)) {
-            consoleSender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmConsoleFormat(), placeholders, replacementList)));
+        if (!(sender instanceof ConsoleCommandSender)) {
+            ReplyCommandExecutor.getReply().put(recipientName, senderName);
+
+            if (configValues.isPrintPmToConsole()) {
+                consoleSender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmConsoleFormat(), placeholders, replacementList)));
+            }
         }
 
         processSocialspy(replacementList);

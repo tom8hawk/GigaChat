@@ -1,6 +1,6 @@
 package groundbreaking.mychat.listeners;
 
-import groundbreaking.mychat.MyChat;
+import groundbreaking.mychat.commands.ReplyCommandExecutor;
 import groundbreaking.mychat.commands.SocialSpyCommandExecutor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -12,8 +12,8 @@ public class DisconnectListener implements Listener {
 
     private final ChatListener chatListener;
 
-    public DisconnectListener(MyChat plugin) {
-        chatListener = new ChatListener(plugin);
+    public DisconnectListener(ChatListener chatListener) {
+        this.chatListener = chatListener;
     }
 
     @EventHandler
@@ -31,5 +31,12 @@ public class DisconnectListener implements Listener {
         chatListener.removePlayerLocalCooldown(name);
         chatListener.removePlayerGlobalCooldown(name);
         SocialSpyCommandExecutor.removeFromListening(name);
+        ReplyCommandExecutor.getReply().remove(name);
+        for (String key : ReplyCommandExecutor.getReply().keySet()) {
+            final String keyName = ReplyCommandExecutor.getReply().get(key);
+            if (keyName.equals(name)) {
+                ReplyCommandExecutor.getReply().remove(key);
+            }
+        }
     }
 }

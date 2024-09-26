@@ -56,32 +56,22 @@ public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
 
         final String recipientName = recipient.getName();
 
-        if (!IgnoreCommandExecutor.ignores(recipientName, senderName)) {
+        if (isRecipientIgnoresSender(sender, recipientName, senderName)) {
             sender.sendMessage(configValues.getRecipientIgnoresSender());
             return true;
         }
 
-        if (!IgnoreCommandExecutor.ignores(senderName, recipientName)) {
+        if (isSenderIgnoresRecipient(sender, senderName, recipientName)) {
             sender.sendMessage(configValues.getSenderIgnoresRecipient());
             return true;
         }
 
-        String senderPrefix = "", senderSuffix = "";
-        if (sender instanceof Player player) {
-            senderPrefix = plugin.getChat().getPlayerPrefix(player);
-            senderSuffix = plugin.getChat().getPlayerSuffix(player);
-        }
+        final String senderPrefix = getPrefix(sender), senderSuffix = getSuffix(sender);
+        final String recipientPrefix = getPrefix(recipient), recipientSuffix = getSuffix(recipient);
 
-        final String recipientPrefix = plugin.getChat().getPlayerPrefix(recipient);
-        final String recipientSuffix = plugin.getChat().getPlayerSuffix(recipient);
+        final String message = getMessage(args);
 
-        final StringBuilder builder = new StringBuilder();
-
-        for (int i = 0; i < args.length; i++) {
-            builder.append(" ").append(args[i]);
-        }
-
-        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, builder.toString().trim()};
+        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, message};
 
         sender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSenderFormat(), placeholders, replacementList)));
         recipient.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmRecipientFormat(), placeholders, replacementList)));
@@ -109,6 +99,31 @@ public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
                 player.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSocialSpyFormat(), placeholders, replacementList)));
             }
         }
+    }
+
+    private String getMessage(String[] args) {
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < args.length; i++) {
+            builder.append(" ").append(args[i]);
+        }
+
+        return builder.toString().trim();
+    }
+
+    private boolean isRecipientIgnoresSender(CommandSender sender, String senderName, String recipientName) {
+        return sender instanceof Player && IgnoreCommandExecutor.ignores(recipientName, senderName);
+    }
+
+    private boolean isSenderIgnoresRecipient(CommandSender sender, String senderName, String recipientName) {
+        return sender instanceof Player && IgnoreCommandExecutor.ignores(senderName, recipientName);
+    }
+
+    private String getPrefix(CommandSender sender) {
+        return sender instanceof Player player ? plugin.getChat().getPlayerPrefix(player) : "";
+    }
+
+    private String getSuffix(CommandSender sender) {
+        return sender instanceof Player player ? plugin.getChat().getPlayerSuffix(player) : "";
     }
 
     @Override

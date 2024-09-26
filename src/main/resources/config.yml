@@ -56,7 +56,7 @@ hoverText:
   # Доступные действия: OPEN_URL, OPEN_FILE, RUN_COMMAND, SUGGEST_COMMAND, CHANGE_PAGE, COPY_TO_CLIPBOARD
   click-action: 'SUGGEST_COMMAND'
   # Команда/ссылка или другое
-  click-command: '/m {player} '
+  click-value: '/m {player} '
   # Само сообщение которое будет показываться при наведении
   format: |-
     &fИнформация об игроке {player}

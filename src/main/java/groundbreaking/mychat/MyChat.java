@@ -84,9 +84,10 @@ public final class MyChat extends JavaPlugin {
 
     private void registerEvents() {
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new ChatListener(this), this);
+        ChatListener chatListener = new ChatListener(this);
+        pm.registerEvents(chatListener, this);
         pm.registerEvents(new CommandListener(this), this);
-        pm.registerEvents(new DisconnectListener(this), this);
+        pm.registerEvents(new DisconnectListener(chatListener), this);
     }
 
     private void registerCommands() {

@@ -11,8 +11,5 @@
         <module name="MyChat" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="PromisedChat" target="17" />
-    </bytecodeTargetLevel>
   </component>
 </project>

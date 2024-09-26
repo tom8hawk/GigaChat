@@ -3,7 +3,6 @@ package groundbreaking.mychat.utils;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
-import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -46,13 +45,12 @@ public class ConfigValues {
 
     @Getter
     private String
+            clickAction,
+            clickValue,
             cooldownMessage,
             hoverMessage,
             newbieChatMessage,
             newbieCommandsMessage;
-
-    @Getter
-    private ClickEvent hoverEvent;
 
     @Getter
     private final Set<String>
@@ -168,9 +166,8 @@ public class ConfigValues {
         final ConfigurationSection hoverText = config.getConfigurationSection("hoverText");
         if (hoverText != null) {
             hoverTextEnable = hoverText.getBoolean("enable");
-            final String hoverEventType = hoverText.getString("click-action");
-            final String hoverCommand = hoverText.getString("click-command");
-            hoverEvent = new ClickEvent(ClickEvent.Action.valueOf(hoverEventType), hoverCommand);
+            clickAction = hoverText.getString("click-action");
+            clickValue = hoverText.getString("click-value");
             hoverMessage = hoverText.getString("format");
         }
         else {
@@ -251,9 +248,9 @@ public class ConfigValues {
                 pmSoundEnabled = false;
             } else {
                 final String[] params = soundString.split(";");
-                pmSound = params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
-                pmSoundVolume = params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-                pmSoundPitch = params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+                pmSound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+                pmSoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+                pmSoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
             }
         }
         else {

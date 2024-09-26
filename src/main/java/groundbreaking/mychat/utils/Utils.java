@@ -76,7 +76,7 @@ public class Utils {
 
     public static String replacePlaceholders(Player player, String message) {
         if (PlaceholderAPI.containsPlaceholders(message)) {
-            message = PlaceholderAPI.setPlaceholders(player, message);
+            return PlaceholderAPI.setPlaceholders(player, message);
         }
         return message;
     }

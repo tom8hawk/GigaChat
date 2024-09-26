@@ -76,6 +76,10 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     }
 
     public static boolean ignores(String playerName, String targetName) {
+        if (!ignored.containsKey(playerName)) {
+            ignored.put(playerName, new ArrayList<>());
+        }
+
         return ignored.get(playerName).contains(targetName);
     }
 
