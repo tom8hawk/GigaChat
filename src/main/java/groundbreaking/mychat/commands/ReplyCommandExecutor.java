@@ -47,14 +47,19 @@ public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
         }
 
         final String senderName = sender.getName();
+        final String recipientName = reply.get(senderName);
+
+        if (recipientName == null) {
+            sender.sendMessage(configValues.getNobodyToAnswer());
+            return true;
+        }
+
         final Player recipient = Bukkit.getPlayer(reply.get(senderName));
 
         if (recipient == null || !recipient.isOnline()) {
             sender.sendMessage(configValues.getPlayerNotFoundMessage());
             return true;
         }
-
-        final String recipientName = recipient.getName();
 
         if (isRecipientIgnoresSender(sender, recipientName, senderName)) {
             sender.sendMessage(configValues.getRecipientIgnoresSender());

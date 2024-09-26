@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -120,8 +121,16 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            return null;
+        if (args.length == 1) {
+            final String input = args[0];
+            final List<String> players = new ArrayList<>();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                final String playerName = player.getName();
+                if (input.startsWith(playerName)) {
+                    players.add(playerName);
+                }
+            }
+            return players;
         }
 
         return Collections.emptyList();

@@ -9,7 +9,9 @@ public class ExpiringMap<K, V> {
     private final Cache<K, V> cache;
 
     public ExpiringMap(long duration, TimeUnit unit) {
-        this.cache = CaffeineFactory.newBuilder().expireAfterWrite(duration, unit).build();
+        this.cache = CaffeineFactory.newBuilder()
+                .expireAfterWrite(duration, unit)
+                .build();
     }
 
     public void put(K key, V value) {

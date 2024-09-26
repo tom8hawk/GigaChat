@@ -189,8 +189,8 @@ public class ChatListener implements Listener {
     }
 
     public String getFormattedMessage(Player player, String message, String format, String[] replacementList) {
-        final String globalFormat = colorizer.colorize(Utils.replacePlaceholders(player, Utils.replaceEach(format, searchList, replacementList)));
+        final String formatted = colorizer.colorize(Utils.replacePlaceholders(player, Utils.replaceEach(format, searchList, replacementList)));
         final String chatMessage = Utils.formatByPerm(player, message);
-        return globalFormat.replace("{message}", chatMessage).replace("%", "%%");
+        return formatted.replace("{message}", chatMessage).replace("%", "%%");
     }
 }

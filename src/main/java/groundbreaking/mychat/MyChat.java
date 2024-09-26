@@ -39,13 +39,16 @@ public final class MyChat extends JavaPlugin {
     private final Logger logger = super.getLogger();
 
     @Getter
-    private IColorizer colorizer;
+    private IColorizer colorizer, chatColorizer;
+
+    @Getter
+    private ServerInfos infos;
 
     @Override
     public void onEnable() {
         final long startTime = System.currentTimeMillis();
 
-        final ServerInfos infos = new ServerInfos(getServer(), logger);
+        infos = new ServerInfos(getServer(), logger);
         if (!infos.isPaperOrFork()) {
             logger.warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
             logger.warning("\u001b[91mThe plugin author against using Bukkit, Spigot etc.!\u001b[0m");
@@ -59,7 +62,7 @@ public final class MyChat extends JavaPlugin {
 
         saveDefaultConfig();
         final FileConfiguration config = getConfig();
-        setColorizer(config, infos);
+        setupColorizers(config, infos);
         setupConfig();
 
         final ServicesManager servicesManager = getServer().getServicesManager();
@@ -121,7 +124,8 @@ public final class MyChat extends JavaPlugin {
         pluginConfig.setupValues(colorizer, getConfig(), logger);
     }
 
-    public void setColorizer(FileConfiguration config, ServerInfos infos) {
+    public void setupColorizers(FileConfiguration config, ServerInfos infos) {
         colorizer = config.getBoolean("messages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
+        colorizer = config.getBoolean("use-minimessage-for-chats") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
     }
 }

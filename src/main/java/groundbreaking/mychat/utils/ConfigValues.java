@@ -70,6 +70,7 @@ public class ConfigValues {
             playerOnly,
             noPermissionMessage,
             reloadMessage,
+            nobodyToAnswer,
             playerNotFoundMessage,
             cannotPmSelf,
             cannotIgnoreSelf,
@@ -263,6 +264,7 @@ public class ConfigValues {
         if (messages != null) {
             playerOnly = colorizer.colorize(messages.getString("player-only"));
             noPermissionMessage = colorizer.colorize(messages.getString("no-perm"));
+            nobodyToAnswer = colorizer.colorize(messages.getString("nobody-to-answer"));
             playerNotFoundMessage = colorizer.colorize(messages.getString("player-not-found"));
             cooldownMessage = colorizer.colorize(config.getString("cooldown-message"));
             cannotPmSelf = colorizer.colorize(messages.getString("cannot-pm-self"));

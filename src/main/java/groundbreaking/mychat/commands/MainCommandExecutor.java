@@ -29,6 +29,7 @@ public class MainCommandExecutor implements CommandExecutor {
         }
 
         plugin.reloadConfig();
+        plugin.setupColorizers(plugin.getConfig(), plugin.getInfos());
         plugin.setupConfig();
 
         Bukkit.getScheduler().cancelTasks(plugin);
