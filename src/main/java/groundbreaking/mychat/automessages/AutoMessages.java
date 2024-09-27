@@ -35,8 +35,15 @@ public class AutoMessages {
                     if (player.hasPermission("mychat.automessages")) {
                         continue;
                     }
-                    for (int i = 0; i < autoMessages.size(); i++) {
-                        player.sendMessage(autoMessages.get(i));
+                    if (configValues.isAutoMessagesSoundEnabled()) {
+                        for (int i = 0; i < autoMessages.size(); i++) {
+                            player.sendMessage(autoMessages.get(i));
+                            player.playSound(player, configValues.getAutoMessagesSound(), configValues.getAutoMessagesSoundVolume(), configValues.getAutoMessagesSoundPitch());
+                        }
+                    } else {
+                        for (int i = 0; i < autoMessages.size(); i++) {
+                            player.sendMessage(autoMessages.get(i));
+                        }
                     }
                 }
             }

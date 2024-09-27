@@ -10,20 +10,20 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 public class CommandListener implements Listener {
 
-    private final ConfigValues pluginConfig;
+    private final ConfigValues configValues;
 
     public CommandListener(MyChat plugin) {
-        pluginConfig = plugin.getConfigValues();
+        configValues = plugin.getConfigValues();
     }
 
     @EventHandler(ignoreCancelled = true)
     public void playerCommand(PlayerCommandPreprocessEvent e) {
-        if (!pluginConfig.isNewbieCommandsEnable()) {
+        if (!configValues.isNewbieCommandsEnable()) {
             return;
         }
 
         final Player player = e.getPlayer();
-        if (player.hasPermission("mychat.bypass.newbie.commands")) {
+        if (player.hasPermission("mychat.bypass.commandsnewbie")) {
             return;
         }
 
@@ -31,11 +31,16 @@ public class CommandListener implements Listener {
         final String command = params[0];
 
         final long time = (System.currentTimeMillis() - player.getFirstPlayed()) / 1000;
-        if (time <= pluginConfig.getNewbieCommandsCooldown()) {
-            for (String cmd : pluginConfig.getNewbieBlockedCommands()) {
+        if (time <= configValues.getNewbieCommandsCooldown()) {
+            for (String cmd : configValues.getNewbieBlockedCommands()) {
                 if (command.startsWith(cmd + " ") || command.equalsIgnoreCase(cmd)) {
-                    final String cd = Utils.getTime((int) (pluginConfig.getNewbieCommandsCooldown() - time));
-                    player.sendMessage(pluginConfig.getNewbieCommandsMessage().replace("{time}", cd));
+                    final String cd = Utils.getTime((int) (configValues.getNewbieCommandsCooldown() - time));
+                    player.sendMessage(configValues.getNewbieCommandsMessage().replace("{time}", cd));
+
+                    if (configValues.isCommandDenySoundEnabled()) {
+                        player.playSound(player, configValues.getCommandDenySound(), configValues.getCommandDenySoundVolume(), configValues.getCommandDenySoundPitch());
+                    }
+
                     e.setCancelled(true);
                     return;
                 }

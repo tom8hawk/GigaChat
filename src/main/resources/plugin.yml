@@ -13,69 +13,113 @@ commands:
 permissions:
   mychat.color.black:
     default: op
+    children:
+      mychat.color.0: true
 
   mychat.color.dark_blue:
     default: op
+    children:
+      mychat.color.1: true
 
   mychat.color.dark_green:
     default: op
+    children:
+      mychat.color.2: true
 
   mychat.color.dark_aqua:
     default: op
+    children:
+      mychat.color.3: true
 
   mychat.color.dark_red:
     default: op
+    children:
+      mychat.color.4: true
 
   mychat.color.dark_purple:
     default: op
+    children:
+      mychat.color.5: true
 
   mychat.color.gold:
     default: op
+    children:
+      mychat.color.6: true
 
   mychat.color.gray:
     default: op
+    children:
+      mychat.color.7: true
 
   mychat.color.dark_gray:
     default: op
+    children:
+      mychat.color.8: true
 
   mychat.color.blue:
     default: op
+    children:
+      mychat.color.9: true
 
   mychat.color.green:
     default: op
+    children:
+      mychat.color.a: true
 
   mychat.color.aqua:
     default: op
+    children:
+      mychat.color.b: true
 
   mychat.color.red:
     default: op
+    children:
+      mychat.color.c: true
 
   mychat.color.light_purple:
     default: op
+    children:
+      mychat.color.d: true
 
   mychat.color.yellow:
     default: op
+    children:
+      mychat.color.e: true
 
   mychat.color.white:
     default: op
-  
+    children:
+      mychat.color.f: true
+
   mychat.style.obfuscated:
     default: op
+    children:
+      mychat.style.k: true
 
   mychat.style.bold:
     default: op
+    children:
+      mychat.style.b: true
 
   mychat.style.strikethrough:
     default: op
+    children:
+      mychat.style.m: true
 
   mychat.style.underline:
     default: op
+    children:
+      mychat.style.n: true
 
   mychat.style.italic:
     default: op
+    children:
+      mychat.style.o: true
 
   mychat.style.reset:
     default: op
+    children:
+      mychat.style.r: true
 
   mychat.hex:
     default: op
@@ -83,13 +127,22 @@ permissions:
   mychat.bypass.cooldown:
     default: op
 
-  mychat.bypass.newbie.chat:
+  mychat.bypass.chatnewbie:
     default: op
 
-  mychat.bypass.newbie.commands:
+  mychat.bypass.commandsnewbie:
     default: op
 
-  mychat.privatemessage:
+  mychat.command.pm:
+    default: op
+
+  mychat.command.ignore:
+    default: op
+
+  mychat.command.socialspy:
+    default: op
+
+  mychat.command.reply:
     default: op
 
   mychat.automessages:

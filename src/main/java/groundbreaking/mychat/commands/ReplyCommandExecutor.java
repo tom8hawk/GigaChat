@@ -3,40 +3,44 @@ package groundbreaking.mychat.commands;
 import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.Utils;
+import groundbreaking.mychat.utils.chatsColorizer.AbstractColorizer;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final MyChat plugin;
-    private final IColorizer colorizer;
+    private final IColorizer hexColorizer;
     private final ConfigValues configValues;
     private final ConsoleCommandSender consoleSender;
 
     @Getter
     private static final HashMap<String, String> reply = new HashMap<>();
 
-    private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}", "{message}" };
+    @Setter
+    private static AbstractColorizer messagesColorizer;
+
+    private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
 
     public ReplyCommandExecutor(MyChat plugin) {
         this.plugin = plugin;
-        this.colorizer = plugin.getColorizer();
+        this.hexColorizer = plugin.getColorizerByVersion();
         this.configValues = plugin.getConfigValues();
         this.consoleSender = plugin.getServer().getConsoleSender();
     }
 
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandlabel, @NotNull String[] args) {
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!sender.hasPermission("mychat.privatemessage")) {
+        if (!sender.hasPermission("mychat.command.pm")) {
             sender.sendMessage(configValues.getNoPermissionMessage());
             return true;
         }
@@ -61,25 +65,45 @@ public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (isRecipientIgnoresSender(sender, recipientName, senderName)) {
-            sender.sendMessage(configValues.getRecipientIgnoresSender());
-            return true;
+        final boolean isPlayerSender = sender instanceof Player;
+        if (isPlayerSender) {
+            if (isIgnored(recipientName, senderName)) {
+                sender.sendMessage(configValues.getRecipientIgnoresSender());
+                return true;
+            }
+
+            if (isIgnored(senderName, recipientName)) {
+                sender.sendMessage(configValues.getSenderIgnoresRecipient());
+                return true;
+            }
         }
 
-        if (isSenderIgnoresRecipient(sender, senderName, recipientName)) {
-            sender.sendMessage(configValues.getSenderIgnoresRecipient());
-            return true;
+        String senderPrefix = "", senderSuffix = "";
+        if (isPlayerSender) {
+            final Player playerSender = (Player) sender;
+            senderPrefix = getPrefix(playerSender);
+            senderSuffix = getSuffix(playerSender);
         }
-
-        final String senderPrefix = getPrefix(sender), senderSuffix = getSuffix(sender);
         final String recipientPrefix = getPrefix(recipient), recipientSuffix = getSuffix(recipient);
 
-        final String message = getMessage(args);
+        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix};
+        final String message = getMessage(sender, args, isPlayerSender);
+        final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;
+        if (isPlayerSender) {
+            final Player playerSender = (Player) sender;
+            formattedMessageForSender = getFormattedMessage(playerSender, message, configValues.getPmSenderFormat(), replacementList);
+            formattedMessageForRecipient = getFormattedMessage(playerSender, message, configValues.getPmRecipientFormat(),replacementList);
+            formattedMessageForConsole = getFormattedMessage(playerSender, message, configValues.getPmConsoleFormat(),replacementList);
+            formattedMessageForSocialSpy = getFormattedMessage(playerSender, message, configValues.getPmSocialSpyFormat(),replacementList);
+        } else {
+            formattedMessageForSender = getFormattedMessage(message, configValues.getPmSenderFormat(), replacementList);
+            formattedMessageForRecipient = getFormattedMessage(message, configValues.getPmRecipientFormat(),replacementList);
+            formattedMessageForConsole = getFormattedMessage(message, configValues.getPmConsoleFormat(),replacementList);
+            formattedMessageForSocialSpy = getFormattedMessage(message, configValues.getPmSocialSpyFormat(),replacementList);
+        }
 
-        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, message};
-
-        sender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSenderFormat(), placeholders, replacementList)));
-        recipient.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmRecipientFormat(), placeholders, replacementList)));
+        sender.sendMessage(formattedMessageForSender);
+        recipient.sendMessage(formattedMessageForRecipient);
 
         reply.put(recipientName, senderName);
 
@@ -87,48 +111,61 @@ public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
             recipient.playSound(recipient, configValues.getPmSound(), configValues.getPmSoundVolume(), configValues.getPmSoundPitch());
         }
 
-        if (configValues.isPrintPmToConsole() && !(sender instanceof ConsoleCommandSender)) {
-            consoleSender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmConsoleFormat(), placeholders, replacementList)));
+        if (configValues.isPrintPmToConsole() && isPlayerSender) {
+            consoleSender.sendMessage(formattedMessageForConsole);
         }
 
-        processSocialspy(replacementList);
+        processSocialspy(formattedMessageForSocialSpy);
 
         return true;
     }
 
-    private void processSocialspy(String[] replacementList) {
-        final List<String> players = SocialSpyCommandExecutor.getListening();
-        for (int i = 0; i < players.size(); i++) {
-            final Player player = Bukkit.getPlayer(players.get(i));
+    private boolean isIgnored(String ignoredName, String ignoringName) {
+        return IgnoreCommandExecutor.ignores(ignoringName, ignoredName);
+    }
+
+    private String getPrefix(Player player) {
+        return plugin.getChat().getPlayerPrefix(player);
+    }
+
+    private String getSuffix(Player player) {
+        return plugin.getChat().getPlayerSuffix(player);
+    }
+
+    public String getFormattedMessage(Player player, String message, String format, String[] replacementList) {
+        final String formatted = hexColorizer.colorize(
+                Utils.replacePlaceholders(player,
+                        Utils.replaceEach(format, placeholders, replacementList)
+                )
+        );
+
+        return formatted.replace("{message}", message).replace("%", "%%");
+    }
+
+    public String getFormattedMessage(String message, String format, String[] replacementList) {
+        final String formatted = hexColorizer.colorize(
+                Utils.replaceEach(format, placeholders, replacementList)
+        );
+
+        return formatted.replace("{message}", message).replace("%", "%%");
+    }
+
+    private String getMessage(CommandSender sender, String[] args, boolean isPlayerSender) {
+        if (isPlayerSender) {
+            return messagesColorizer.colorize((Player) sender, String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim());
+        }
+
+        return hexColorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim());
+    }
+
+    private void processSocialspy(String formattedMessage) {
+        final Set<String> players = SocialSpyCommandExecutor.getListening();
+        for (String s : players) {
+            final Player player = Bukkit.getPlayer(s);
             if (player != null) {
-                player.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSocialSpyFormat(), placeholders, replacementList)));
+                player.sendMessage(formattedMessage);
             }
         }
-    }
-
-    private String getMessage(String[] args) {
-        final StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            builder.append(" ").append(args[i]);
-        }
-
-        return builder.toString().trim();
-    }
-
-    private boolean isRecipientIgnoresSender(CommandSender sender, String senderName, String recipientName) {
-        return sender instanceof Player && IgnoreCommandExecutor.ignores(recipientName, senderName);
-    }
-
-    private boolean isSenderIgnoresRecipient(CommandSender sender, String senderName, String recipientName) {
-        return sender instanceof Player && IgnoreCommandExecutor.ignores(senderName, recipientName);
-    }
-
-    private String getPrefix(CommandSender sender) {
-        return sender instanceof Player player ? plugin.getChat().getPlayerPrefix(player) : "";
-    }
-
-    private String getSuffix(CommandSender sender) {
-        return sender instanceof Player player ? plugin.getChat().getPlayerSuffix(player) : "";
     }
 
     @Override

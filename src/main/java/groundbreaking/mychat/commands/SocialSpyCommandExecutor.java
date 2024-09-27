@@ -11,16 +11,17 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final ConfigValues configValues;
 
     @Getter
-    private static final List<String> listening = new ArrayList<>();
+    private static final Set<String> listening = new HashSet<>();
 
     public SocialSpyCommandExecutor(MyChat plugin) {
         this.configValues = plugin.getConfigValues();

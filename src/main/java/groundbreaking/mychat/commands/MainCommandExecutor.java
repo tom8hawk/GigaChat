@@ -3,7 +3,6 @@ package groundbreaking.mychat.commands;
 import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.automessages.AutoMessages;
 import groundbreaking.mychat.utils.ConfigValues;
-import groundbreaking.mychat.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -30,11 +29,8 @@ public class MainCommandExecutor implements CommandExecutor {
         }
 
         plugin.reloadConfig();
-        plugin.setColorizer(plugin.getColorizer("messages.use-minimessage"));
+        plugin.setColorizers();
         configValues.setupValues(plugin);
-
-        Utils.setChatColorizer(plugin.getColorizer("use-minimessage-for-chats"));
-        Utils.setChatColorizer(plugin.getColorizer("privateMessages.use-minimessage"));
 
         Bukkit.getScheduler().cancelTasks(plugin);
         new AutoMessages(plugin).startMSG(plugin.getConfig());

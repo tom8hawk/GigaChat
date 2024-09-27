@@ -39,7 +39,10 @@ public class ConfigValues {
             autoMessageEnable,
             isAutoMessagesRandom,
             printPmToConsole,
-            pmSoundEnabled = true;
+            pmSoundEnabled = true,
+            chatDenySoundEnabled = true,
+            commandDenySoundEnabled = true,
+            autoMessagesSoundEnabled = true;
 
     @Getter
     public char globalSymbol;
@@ -93,12 +96,22 @@ public class ConfigValues {
             secondsText;
 
     @Getter
-    private Sound pmSound;
+    private Sound
+            pmSound,
+            chatDenySound,
+            commandDenySound,
+            autoMessagesSound;
 
     @Getter
     private float
             pmSoundVolume,
-            pmSoundPitch;
+            pmSoundPitch,
+            chatDenySoundVolume,
+            chatDenySoundPitch,
+            commandDenySoundVolume,
+            commandDenySoundPitch,
+            autoMessagesSoundVolume,
+            autoMessagesSoundPitch;
 
     public void setupValues(MyChat plugin) {
         final IColorizer colorizer = plugin.getColorizer();
@@ -188,6 +201,18 @@ public class ConfigValues {
             newbieChatEnable =  newbieChat.getBoolean("enable");
             newbieChatCooldown = newbieChat.getInt("cooldown");
             newbieChatMessage = colorizer.colorize(newbieChat.getString("denyMessage"));
+            final String soundString = newbieChat.getString("deny-sound");
+            if (soundString == null) {
+                logger.warning("\u001b[91mFailed to load deny sound for nebie chat from \"newbieChat.deny-sound\". Sounds for private messages will be disabled!\u001b[0m");
+                chatDenySoundEnabled = false;
+            } else if (soundString.equalsIgnoreCase("disabled")) {
+                chatDenySoundEnabled = false;
+            } else {
+                final String[] params = soundString.split(";");
+                chatDenySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+                chatDenySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+                chatDenySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            }
         }
         else {
             logger.warning("\u001b[91mFailed to load values from \"newbieChat\" section. Please check your configuration file, or delete it and restart your server!\u001b[0m");
@@ -202,6 +227,18 @@ public class ConfigValues {
             newbieCommandsMessage = colorizer.colorize(newbieCommands.getString("denyMessage"));
             newbieBlockedCommands.clear();
             newbieBlockedCommands.addAll(newbieCommands.getStringList("blockedCommands"));
+            final String soundString = newbieCommands.getString("deny-sound");
+            if (soundString == null) {
+                logger.warning("\u001b[91mFailed to load deny sound for newbie commands from \"blockedCommands.deny-sound\". Sounds for private messages will be disabled!\u001b[0m");
+                commandDenySoundEnabled = false;
+            } else if (soundString.equalsIgnoreCase("disabled")) {
+                commandDenySoundEnabled = false;
+            } else {
+                final String[] params = soundString.split(";");
+                commandDenySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+                commandDenySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+                commandDenySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            }
         }
         else {
             logger.warning("\u001b[91mFailed to load values from \"newbieCommands\" section. Please check your configuration file, or delete it and restart your server!\u001b[0m");
@@ -214,6 +251,18 @@ public class ConfigValues {
             autoMessageEnable = autoMessage.getBoolean("enable");
             if (!autoMessageEnable) {
                 return;
+            }
+            final String soundString = autoMessage.getString("sound");
+            if (soundString == null) {
+                logger.warning("\u001b[91mFailed to load deny sound for nebie chat from \"autoMessage.sound\". Sounds for private messages will be disabled!\u001b[0m");
+                autoMessagesSoundEnabled = false;
+            } else if (soundString.equalsIgnoreCase("disabled")) {
+                autoMessagesSoundEnabled = false;
+            } else {
+                final String[] params = soundString.split(";");
+                autoMessagesSound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+                autoMessagesSoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+                autoMessagesSoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
             }
 
             final ConfigurationSection messagesSection = autoMessage.getConfigurationSection("messages");

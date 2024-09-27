@@ -3,8 +3,10 @@ package groundbreaking.mychat.listeners;
 import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.Utils;
+import groundbreaking.mychat.utils.chatsColorizer.AbstractColorizer;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import groundbreaking.mychat.utils.map.ExpiringMap;
+import lombok.Setter;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -32,6 +34,9 @@ public class ChatListener implements Listener {
     private final ExpiringMap<String, Long> localCooldowns;
     private final ExpiringMap<String, Long> globalCooldowns;
 
+    @Setter
+    public static AbstractColorizer messagesColorizer;
+
     public ChatListener(MyChat plugin) {
         this.plugin = plugin;
         this.configValues = plugin.getConfigValues();
@@ -50,6 +55,11 @@ public class ChatListener implements Listener {
         if (steelNewbie(player, time)) {
             String restTime = Utils.getTime((int) (configValues.getNewbieChatCooldown() - time));
             player.sendMessage(configValues.getNewbieChatMessage().replace("{time}", restTime));
+
+            if (configValues.isChatDenySoundEnabled()) {
+                player.playSound(player, configValues.getChatDenySound(), configValues.getChatDenySoundVolume(), configValues.getChatDenySoundPitch());
+            }
+
             event.setCancelled(true);
             return;
         }
@@ -100,7 +110,7 @@ public class ChatListener implements Listener {
     }
 
     private boolean steelNewbie(Player player, long time) {
-        if (!configValues.isNewbieChatEnable() || player.hasPermission("mychat.bypass.newbie.chat")) {
+        if (!configValues.isNewbieChatEnable() || player.hasPermission("mychat.bypass.chatnewbie")) {
             return false;
         }
 
@@ -188,7 +198,7 @@ public class ChatListener implements Listener {
 
     public String getFormattedMessage(Player player, String message, String format, String[] replacementList) {
         final String formatted = colorizer.colorize(Utils.replacePlaceholders(player, Utils.replaceEach(format, searchList, replacementList)));
-        final String chatMessage = Utils.colorizeChatMessage(player, message);
+        final String chatMessage = messagesColorizer.colorize(player, message);
         return formatted.replace("{message}", chatMessage).replace("%", "%%");
     }
 }

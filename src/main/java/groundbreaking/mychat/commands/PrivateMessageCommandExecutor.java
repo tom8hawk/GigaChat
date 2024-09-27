@@ -3,33 +3,35 @@ package groundbreaking.mychat.commands;
 import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.Utils;
+import groundbreaking.mychat.utils.chatsColorizer.AbstractColorizer;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import lombok.Getter;
+import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
 
     private final MyChat plugin;
     private final ConfigValues configValues;
-    private final IColorizer colorizer, messagesColorizer;
+    private final IColorizer hexColorizer;
     private final ConsoleCommandSender consoleSender;
 
+    @Setter
+    public static AbstractColorizer messagesColorizer;
+
     @Getter
-    private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}", "{message}" };
+    private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
 
     public PrivateMessageCommandExecutor(MyChat plugin) {
         this.plugin = plugin;
         this.configValues = plugin.getConfigValues();
-        this.colorizer = plugin.getColorizer();
-        this.messagesColorizer = plugin.getColorizer("privateMessages.use-minimessage");
+        this.hexColorizer = plugin.getColorizerByVersion();
         this.consoleSender = plugin.getServer().getConsoleSender();
     }
 
@@ -61,7 +63,8 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         final String senderName = sender.getName();
         final String recipientName = recipient.getName();
 
-        if (sender instanceof Player) {
+        final boolean isPlayerSender = sender instanceof Player;
+        if (isPlayerSender) {
             if (!IgnoreCommandExecutor.ignores(recipientName, senderName)) {
                 sender.sendMessage(configValues.getRecipientIgnoresSender());
                 return true;
@@ -74,7 +77,8 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         }
 
         String senderPrefix = "", senderSuffix = "";
-        if (sender instanceof Player player) {
+        if (isPlayerSender) {
+            final Player player = (Player) sender;
             senderPrefix = plugin.getChat().getPlayerPrefix(player);
             senderSuffix = plugin.getChat().getPlayerSuffix(player);
         }
@@ -82,50 +86,74 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         final String recipientPrefix = plugin.getChat().getPlayerPrefix(recipient);
         final String recipientSuffix = plugin.getChat().getPlayerSuffix(recipient);
 
-        final String message = getMessage(sender, args);
+        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix};
+        final String message = getMessage(sender, args, isPlayerSender);
+        final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;
+        if (isPlayerSender) {
+            final Player playerSender = (Player) sender;
+            formattedMessageForSender = getFormattedMessage(playerSender, message, configValues.getPmSenderFormat(), replacementList);
+            formattedMessageForRecipient = getFormattedMessage(playerSender, message, configValues.getPmRecipientFormat(),replacementList);
+            formattedMessageForConsole = getFormattedMessage(playerSender, message, configValues.getPmConsoleFormat(),replacementList);
+            formattedMessageForSocialSpy = getFormattedMessage(playerSender, message, configValues.getPmSocialSpyFormat(),replacementList);
+        } else {
+            formattedMessageForSender = getFormattedMessage(message, configValues.getPmSenderFormat(), replacementList);
+            formattedMessageForRecipient = getFormattedMessage(message, configValues.getPmRecipientFormat(),replacementList);
+            formattedMessageForConsole = getFormattedMessage(message, configValues.getPmConsoleFormat(),replacementList);
+            formattedMessageForSocialSpy = getFormattedMessage(message, configValues.getPmSocialSpyFormat(),replacementList);
+        }
 
-        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, message};
-
-        sender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSenderFormat(), placeholders, replacementList)));
-        recipient.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmRecipientFormat(), placeholders, replacementList)));
+        sender.sendMessage(formattedMessageForSender);
+        recipient.sendMessage(formattedMessageForRecipient);
 
         if (configValues.isPmSoundEnabled()) {
             recipient.playSound(recipient, configValues.getPmSound(), configValues.getPmSoundVolume(), configValues.getPmSoundPitch());
         }
 
-        if (!(sender instanceof ConsoleCommandSender)) {
+        if (isPlayerSender) {
             ReplyCommandExecutor.getReply().put(recipientName, senderName);
 
             if (configValues.isPrintPmToConsole()) {
-                consoleSender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmConsoleFormat(), placeholders, replacementList)));
+                consoleSender.sendMessage(formattedMessageForConsole);
             }
         }
 
-        processSocialspy(replacementList);
+        processSocialspy(formattedMessageForSocialSpy);
 
         return true;
     }
 
-    private String getMessage(CommandSender sender, String[] args) {
-        final StringBuilder builder = new StringBuilder();
+    public String getFormattedMessage(Player player, String message, String format, String[] replacementList) {
+        final String formatted = hexColorizer.colorize(
+                Utils.replacePlaceholders(player,
+                        Utils.replaceEach(format, placeholders, replacementList)
+                )
+        );
 
-        for (int i = 0; i < args.length; i++) {
-            builder.append(" ").append(args[i]);
-        }
-
-        if (sender instanceof Player player) {
-            return Utils.colorizePrivateMessage(player, builder.toString().trim());
-        } else {
-            return messagesColorizer.colorize(builder.toString().trim());
-        }
+        return formatted.replace("{message}", message).replace("%", "%%");
     }
 
-    private void processSocialspy(String[] replacementList) {
-        final List<String> players = SocialSpyCommandExecutor.getListening();
-        for (int i = 0; i < players.size(); i++) {
-            final Player player = Bukkit.getPlayer(players.get(i));
+    public String getFormattedMessage(String message, String format, String[] replacementList) {
+        final String formatted = hexColorizer.colorize(
+                Utils.replaceEach(format, placeholders, replacementList)
+        );
+
+        return formatted.replace("{message}", message).replace("%", "%%");
+    }
+
+    private String getMessage(CommandSender sender, String[] args, boolean isPlayerSender) {
+        if (isPlayerSender) {
+            return messagesColorizer.colorize((Player) sender, String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim());
+        }
+
+        return hexColorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim());
+    }
+
+    private void processSocialspy(String message) {
+        final Set<String> players = SocialSpyCommandExecutor.getListening();
+        for (String s : players) {
+            final Player player = Bukkit.getPlayer(s);
             if (player != null) {
-                player.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSocialSpyFormat(), placeholders, replacementList)));
+                player.sendMessage(message);
             }
         }
     }

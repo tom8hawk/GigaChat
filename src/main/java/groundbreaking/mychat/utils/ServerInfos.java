@@ -13,14 +13,14 @@ public class ServerInfos {
     private final int subVersion;
 
     @Getter
-    private final boolean isAbove16;
+    private final boolean is16OrAbove;
 
     @Getter
     private final boolean isPaperOrFork = checkIsPaperOrFork();
 
     public ServerInfos(MyChat plugin) {
         subVersion = extractMainVersion(plugin);
-        isAbove16 = subVersion >= 16;
+        is16OrAbove = subVersion >= 16;
     }
 
     public int extractMainVersion(MyChat plugin) {
