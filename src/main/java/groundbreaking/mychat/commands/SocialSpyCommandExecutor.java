@@ -23,7 +23,7 @@ public class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
     private static final List<String> listening = new ArrayList<>();
 
     public SocialSpyCommandExecutor(MyChat plugin) {
-        this.configValues = plugin.getPluginConfig();
+        this.configValues = plugin.getConfigValues();
     }
 
     @Override

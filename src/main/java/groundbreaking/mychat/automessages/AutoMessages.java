@@ -13,12 +13,14 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class AutoMessages {
 
+    private int i = 0;
+
     private final MyChat plugin;
     private final ConfigValues configValues;
 
     public AutoMessages(MyChat plugin) {
         this.plugin = plugin;
-        this.configValues = plugin.getPluginConfig();
+        this.configValues = plugin.getConfigValues();
     }
 
     public void startMSG(FileConfiguration config) {
@@ -28,20 +30,18 @@ public class AutoMessages {
                     return;
                 }
 
-                List<String> amsg = getAutoMessage();
+                final List<String> autoMessages = getAutoMessage();
                 for (Player p : Bukkit.getOnlinePlayers()) {
                     if (p.hasPermission("mychat.automessages")) {
                         continue;
                     }
-                    for (String message : amsg) {
-                        p.sendMessage(message);
+                    for (int i = 0; i < autoMessages.size(); i++) {
+                        p.sendMessage(autoMessages.get(i));
                     }
                 }
             }
         }.runTaskTimerAsynchronously(plugin, 20L, config.getInt("autoMessage.send-interval") * 20L);
     }
-
-    private int i = 0;
 
     private List<String> getAutoMessage() {
         if (configValues.isAutoMessagesRandom()) {

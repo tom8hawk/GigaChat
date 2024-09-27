@@ -7,22 +7,21 @@ import groundbreaking.mychat.listeners.CommandListener;
 import groundbreaking.mychat.listeners.DisconnectListener;
 import groundbreaking.mychat.utils.ConfigValues;
 import groundbreaking.mychat.utils.ServerInfos;
+import groundbreaking.mychat.utils.Utils;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import groundbreaking.mychat.utils.colorizer.LegacyColorizer;
 import groundbreaking.mychat.utils.colorizer.MiniMessagesColorizer;
 import groundbreaking.mychat.utils.colorizer.VanilaColorizer;
 import lombok.Getter;
+import lombok.Setter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.logging.Logger;
 
 public final class MyChat extends JavaPlugin {
 
@@ -33,13 +32,10 @@ public final class MyChat extends JavaPlugin {
     private Permission perms;
 
     @Getter
-    private final ConfigValues pluginConfig = new ConfigValues();
+    private final ConfigValues configValues = new ConfigValues();
 
-    @Getter
-    private final Logger logger = super.getLogger();
-
-    @Getter
-    private IColorizer colorizer, chatColorizer;
+    @Getter @Setter
+    private IColorizer colorizer;
 
     @Getter
     private ServerInfos infos;
@@ -48,22 +44,24 @@ public final class MyChat extends JavaPlugin {
     public void onEnable() {
         final long startTime = System.currentTimeMillis();
 
-        infos = new ServerInfos(getServer(), logger);
+        infos = new ServerInfos(this);
         if (!infos.isPaperOrFork()) {
-            logger.warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
-            logger.warning("\u001b[91mThe plugin author against using Bukkit, Spigot etc.!\u001b[0m");
-            logger.warning("\u001b[91mMove to Paper or his forks. To download Paper visit:\u001b[0m");
-            logger.warning("\u001b[91mhttps://papermc.io/downloads/all\u001b[0m");
-            logger.warning("\u001b[91m=======================================\u001b[0m");
+            getLogger().warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
+            getLogger().warning("\u001b[91mThe plugin author against using Bukkit, Spigot etc.!\u001b[0m");
+            getLogger().warning("\u001b[91mMove to Paper or his forks. To download Paper visit:\u001b[0m");
+            getLogger().warning("\u001b[91mhttps://papermc.io/downloads/all\u001b[0m");
+            getLogger().warning("\u001b[91m=======================================\u001b[0m");
             Bukkit.getPluginManager().disablePlugin(this);
 
             return;
         }
 
         saveDefaultConfig();
-        final FileConfiguration config = getConfig();
-        setupColorizers(config, infos);
-        setupConfig();
+        colorizer = getDefaultColorizer();
+        configValues.setupValues(this);
+
+        Utils.setChatColorizer(getChatColorizer());
+        Utils.setChatColorizer(getPrivateMessagesColorizer());
 
         final ServicesManager servicesManager = getServer().getServicesManager();
         setupChat(servicesManager);
@@ -71,7 +69,7 @@ public final class MyChat extends JavaPlugin {
 
         this.registerEvents();
 
-        new AutoMessages(this).startMSG(config);
+        new AutoMessages(this).startMSG(getConfig());
 
         getCommand("mychat").setExecutor(new MainCommandExecutor(this));
         registerCommands();
@@ -120,12 +118,19 @@ public final class MyChat extends JavaPlugin {
         }
     }
 
-    public void setupConfig() {
-        pluginConfig.setupValues(colorizer, getConfig(), logger);
+    public IColorizer getDefaultColorizer() {
+        return getConfig().getBoolean("messages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
     }
 
-    public void setupColorizers(FileConfiguration config, ServerInfos infos) {
-        colorizer = config.getBoolean("messages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
-        colorizer = config.getBoolean("use-minimessage-for-chats") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
+    public IColorizer getChatColorizer() {
+        return getConfig().getBoolean("use-minimessage-for-chats") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
+    }
+
+    public IColorizer getAutomessagesColorizer() {
+        return getConfig().getBoolean("autoMessage.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
+    }
+
+    public IColorizer getPrivateMessagesColorizer() {
+        return getConfig().getBoolean("privateMessages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
     }
 }

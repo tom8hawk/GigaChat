@@ -30,7 +30,7 @@ public class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
     public ReplyCommandExecutor(MyChat plugin) {
         this.plugin = plugin;
         this.colorizer = plugin.getColorizer();
-        this.configValues = plugin.getPluginConfig();
+        this.configValues = plugin.getConfigValues();
         this.consoleSender = plugin.getServer().getConsoleSender();
     }
 

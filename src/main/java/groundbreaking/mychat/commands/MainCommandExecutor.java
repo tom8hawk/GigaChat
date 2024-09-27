@@ -3,6 +3,7 @@ package groundbreaking.mychat.commands;
 import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.automessages.AutoMessages;
 import groundbreaking.mychat.utils.ConfigValues;
+import groundbreaking.mychat.utils.Utils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -16,7 +17,7 @@ public class MainCommandExecutor implements CommandExecutor {
 
     public MainCommandExecutor(MyChat plugin) {
         this.plugin = plugin;
-        this.configValues = plugin.getPluginConfig();
+        this.configValues = plugin.getConfigValues();
     }
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandlabel, @NotNull String[] args) {
@@ -29,8 +30,11 @@ public class MainCommandExecutor implements CommandExecutor {
         }
 
         plugin.reloadConfig();
-        plugin.setupColorizers(plugin.getConfig(), plugin.getInfos());
-        plugin.setupConfig();
+        plugin.getDefaultColorizer();
+        configValues.setupValues(plugin);
+
+        Utils.setChatColorizer(plugin.getChatColorizer());
+        Utils.setChatColorizer(plugin.getPrivateMessagesColorizer());
 
         Bukkit.getScheduler().cancelTasks(plugin);
         new AutoMessages(plugin).startMSG(plugin.getConfig());

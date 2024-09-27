@@ -37,6 +37,7 @@ global:
   # Задержка на чат (указывать в миллисекундах
   cooldown: 500
 
+# Нужно ли использовать формат цветов <color></color> для сообщений в чате? (Влияет только на отправляемый текст от игрока)
 use-minimessage-for-chats: false
 
 # Настройка цветов групп для внутренних плейсхолдеров
@@ -100,6 +101,8 @@ autoMessage:
   random: true
   # Промежуток между отправкой сообщений (В секундах)
   send-interval: 300
+  # Нужно ли использовать формат цветов <color></color>
+  use-minimessage: false
   # Сами сообщения:
   messages:
     # Название ни на что, не влияет!
@@ -138,6 +141,9 @@ privateMessages:
     - "spy"
 
   print-to-console: true
+
+  # Нужно ли использовать формат цветов <color></color> для отправляемых сообщений
+  use-minimessage: false
 
   # Сообщение, которое увидит игрок использовавший /msg <ник>
   sender-format: "&d[ЛС] &f[&dя &f-> {to-prefix}{to-name}&f] &r{message}"

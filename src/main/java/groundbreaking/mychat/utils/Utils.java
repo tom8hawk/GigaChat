@@ -1,9 +1,9 @@
 package groundbreaking.mychat.utils;
 
-import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
+import lombok.Setter;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -22,12 +22,9 @@ public class Utils {
             'K', 'L', 'M', 'N', 'O', 'R', 'X'
     });
 
-    private static IColorizer chatColorizer;
+    @Setter
+    private static IColorizer chatColorizer, privateColorizer;
     private static final char COLOR_CHAR = '&';
-
-    public Utils(MyChat plugin) {
-        Utils.chatColorizer = plugin.getChatColorizer();
-    }
 
     public static String replacePlaceholders(Player player, String message) {
         if (PlaceholderAPI.containsPlaceholders(message)) {
@@ -36,20 +33,32 @@ public class Utils {
         return message;
     }
 
-    public static String formatByPerm(Player player, String message) {
-        if (player.hasPermission("mychat.hex")) {
+    public static String colorizeChatMessage(Player player, String message) {
+        if (player.hasPermission("mychat.chat.hex")) {
             return chatColorizer.colorize(message);
         }
 
+        return formatByPerm(player, message, "chat");
+    }
+
+    public static String colorizePrivateMessage(Player player, String message) {
+        if (player.hasPermission("mychat.private.hex")) {
+            return privateColorizer.colorize(message);
+        }
+
+        return formatByPerm(player, message, "private");
+    }
+
+    public static String formatByPerm(Player player, String message, String place) {
         char[] letters = message.toCharArray();
         for (int i = 0; i < letters.length; i++) {
             if (letters[i] == COLOR_CHAR) {
                 final char code = letters[i + 1];
-                if (COLOR_CODES.contains(code) && player.hasPermission("mychat.color." + code)) {
+                if (COLOR_CODES.contains(code) && player.hasPermission("mychat." + place + ".color." + code)) {
                     letters[i++] = '§';
                     letters[i] = Character.toLowerCase(letters[i]);
                 }
-                else if (STYLE_CODES.contains(code) && player.hasPermission("mychat.style." + code)) {
+                else if (STYLE_CODES.contains(code) && player.hasPermission("mychat." + place + ".style." + code)) {
                     letters[i++] = '§';
                     letters[i] = Character.toLowerCase(letters[i]);
                 }

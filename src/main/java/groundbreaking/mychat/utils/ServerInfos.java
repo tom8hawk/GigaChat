@@ -1,10 +1,8 @@
 package groundbreaking.mychat.utils;
 
+import groundbreaking.mychat.MyChat;
 import lombok.Getter;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
-
-import java.util.logging.Logger;
 
 public class ServerInfos {
 
@@ -20,22 +18,16 @@ public class ServerInfos {
     @Getter
     private final boolean isPaperOrFork = checkIsPaperOrFork();
 
-
-    private final Server server;
-    private final Logger logger;
-
-    public ServerInfos(Server server, Logger logger) {
-        this.server = server;
-        this.logger = logger;
-        subVersion = extractMainVersion();
+    public ServerInfos(MyChat plugin) {
+        subVersion = extractMainVersion(plugin);
         isAbove16 = subVersion >= 16;
     }
 
-    public int extractMainVersion() {
+    public int extractMainVersion(MyChat plugin) {
         try {
-            return Integer.parseInt(server.getMinecraftVersion().split("\\.", 3)[1]);
+            return Integer.parseInt(plugin.getServer().getMinecraftVersion().split("\\.", 3)[1]);
         } catch (NumberFormatException ex) {
-            logger.warning("\u001b[32mFailed to extract server version. Plugin may not work correctly!");
+            plugin.getLogger().warning("\u001b[32mFailed to extract server version. Plugin may not work correctly!");
             return 0;
         }
     }

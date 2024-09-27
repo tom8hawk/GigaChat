@@ -19,7 +19,7 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
 
     private final MyChat plugin;
     private final ConfigValues configValues;
-    private final IColorizer colorizer;
+    private final IColorizer colorizer, messagesColorizer;
     private final ConsoleCommandSender consoleSender;
 
     @Getter
@@ -27,8 +27,9 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
 
     public PrivateMessageCommandExecutor(MyChat plugin) {
         this.plugin = plugin;
-        this.configValues = plugin.getPluginConfig();
+        this.configValues = plugin.getConfigValues();
         this.colorizer = plugin.getColorizer();
+        this.messagesColorizer = plugin.getPrivateMessagesColorizer();
         this.consoleSender = plugin.getServer().getConsoleSender();
     }
 
@@ -81,13 +82,9 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         final String recipientPrefix = plugin.getChat().getPlayerPrefix(recipient);
         final String recipientSuffix = plugin.getChat().getPlayerSuffix(recipient);
 
-        final StringBuilder builder = new StringBuilder();
+        final String message = getMessage(sender, args);
 
-        for (int i = 0; i < args.length; i++) {
-            builder.append(" ").append(args[i]);
-        }
-
-        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, builder.toString().trim()};
+        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix, message};
 
         sender.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmSenderFormat(), placeholders, replacementList)));
         recipient.sendMessage(colorizer.colorize(Utils.replaceEach(configValues.getPmRecipientFormat(), placeholders, replacementList)));
@@ -107,6 +104,20 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         processSocialspy(replacementList);
 
         return true;
+    }
+
+    private String getMessage(CommandSender sender, String[] args) {
+        final StringBuilder builder = new StringBuilder();
+
+        for (int i = 0; i < args.length; i++) {
+            builder.append(" ").append(args[i]);
+        }
+
+        if (sender instanceof Player player) {
+            return Utils.colorizePrivateMessage(player, builder.toString().trim());
+        } else {
+            return messagesColorizer.colorize(builder.toString().trim());
+        }
     }
 
     private void processSocialspy(String[] replacementList) {

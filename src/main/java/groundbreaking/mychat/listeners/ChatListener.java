@@ -32,10 +32,10 @@ public class ChatListener implements Listener {
 
     public ChatListener(MyChat plugin) {
         this.plugin = plugin;
-        configValues = plugin.getPluginConfig();
-        colorizer = plugin.getColorizer();
-        localCooldowns = new ExpiringMap<>(configValues.getLocalCooldown(), TimeUnit.MILLISECONDS);
-        globalCooldowns = new ExpiringMap<>(configValues.getGlobalCooldown(), TimeUnit.MILLISECONDS);
+        this.configValues = plugin.getConfigValues();
+        this.colorizer = plugin.getColorizer();
+        this.localCooldowns = new ExpiringMap<>(configValues.getLocalCooldown(), TimeUnit.MILLISECONDS);
+        this.globalCooldowns = new ExpiringMap<>(configValues.getGlobalCooldown(), TimeUnit.MILLISECONDS);
     }
 
     private final String[] searchList = {"{player}", "{prefix}", "{suffix}", "{local-color}", "{global-color}"};
@@ -190,7 +190,7 @@ public class ChatListener implements Listener {
 
     public String getFormattedMessage(Player player, String message, String format, String[] replacementList) {
         final String formatted = colorizer.colorize(Utils.replacePlaceholders(player, Utils.replaceEach(format, searchList, replacementList)));
-        final String chatMessage = Utils.formatByPerm(player, message);
+        final String chatMessage = Utils.colorizeChatMessage(player, message);
         return formatted.replace("{message}", chatMessage).replace("%", "%%");
     }
 }

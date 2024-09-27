@@ -23,7 +23,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     private static final HashMap<String, List<String>> ignored = new HashMap<>();
 
     public IgnoreCommandExecutor(MyChat plugin) {
-        this.configValues = plugin.getPluginConfig();
+        this.configValues = plugin.getConfigValues();
     }
 
     @Override

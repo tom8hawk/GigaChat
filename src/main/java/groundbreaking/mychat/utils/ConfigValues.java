@@ -1,5 +1,6 @@
 package groundbreaking.mychat.utils;
 
+import groundbreaking.mychat.MyChat;
 import groundbreaking.mychat.utils.colorizer.IColorizer;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import lombok.Getter;
@@ -99,7 +100,12 @@ public class ConfigValues {
             pmSoundVolume,
             pmSoundPitch;
 
-    public void setupValues(IColorizer colorizer, FileConfiguration config, Logger logger) {
+    public void setupValues(MyChat plugin) {
+        final IColorizer colorizer = plugin.getColorizer();
+        final IColorizer minimessagesColorizer = plugin.getAutomessagesColorizer();
+        final FileConfiguration config = plugin.getConfig();
+        final Logger logger = plugin.getLogger();
+
         setupLocal(config, logger);
         setupGlobal(config, logger);
         setupLocalGroupsColors(config, logger);
@@ -107,7 +113,7 @@ public class ConfigValues {
         setupHover(config, logger);
         setupNewbieChat(colorizer, config, logger);
         setupNewbieCommands(colorizer, config, logger);
-        setupAutoMessage(colorizer, config, logger);
+        setupAutoMessage(minimessagesColorizer, config, logger);
         setupPrivateMessages(config, logger);
         setupMessages(colorizer, config, logger);
     }

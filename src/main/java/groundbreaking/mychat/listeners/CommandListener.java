@@ -13,7 +13,7 @@ public class CommandListener implements Listener {
     private final ConfigValues pluginConfig;
 
     public CommandListener(MyChat plugin) {
-        pluginConfig = plugin.getPluginConfig();
+        pluginConfig = plugin.getConfigValues();
     }
 
     @EventHandler(ignoreCancelled = true)
