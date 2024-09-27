@@ -46,22 +46,16 @@ public final class MyChat extends JavaPlugin {
 
         infos = new ServerInfos(this);
         if (!infos.isPaperOrFork()) {
-            getLogger().warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
-            getLogger().warning("\u001b[91mThe plugin author against using Bukkit, Spigot etc.!\u001b[0m");
-            getLogger().warning("\u001b[91mMove to Paper or his forks. To download Paper visit:\u001b[0m");
-            getLogger().warning("\u001b[91mhttps://papermc.io/downloads/all\u001b[0m");
-            getLogger().warning("\u001b[91m=======================================\u001b[0m");
+            logPaperWarning();
             Bukkit.getPluginManager().disablePlugin(this);
-
-            return;
         }
 
         saveDefaultConfig();
-        colorizer = getDefaultColorizer();
+        colorizer = getColorizer("messages.use-minimessage");
         configValues.setupValues(this);
 
-        Utils.setChatColorizer(getChatColorizer());
-        Utils.setChatColorizer(getPrivateMessagesColorizer());
+        Utils.setChatColorizer(getColorizer("use-minimessage-for-chats"));
+        Utils.setChatColorizer(getColorizer("privateMessages.use-minimessage"));
 
         final ServicesManager servicesManager = getServer().getServicesManager();
         setupChat(servicesManager);
@@ -81,6 +75,14 @@ public final class MyChat extends JavaPlugin {
     @Override
     public void onDisable() {
         getServer().getScheduler().cancelTasks(this);
+    }
+
+    private void logPaperWarning() {
+        getLogger().warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
+        getLogger().warning("\u001b[91mThe plugin author against using Bukkit, Spigot etc.!\u001b[0m");
+        getLogger().warning("\u001b[91mMove to Paper or his forks. To download Paper visit:\u001b[0m");
+        getLogger().warning("\u001b[91mhttps://papermc.io/downloads/all\u001b[0m");
+        getLogger().warning("\u001b[91m=======================================\u001b[0m");
     }
 
     private void registerEvents() {
@@ -118,19 +120,11 @@ public final class MyChat extends JavaPlugin {
         }
     }
 
-    public IColorizer getDefaultColorizer() {
-        return getConfig().getBoolean("messages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
-    }
-
-    public IColorizer getChatColorizer() {
-        return getConfig().getBoolean("use-minimessage-for-chats") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
-    }
-
-    public IColorizer getAutomessagesColorizer() {
-        return getConfig().getBoolean("autoMessage.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
-    }
-
-    public IColorizer getPrivateMessagesColorizer() {
-        return getConfig().getBoolean("privateMessages.use-minimessage") ? new MiniMessagesColorizer() : infos.isAbove16() ? new LegacyColorizer() : new VanilaColorizer();
+    public IColorizer getColorizer(String configPath) {
+        return getConfig().getBoolean(configPath)
+                ? new MiniMessagesColorizer()
+                : infos.isAbove16()
+                ? new LegacyColorizer()
+                : new VanilaColorizer();
     }
 }

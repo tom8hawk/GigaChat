@@ -29,7 +29,7 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
         this.plugin = plugin;
         this.configValues = plugin.getConfigValues();
         this.colorizer = plugin.getColorizer();
-        this.messagesColorizer = plugin.getPrivateMessagesColorizer();
+        this.messagesColorizer = plugin.getColorizer("privateMessages.use-minimessage");
         this.consoleSender = plugin.getServer().getConsoleSender();
     }
 
@@ -137,7 +137,7 @@ public class PrivateMessageCommandExecutor implements CommandExecutor, TabComple
             final List<String> players = new ArrayList<>();
             for (Player player : Bukkit.getOnlinePlayers()) {
                 final String playerName = player.getName();
-                if (input.startsWith(playerName)) {
+                if (playerName.startsWith(input)) {
                     players.add(playerName);
                 }
             }

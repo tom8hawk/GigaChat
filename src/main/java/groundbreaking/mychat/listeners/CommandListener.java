@@ -27,8 +27,8 @@ public class CommandListener implements Listener {
             return;
         }
 
-        final String[] message = e.getMessage().split(" ");
-        final String command = message[0];
+        final String[] params = e.getMessage().split(" ");
+        final String command = params[0];
 
         final long time = (System.currentTimeMillis() - player.getFirstPlayed()) / 1000;
         if (time <= pluginConfig.getNewbieCommandsCooldown()) {

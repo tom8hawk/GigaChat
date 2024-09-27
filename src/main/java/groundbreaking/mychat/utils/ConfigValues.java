@@ -102,7 +102,7 @@ public class ConfigValues {
 
     public void setupValues(MyChat plugin) {
         final IColorizer colorizer = plugin.getColorizer();
-        final IColorizer minimessagesColorizer = plugin.getAutomessagesColorizer();
+        final IColorizer minimessagesColorizer = plugin.getColorizer("autoMessage.use-minimessage");
         final FileConfiguration config = plugin.getConfig();
         final Logger logger = plugin.getLogger();
 

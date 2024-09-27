@@ -31,12 +31,12 @@ public class AutoMessages {
                 }
 
                 final List<String> autoMessages = getAutoMessage();
-                for (Player p : Bukkit.getOnlinePlayers()) {
-                    if (p.hasPermission("mychat.automessages")) {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (player.hasPermission("mychat.automessages")) {
                         continue;
                     }
                     for (int i = 0; i < autoMessages.size(); i++) {
-                        p.sendMessage(autoMessages.get(i));
+                        player.sendMessage(autoMessages.get(i));
                     }
                 }
             }

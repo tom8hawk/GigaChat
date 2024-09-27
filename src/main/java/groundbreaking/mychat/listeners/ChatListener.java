@@ -19,7 +19,9 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class ChatListener implements Listener {
@@ -63,6 +65,7 @@ public class ChatListener implements Listener {
         final String message = event.getMessage();
         final String globalMessage = removeGlobalPrefix(message);
 
+        String formattedMessage;
         if ((configValues.isForceGlobal() || startsWithExclamation(message)) && !globalMessage.isEmpty()) {
 
             if (hasCooldown(player, name, globalCooldowns)) {
@@ -71,14 +74,7 @@ public class ChatListener implements Listener {
                 event.setCancelled(true);
             }
 
-            final String formattedMessage = getFormattedMessage(player, globalMessage, configValues.getGlobalFormat(), replacementList);
-            if (configValues.isHoverTextEnable()) {
-                event.setCancelled(true);
-                sendHover(player, formattedMessage, new ArrayList<>(Bukkit.getOnlinePlayers()), replacementList);
-            }
-            else {
-                event.setFormat(formattedMessage);
-            }
+            formattedMessage = getFormattedMessage(player, globalMessage, configValues.getGlobalFormat(), replacementList);
         }
         else {
             if (hasCooldown(player, name, localCooldowns)) {
@@ -88,16 +84,18 @@ public class ChatListener implements Listener {
             }
 
             event.getRecipients().clear();
-            final List<Player> radiusInfo = getRadius(player);
+            final Set<Player> radiusInfo = getRadius(player);
             event.getRecipients().addAll(radiusInfo);
 
-            final String formattedMessage = getFormattedMessage(player, message, configValues.getLocalFormat(), replacementList);
-            if (configValues.isHoverTextEnable()) {
-                event.setCancelled(true);
-                sendHover(player, formattedMessage, radiusInfo, replacementList);
-            } else {
-                event.setFormat(formattedMessage);
-            }
+            formattedMessage = getFormattedMessage(player, message, configValues.getLocalFormat(), replacementList);
+        }
+
+        if (configValues.isHoverTextEnable()) {
+            event.setCancelled(true);
+            sendHover(player, formattedMessage, new ArrayList<>(Bukkit.getOnlinePlayers()), replacementList);
+        }
+        else {
+            event.setFormat(formattedMessage);
         }
     }
 
@@ -166,8 +164,8 @@ public class ChatListener implements Listener {
         Bukkit.getConsoleSender().sendMessage(formattedMessage);
     }
 
-    private List<Player> getRadius(Player player) {
-        final List<Player> playerList = new ArrayList<>();
+    private Set<Player> getRadius(Player player) {
+        final Set<Player> playerList = new HashSet<>();
         for (Player target : Bukkit.getOnlinePlayers()) {
             if (target.getWorld() == player.getWorld()) {
                 boolean dist = player.getLocation().distanceSquared(target.getLocation()) <= Math.pow(configValues.getChatRadius(), 2.0D);

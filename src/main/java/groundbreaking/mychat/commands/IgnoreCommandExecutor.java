@@ -85,8 +85,16 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
     @Override
     public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        if (args.length == 0) {
-            return null;
+        if (args.length == 1) {
+            final String input = args[0];
+            final List<String> players = new ArrayList<>();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                final String playerName = player.getName();
+                if (playerName.startsWith(input)) {
+                    players.add(playerName);
+                }
+            }
+            return players;
         }
 
         return Collections.emptyList();

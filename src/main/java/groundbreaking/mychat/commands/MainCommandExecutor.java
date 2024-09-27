@@ -30,11 +30,11 @@ public class MainCommandExecutor implements CommandExecutor {
         }
 
         plugin.reloadConfig();
-        plugin.getDefaultColorizer();
+        plugin.setColorizer(plugin.getColorizer("messages.use-minimessage"));
         configValues.setupValues(plugin);
 
-        Utils.setChatColorizer(plugin.getChatColorizer());
-        Utils.setChatColorizer(plugin.getPrivateMessagesColorizer());
+        Utils.setChatColorizer(plugin.getColorizer("use-minimessage-for-chats"));
+        Utils.setChatColorizer(plugin.getColorizer("privateMessages.use-minimessage"));
 
         Bukkit.getScheduler().cancelTasks(plugin);
         new AutoMessages(plugin).startMSG(plugin.getConfig());
