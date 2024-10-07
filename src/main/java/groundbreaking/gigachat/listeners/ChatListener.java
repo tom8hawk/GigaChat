@@ -2,6 +2,7 @@ package groundbreaking.gigachat.listeners;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.Cooldowns;
+import groundbreaking.gigachat.collections.DisabledChat;
 import groundbreaking.gigachat.collections.Ignore;
 import groundbreaking.gigachat.collections.LocalSpy;
 import groundbreaking.gigachat.commands.args.DisableServerChatArgument;
@@ -260,6 +261,10 @@ public final class ChatListener implements Listener {
         final Location location = player.getLocation();
         for (final Player target : Bukkit.getOnlinePlayers()) {
             if (Ignore.isIgnoredChat(target.getName(), player.getName())) {
+                continue;
+            }
+
+            if (DisabledChat.contains(target.getName())) {
                 continue;
             }
 
