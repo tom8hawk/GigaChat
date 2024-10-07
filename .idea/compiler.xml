@@ -7,9 +7,12 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="PromisedChat" />
-        <module name="MyChat" />
+        <module name="GigaChat" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="MyChat" target="17" />
+      <module name="PromisedChat" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>

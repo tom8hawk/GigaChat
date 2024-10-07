@@ -1,0 +1,69 @@
+# ░██████╗░██╗░██████╗░░█████╗░░█████╗░██╗░░██╗░█████╗░████████╗
+# ██╔════╝░██║██╔════╝░██╔══██╗██╔══██╗██║░░██║██╔══██╗╚══██╔══╝
+# ██║░░██╗░██║██║░░██╗░███████║██║░░╚═╝███████║███████║░░░██║░░░
+# ██║░░╚██╗██║██║░░╚██╗██╔══██║██║░░██╗██╔══██║██╔══██║░░░██║░░░
+# ╚██████╔╝██║╚██████╔╝██║░░██║╚█████╔╝██║░░██║██║░░██║░░░██║░░░
+# ░╚═════╝░╚═╝░╚═════╝░╚═╝░░╚═╝░╚════╝░╚═╝░░╚═╝╚═╝░░╚═╝░░░╚═╝░░░
+#
+# Основные настройки
+settings:
+  # Стоит ли отправлять логи личных сообщений в консоль?
+  print-to-console: true
+
+  # Нужно ли использовать формат цветов <color></color> для форматов
+  use-minimessage-for-formats: false
+
+  # Звук, который проиграется получателю личного сообщения (Формат: звук;громкость;высота (громкость и высота - необязательны))
+  # Оставь "disabled", чтобы отключить
+  sound: block_brewing_stand_brew;1.0;1.0
+
+  # Не трогать.
+  config-version: 1.0
+
+# Настройки для команды на отправку приватных сообщений
+private-message-command:
+  # Право на использование: "gigachat.command.pm"
+  command: "pm"
+  aliases:
+    - "msg"
+    - "m"
+    - "w"
+  # Право для обхода - "gigachat.bypass.cooldown.pm"
+  cooldown: 2000
+
+# Настройки для команды на ответ на приватное сообщение
+# (Использует задержку из "private-message-command")
+reply-command:
+  # Право на использование: "gigachat.command.reply"
+  command: "reply"
+  aliases:
+    - "r"
+
+# Настройки для игнорирования игроков
+ignore-command:
+  # Право на использование: "gigachat.command.ignore"
+  command: "ignore"
+  aliases: []
+  # Право для обхода - "gigachat.bypass.cooldown.ignore"
+  cooldown: 15000
+
+# Настройки для прослушивания приватных сообщений
+socialspy-command:
+  # Право на использование: "gigachat.command.socialspy"
+  command: "socialspy"
+  aliases:
+    - "spy"
+  # Право для обхода - "gigachat.bypass.cooldown.socialspy"
+  cooldown: 30000
+
+formats:
+  # Сообщение, которое увидит игрок использовавший /msg <ник>
+  sender-format: "&d[ЛС] &f[&dя &f-> {to-prefix}{to-name}&f] &r{message}"
+  # Сообщение, которое увидит получивший игрок
+  recipient-format: "&d[ЛС] &f[{from-prefix}{from-name} &f-> &dмне&f] &r{message}"
+
+  # Сообщение, которое увидит игрок прослушивающий сообщения (Написавший /socialspy)
+  socialspy-format: "&6* &f[&r{from-prefix}{from-name}{from-suffix} &f-> &r{to-prefix}{to-name}{to-suffix}&f] &r{message}"
+
+  # Сообщение, которое отправится в консоль ("settings.print-to-console" должно быть включено, для этого)
+  console-format: "&f[&r{from-prefix}{from-name}{from-suffix} &f-> &r{to-prefix}{to-name}{to-suffix}&f] &r{message}"
