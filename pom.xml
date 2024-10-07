@@ -99,6 +99,7 @@
             <groupId>net.kyori</groupId>
             <artifactId>adventure-text-logger-slf4j</artifactId>
             <version>4.17.0</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.essentialsx</groupId>
