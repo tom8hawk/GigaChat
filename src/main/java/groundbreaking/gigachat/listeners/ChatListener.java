@@ -17,6 +17,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -255,13 +256,15 @@ public final class ChatListener implements Listener {
 
     private List<Player> getRadius(final Player player) {
         final List<Player> playerList = new ArrayList<>();
+        final double maxDist = Math.pow(chatValues.getLocalDistance(), 2.0D);
+        final Location location = player.getLocation();
         for (final Player target : Bukkit.getOnlinePlayers()) {
             if (Ignore.isIgnoredChat(target.getName(), player.getName())) {
                 continue;
             }
 
             if (target.getWorld() == player.getWorld()) {
-                final boolean distance = player.getLocation().distanceSquared(target.getLocation()) <= Math.pow(chatValues.getLocalDistance(), 2.0D);
+                final boolean distance = location.distanceSquared(target.getLocation()) <= maxDist;
                 if (distance) {
                     playerList.add(target);
                 }
