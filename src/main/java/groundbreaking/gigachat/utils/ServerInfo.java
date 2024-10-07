@@ -12,12 +12,12 @@ public final class ServerInfo {
     @Getter
     private final boolean isPaperOrFork = checkIsPaperOrFork();
 
-    public boolean is16OrAbove(final GigaChat plugin) {
+    public int getSubVersion(final GigaChat plugin) {
         try {
-            return Integer.parseInt(plugin.getServer().getMinecraftVersion().split("\\.", 3)[1]) >= 16;
+            return Integer.parseInt(plugin.getServer().getMinecraftVersion().split("\\.", 3)[1]);
         } catch (NumberFormatException ex) {
             plugin.getLogger().warning("\u001b[32mFailed to extract server version. Plugin may not work correctly!");
-            return false;
+            return 0;
         }
     }
 

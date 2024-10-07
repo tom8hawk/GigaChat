@@ -72,16 +72,16 @@ public final class NewbieChatValues {
             setupSound(settings);
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"settings\" from file \"newbie-chat.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"newbie-chat.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
     private void setupSound(final ConfigurationSection settings) {
         final String soundString = settings.getString("deny-sound");
         if (soundString == null) {
-            plugin.getLogger().warning("Failed to load sound on path \"settings.deny-sound\" from file \"newbie-chat.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load sound on path \"settings.deny-sound\" from file \"newbie-chat.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             isDenySoundEnabled = false;
         } else if (soundString.equalsIgnoreCase("disabled")) {
             isDenySoundEnabled = false;

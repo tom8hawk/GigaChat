@@ -63,8 +63,8 @@ public final class PrivateMessagesValues {
             formatsColorizer = plugin.getColorizer(config, "settings.use-minimessage-for-formats");
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"settings\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
@@ -79,8 +79,8 @@ public final class PrivateMessagesValues {
             }
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"private-message-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"private-message-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
 
         final ConfigurationSection replyCommand = config.getConfigurationSection("reply-command");
@@ -92,8 +92,8 @@ public final class PrivateMessagesValues {
             }
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"reply-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"reply-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
 
         final ConfigurationSection ignoreCommand = config.getConfigurationSection("ignore-command");
@@ -107,8 +107,8 @@ public final class PrivateMessagesValues {
             }
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"ignore-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"ignore-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
 
         final ConfigurationSection spyCommand = config.getConfigurationSection("socialspy-command");
@@ -121,8 +121,8 @@ public final class PrivateMessagesValues {
             }
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"socialspy-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"socialspy-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
 
         commandsRegistered = true;
@@ -137,16 +137,16 @@ public final class PrivateMessagesValues {
             consoleFormat = formats.getString("console-format");
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"formats\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"formats\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
     private void setupSound(final ConfigurationSection settings) {
         final String soundString = settings.getString("sound");
         if (soundString == null) {
-            plugin.getLogger().warning("Failed to load sound on path \"settings.deny-sound\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load sound on path \"settings.deny-sound\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             isSoundEnabled = false;
         }
         else if (soundString.equalsIgnoreCase("disabled")) {

@@ -18,6 +18,9 @@ import groundbreaking.gigachat.utils.colorizer.LegacyColorizer;
 import groundbreaking.gigachat.utils.colorizer.MiniMessagesColorizer;
 import groundbreaking.gigachat.utils.colorizer.VanillaColorize;
 import groundbreaking.gigachat.utils.config.values.*;
+import groundbreaking.gigachat.utils.logging.BukkitLogger;
+import groundbreaking.gigachat.utils.logging.ILogger;
+import groundbreaking.gigachat.utils.logging.PaperLogger;
 import groundbreaking.gigachat.utils.vanish.*;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
@@ -29,14 +32,15 @@ import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Locale;
+import java.util.logging.Logger;
 
 @Getter
 public final class GigaChat extends JavaPlugin {
@@ -46,8 +50,6 @@ public final class GigaChat extends JavaPlugin {
     private Permission perms;
 
     private boolean is16OrAbove;
-
-    private BukkitTask task;
 
     private AutoMessages autoMessages;
 
@@ -65,21 +67,26 @@ public final class GigaChat extends JavaPlugin {
 
     private IVanishChecker vanishChecker;
 
+    private ILogger myLogger;
+
     @Override
     public void onEnable() {
         final long startTime = System.currentTimeMillis();
 
         final ServerInfo serverInfo = new ServerInfo();
-        is16OrAbove = serverInfo.is16OrAbove(this);
+        final int subVersion = serverInfo.getSubVersion(this);
+        is16OrAbove = subVersion >= 16;
         if (!serverInfo.isPaperOrFork()) {
             logPaperWarning();
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
+        setupLogger(subVersion);
+
         saveDefaultConfig();
         setVanishChecker();
-        loadClasses(); //4
-        setupAll(); // 5
+        loadClasses();
+        setupAll();
 
         new DatabaseHandler(this).createConnection();
         DatabaseQueries.createTables();
@@ -91,26 +98,40 @@ public final class GigaChat extends JavaPlugin {
         setupChat(servicesManager);
         setupPerms(servicesManager);
 
-        registerEvents(); // 8
+        registerEvents();
         registerCommands();
         registerBroadcastCommand();
 
+        logLoggerType();
+
         final long endTime = System.currentTimeMillis();
-        getLogger().info("Plugin successfully started in " + (endTime - startTime) + "ms.");
+        this.getMyLogger().info("Plugin successfully started in " + (endTime - startTime) + "ms.");
     }
 
     @Override
     public void onDisable() {
-        task.cancel();
         new DatabaseHandler(this).closeConnection();
     }
 
     private void logPaperWarning() {
-        getLogger().warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
-        getLogger().warning("\u001b[91mThe plugin dev is against using Bukkit, Spigot etc.!\u001b[0m");
-        getLogger().warning("\u001b[91mSwitch to Paper or its fork. To download Paper visit:\u001b[0m");
-        getLogger().warning("\u001b[91mhttps://papermc.io/downloads/all\u001b[0m");
-        getLogger().warning("\u001b[91m=======================================\u001b[0m");
+        final Logger logger = getLogger();
+        logger.warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
+        logger.warning("\u001b[91mThe plugin dev is against using Bukkit, Spigot etc.!\u001b[0m");
+        logger.warning("\u001b[91mSwitch to Paper or its fork. To download Paper visit:\u001b[0m");
+        logger.warning("\u001b[91mhttps://papermc.io/downloads/all\u001b[0m");
+        logger.warning("\u001b[91m=======================================\u001b[0m");
+    }
+
+    private void logLoggerType() {
+        if (myLogger instanceof PaperLogger) {
+            myLogger.info("Plugin will use new ComponentLogger for logging.");
+        } else if (myLogger instanceof BukkitLogger) {
+            myLogger.info("Plugin will use default old BukkitLogger for logging. Because your server version is under 19!");
+        }
+    }
+
+    private void setupLogger(final int subVersion) {
+        myLogger = subVersion >= 19 ? new PaperLogger(this) : new BukkitLogger(this);
     }
 
     private void setupChat(final ServicesManager servicesManager) {
@@ -158,7 +179,7 @@ public final class GigaChat extends JavaPlugin {
             pluginCommand.setTabCompleter(tabCompleter);
             commandMap.register(getDescription().getName(), pluginCommand);
         } catch (Exception ex) {
-            getLogger().info("Unable to register" + command + " command! " + ex);
+            this.getMyLogger().info("Unable to register" + command + " command! " + ex);
             getServer().getPluginManager().disablePlugin(this);
         }
     }
@@ -187,10 +208,11 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void registerEvents() {
-        getServer().getPluginManager().registerEvents(new ChatListener(this), this);
-        getServer().getPluginManager().registerEvents(new NewbieChatListener(this), this);
-        getServer().getPluginManager().registerEvents(new CommandListener(this), this);
-        getServer().getPluginManager().registerEvents(new DisconnectListener(this), this);
+        final PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new ChatListener(this), this);
+        pluginManager.registerEvents(new NewbieChatListener(this), this);
+        pluginManager.registerEvents(new CommandListener(this), this);
+        pluginManager.registerEvents(new DisconnectListener(this), this);
     }
 
     private void registerCommands() { // todo
@@ -216,29 +238,30 @@ public final class GigaChat extends JavaPlugin {
 
     public void setVanishChecker() {
         final String checker = getConfig().getString("vanish-provider", "SUPER_VANISH").toUpperCase(Locale.ENGLISH);
+        final PluginManager pluginManager = getServer().getPluginManager();
         switch (checker) {
             case "SUPER_VANISH":
-                if (getServer().getPluginManager().getPlugin("SuperVanish") != null) {
-                    getLogger().warning("SuperVanish will be used as vanish provider.");
+                if (pluginManager.getPlugin("SuperVanish") != null) {
+                    this.getMyLogger().warning("SuperVanish will be used as vanish provider.");
                     vanishChecker = new SuperVanishChecker();
                     break;
                 }
             case "ESSENTIALS":
-                final Plugin essentials = getServer().getPluginManager().getPlugin("Essentials");
+                final Plugin essentials = pluginManager.getPlugin("Essentials");
                 if (essentials != null) {
-                    getLogger().warning("Essentials will be used as vanish provider.");
+                    this.getMyLogger().warning("Essentials will be used as vanish provider.");
                     vanishChecker = new EssentialsChecker(essentials);
                     break;
                 }
             case "CMI":
-                if (getServer().getPluginManager().getPlugin("CMI") != null) {
-                    getLogger().warning("CMI will be used as vanish provider.");
+                if (pluginManager.getPlugin("CMI") != null) {
+                    this.getMyLogger().warning("CMI will be used as vanish provider.");
                     vanishChecker = new CMIChecker();
                     break;
                 }
             default:
-                getLogger().warning("No vanish provider were found! Plugin will not check if the player is vanished.");
-                getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                this.getMyLogger().warning("No vanish provider were found! Plugin will not check if the player is vanished.");
+                this.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
                 vanishChecker = new NoChecker();
         }
     }

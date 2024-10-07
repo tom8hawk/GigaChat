@@ -44,8 +44,8 @@ public class BroadcastValues {
             setupHover(broadcast);
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"broadcast\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"broadcast\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
@@ -58,8 +58,8 @@ public class BroadcastValues {
             hoverText = hover.getString("text");
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"broadcast.hover\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"broadcast.hover\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 }

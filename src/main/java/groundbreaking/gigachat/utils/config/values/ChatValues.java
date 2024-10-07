@@ -83,8 +83,8 @@ public final class ChatValues {
             formatsColorizer = plugin.getColorizer(config, "settings.use-minimessage-for-formats");
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"settings\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
@@ -107,13 +107,13 @@ public final class ChatValues {
                 }
             }
             else {
-                plugin.getLogger().warning("Failed to load section \"local.groups-colors\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-                plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                plugin.getMyLogger().warning("Failed to load section \"local.groups-colors\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+                plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             }
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"local\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"local\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
@@ -132,13 +132,13 @@ public final class ChatValues {
                 }
             }
             else {
-                plugin.getLogger().warning("Failed to load section \"local.groups-colors\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-                plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                plugin.getMyLogger().warning("Failed to load section \"local.groups-colors\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+                plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             }
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"global\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"global\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
@@ -151,8 +151,8 @@ public final class ChatValues {
             hoverText = hover.getString("text");
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
@@ -165,8 +165,8 @@ public final class ChatValues {
             adminHoverText = hover.getString("text");
         }
         else {
-            plugin.getLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getMyLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
 
