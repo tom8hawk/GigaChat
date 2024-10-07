@@ -43,7 +43,7 @@ public final class ConfigLoader {
                 config.setDefaults(YamlConfiguration.loadConfiguration(new InputStreamReader(defConfigStream, Charsets.UTF_8)));
             }
         } catch (IOException e) {
-            plugin.getMyLogger().severe("Error loading default configuration: " + e.getMessage());
+            plugin.getMyLogger().warning("Error loading default configuration: " + e.getMessage());
         }
     }
 
