@@ -1,4 +1,4 @@
-package groundbreaking.gigachat.commands.privateMessages;
+package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.DisabledChat;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 
-public class DisableOwnChatExecutor implements CommandExecutor, TabCompleter {
+public final class DisableOwnChatExecutor implements CommandExecutor, TabCompleter {
 
     private final Messages messages;
 
@@ -30,16 +30,10 @@ public class DisableOwnChatExecutor implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (args.length != 0) {
-            playerSender.sendMessage(messages.getIgnoreUsageError());
-            return true;
-        }
-
         return processDisable(playerSender);
     }
 
     private boolean processDisable(final Player sender) {
-
         final String name = sender.getName();
         if (DisabledChat.contains(name)) {
             sender.sendMessage(messages.getOwnChatDisabled());

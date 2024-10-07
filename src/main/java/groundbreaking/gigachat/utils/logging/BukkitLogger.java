@@ -4,7 +4,7 @@ import groundbreaking.gigachat.GigaChat;
 
 import java.util.logging.Logger;
 
-public class BukkitLogger implements ILogger {
+public final class BukkitLogger implements ILogger {
 
     private final Logger logger;
 

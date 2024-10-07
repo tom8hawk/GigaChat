@@ -9,7 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-public class NewbieChatListener implements Listener {
+public final class NewbieChatListener implements Listener {
 
     private final GigaChat plugin;
     private final NewbieChatValues newbieValues;

@@ -3,7 +3,7 @@ package groundbreaking.gigachat.utils.chatsColorizer;
 import groundbreaking.gigachat.GigaChat;
 import org.bukkit.entity.Player;
 
-public class BroadcastColorizer extends AbstractColorizer {
+public final class BroadcastColorizer extends AbstractColorizer {
 
     public BroadcastColorizer(final GigaChat plugin) {
         super(plugin);

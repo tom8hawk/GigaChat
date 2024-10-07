@@ -6,6 +6,7 @@ import groundbreaking.gigachat.collections.DisabledPrivateMessages;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.commands.args.*;
 import groundbreaking.gigachat.commands.other.BroadcastCommand;
+import groundbreaking.gigachat.commands.other.DisableOwnChatExecutor;
 import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.listeners.ChatListener;
@@ -131,7 +132,9 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void setupLogger(final int subVersion) {
-        myLogger = subVersion >= 19 ? new PaperLogger(this) : new BukkitLogger(this);
+        myLogger = subVersion >= 19
+                ? new PaperLogger(this)
+                : new BukkitLogger(this);
     }
 
     private void setupChat(final ServicesManager servicesManager) {
@@ -218,6 +221,11 @@ public final class GigaChat extends JavaPlugin {
     private void registerCommands() { // todo
         final MainCommandHandler mainCommandHandler = new MainCommandHandler(this);
         getCommand("gigachat").setExecutor(mainCommandHandler);
+
+        final DisableOwnChatExecutor disableOwnChat = new DisableOwnChatExecutor(this);
+        final String disableOwnChatCommand = getConfig().getString("disable-own-chat.command");
+        final List<String> disableOwnChatAliases = getConfig().getStringList("disable-own-chat.aliases");
+        registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
 
         final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
         final DisableServerChatArgument disableServerChat = new DisableServerChatArgument(this, "disablechat", "gigachat.command.disablechat");

@@ -33,3 +33,7 @@ broadcast:
     click-value: '/m {player} '
     # Само сообщение которое будет показываться при наведении
     text: " &fНаписать &e{player} "
+
+disable-own-chat:
+  command: "disablechat"
+  aliases: []

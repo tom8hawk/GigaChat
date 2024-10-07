@@ -7,7 +7,7 @@ import groundbreaking.gigachat.utils.colorizer.IColorizer;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
-public class BroadcastValues {
+public final class BroadcastValues {
 
     private final GigaChat plugin;
 

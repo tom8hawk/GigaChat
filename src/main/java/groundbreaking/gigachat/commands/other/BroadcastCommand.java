@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class BroadcastCommand implements CommandExecutor, TabCompleter {
+public final class BroadcastCommand implements CommandExecutor, TabCompleter {
 
     private final GigaChat plugin;
     private final BroadcastValues broadcastValues;

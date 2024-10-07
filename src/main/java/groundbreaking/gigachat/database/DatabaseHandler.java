@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-public class DatabaseHandler {
+public final class DatabaseHandler {
 
     private final GigaChat plugin;
 
