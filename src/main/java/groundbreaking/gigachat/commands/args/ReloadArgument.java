@@ -24,10 +24,10 @@ public final class ReloadArgument extends ArgsConstructor {
         final long startTime = System.currentTimeMillis();
 
         plugin.reloadConfig();
-        plugin.setVanishChecker();
+        plugin.setupVanishChecker();
         plugin.setupAll();
         plugin.getCooldowns().setCooldowns();
-        plugin.runAutoMessagesTask();
+        plugin.getAutoMessages().run();
 
         long endTime = System.currentTimeMillis();
         if (sender instanceof Player) {

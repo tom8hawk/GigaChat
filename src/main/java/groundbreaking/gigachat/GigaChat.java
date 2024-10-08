@@ -17,7 +17,7 @@ import groundbreaking.gigachat.utils.ServerInfo;
 import groundbreaking.gigachat.utils.colorizer.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.LegacyColorizer;
 import groundbreaking.gigachat.utils.colorizer.MiniMessagesColorizer;
-import groundbreaking.gigachat.utils.colorizer.VanillaColorize;
+import groundbreaking.gigachat.utils.colorizer.VanillaColorizer;
 import groundbreaking.gigachat.utils.config.values.*;
 import groundbreaking.gigachat.utils.logging.BukkitLogger;
 import groundbreaking.gigachat.utils.logging.ILogger;
@@ -50,8 +50,6 @@ public final class GigaChat extends JavaPlugin {
 
     private Permission perms;
 
-    private boolean is16OrAbove;
-
     private AutoMessages autoMessages;
 
     private AutoMessagesValues autoMessagesValues;
@@ -75,17 +73,16 @@ public final class GigaChat extends JavaPlugin {
         final long startTime = System.currentTimeMillis();
 
         final ServerInfo serverInfo = new ServerInfo();
-        final int subVersion = serverInfo.getSubVersion(this);
-        is16OrAbove = subVersion >= 16;
         if (!serverInfo.isPaperOrFork()) {
             logPaperWarning();
             Bukkit.getPluginManager().disablePlugin(this);
         }
 
+        final int subVersion = serverInfo.getSubVersion(this);
         setupLogger(subVersion);
 
         saveDefaultConfig();
-        setVanishChecker();
+        setupVanishChecker();
         loadClasses();
         setupAll();
 
@@ -93,7 +90,7 @@ public final class GigaChat extends JavaPlugin {
         DatabaseQueries.createTables();
 
         autoMessages = new AutoMessages(this);
-        runAutoMessagesTask();
+        autoMessages.run();
 
         final ServicesManager servicesManager = getServer().getServicesManager();
         setupChat(servicesManager);
@@ -106,7 +103,7 @@ public final class GigaChat extends JavaPlugin {
         logLoggerType();
 
         final long endTime = System.currentTimeMillis();
-        this.getMyLogger().info("Plugin successfully started in " + (endTime - startTime) + "ms.");
+        getMyLogger().info("Plugin successfully started in " + (endTime - startTime) + "ms.");
     }
 
     @Override
@@ -151,42 +148,6 @@ public final class GigaChat extends JavaPlugin {
         }
     }
 
-    public IColorizer getColorizer(final FileConfiguration config, final String configPath) {
-        return config.getBoolean(configPath)
-                ? new MiniMessagesColorizer()
-                : getColorizerByVersion();
-    }
-
-    public IColorizer getColorizerByVersion() {
-        return is16OrAbove
-                ? new LegacyColorizer()
-                : new VanillaColorize();
-    }
-
-    private void registerBroadcastCommand() {
-        final String command = getConfig().getString("broadcast.command");
-        final List<String> aliases = getConfig().getStringList("broadcast.aliases");
-        final BroadcastCommand broadcast = new BroadcastCommand(this);
-
-        registerCommand(command, aliases, broadcast, broadcast);
-    }
-
-    public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
-        try {
-            CommandMap commandMap = getServer().getCommandMap();
-            Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-            constructor.setAccessible(true);
-            PluginCommand pluginCommand = constructor.newInstance(command, this);
-            pluginCommand.setAliases(aliases);
-            pluginCommand.setExecutor(commandExecutor);
-            pluginCommand.setTabCompleter(tabCompleter);
-            commandMap.register(getDescription().getName(), pluginCommand);
-        } catch (Exception ex) {
-            this.getMyLogger().info("Unable to register" + command + " command! " + ex);
-            getServer().getPluginManager().disablePlugin(this);
-        }
-    }
-
     private void loadClasses() {
         messages = new Messages(this);
         autoMessagesValues = new AutoMessagesValues(this);
@@ -210,41 +171,7 @@ public final class GigaChat extends JavaPlugin {
         cooldowns.setCooldowns();
     }
 
-    private void registerEvents() {
-        final PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new ChatListener(this), this);
-        pluginManager.registerEvents(new NewbieChatListener(this), this);
-        pluginManager.registerEvents(new CommandListener(this), this);
-        pluginManager.registerEvents(new DisconnectListener(this), this);
-    }
-
-    private void registerCommands() { // todo
-        final MainCommandHandler mainCommandHandler = new MainCommandHandler(this);
-        getCommand("gigachat").setExecutor(mainCommandHandler);
-
-        final DisableOwnChatExecutor disableOwnChat = new DisableOwnChatExecutor(this);
-        final String disableOwnChatCommand = getConfig().getString("disable-own-chat.command");
-        final List<String> disableOwnChatAliases = getConfig().getStringList("disable-own-chat.aliases");
-        registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
-
-        final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
-        final DisableServerChatArgument disableServerChat = new DisableServerChatArgument(this, "disablechat", "gigachat.command.disablechat");
-        final LocalSpyArgument localSpy = new LocalSpyArgument(this, "localspy", "gigachat.command.localspy");
-        final ReloadArgument reload = new ReloadArgument(this, "reload", "gigachat.command.reload");
-        final SetPmSoundArgument pmSoundSetter = new SetPmSoundArgument(this, "setpmsound", "gigachat.command.setpmsound");
-
-        mainCommandHandler.registerArgument(clearChat);
-        mainCommandHandler.registerArgument(disableServerChat);
-        mainCommandHandler.registerArgument(localSpy);
-        mainCommandHandler.registerArgument(reload);
-        mainCommandHandler.registerArgument(pmSoundSetter);
-    }
-
-    public void runAutoMessagesTask() {
-        autoMessages.run();
-    }
-
-    public void setVanishChecker() {
+    public void setupVanishChecker() {
         final String checker = getConfig().getString("vanish-provider", "SUPER_VANISH").toUpperCase(Locale.ENGLISH);
         final PluginManager pluginManager = getServer().getPluginManager();
         switch (checker) {
@@ -272,5 +199,73 @@ public final class GigaChat extends JavaPlugin {
                 this.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
                 vanishChecker = new NoChecker();
         }
+    }
+
+    private void registerEvents() {
+        final PluginManager pluginManager = getServer().getPluginManager();
+        pluginManager.registerEvents(new ChatListener(this), this);
+        pluginManager.registerEvents(new NewbieChatListener(this), this);
+        pluginManager.registerEvents(new CommandListener(this), this);
+        pluginManager.registerEvents(new DisconnectListener(this), this);
+    }
+
+    private void registerCommands() {
+        final MainCommandHandler mainCommandHandler = new MainCommandHandler(this);
+        getCommand("gigachat").setExecutor(mainCommandHandler);
+
+        final DisableOwnChatExecutor disableOwnChat = new DisableOwnChatExecutor(this);
+        final String disableOwnChatCommand = getConfig().getString("disable-own-chat.command");
+        final List<String> disableOwnChatAliases = getConfig().getStringList("disable-own-chat.aliases");
+        registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
+
+        final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
+        final DisableServerChatArgument disableServerChat = new DisableServerChatArgument(this, "disablechat", "gigachat.command.disablechat");
+        final LocalSpyArgument localSpy = new LocalSpyArgument(this, "localspy", "gigachat.command.localspy");
+        final ReloadArgument reload = new ReloadArgument(this, "reload", "gigachat.command.reload");
+        final SetPmSoundArgument pmSoundSetter = new SetPmSoundArgument(this, "setpmsound", "gigachat.command.setpmsound");
+
+        mainCommandHandler.registerArgument(clearChat);
+        mainCommandHandler.registerArgument(disableServerChat);
+        mainCommandHandler.registerArgument(localSpy);
+        mainCommandHandler.registerArgument(reload);
+        mainCommandHandler.registerArgument(pmSoundSetter);
+    }
+
+    private void registerBroadcastCommand() {
+        final String command = getConfig().getString("broadcast.command");
+        final List<String> aliases = getConfig().getStringList("broadcast.aliases");
+        final BroadcastCommand broadcast = new BroadcastCommand(this);
+
+        registerCommand(command, aliases, broadcast, broadcast);
+    }
+
+    public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
+        try {
+            CommandMap commandMap = getServer().getCommandMap();
+            Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            constructor.setAccessible(true);
+            PluginCommand pluginCommand = constructor.newInstance(command, this);
+            pluginCommand.setAliases(aliases);
+            pluginCommand.setExecutor(commandExecutor);
+            pluginCommand.setTabCompleter(tabCompleter);
+            commandMap.register(getDescription().getName(), pluginCommand);
+        } catch (Exception ex) {
+            this.getMyLogger().info("Unable to register" + command + " command! " + ex);
+            getServer().getPluginManager().disablePlugin(this);
+        }
+    }
+
+    public IColorizer getColorizer(final FileConfiguration config, final String configPath) {
+        return config.getBoolean(configPath)
+                ? new MiniMessagesColorizer()
+                : getColorizerByVersion();
+    }
+
+    public IColorizer getColorizerByVersion() {
+        final ServerInfo serverInfo = new ServerInfo();
+        final boolean is16OrAbove = serverInfo.getSubVersion(this) >= 16;
+        return is16OrAbove
+                ? new LegacyColorizer()
+                : new VanillaColorizer();
     }
 }

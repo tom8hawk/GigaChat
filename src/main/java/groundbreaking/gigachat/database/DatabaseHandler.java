@@ -1,6 +1,7 @@
 package groundbreaking.gigachat.database;
 
 import groundbreaking.gigachat.GigaChat;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.io.File;
@@ -13,7 +14,7 @@ public final class DatabaseHandler {
 
     private final GigaChat plugin;
 
-    @Getter
+    @Getter(AccessLevel.PACKAGE)
     private static Connection connection;
 
     public DatabaseHandler(final GigaChat plugin) {

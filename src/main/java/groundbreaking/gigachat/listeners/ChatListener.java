@@ -9,7 +9,6 @@ import groundbreaking.gigachat.commands.args.DisableServerChatArgument;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
-import groundbreaking.gigachat.utils.config.values.NewbieChatValues;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -32,7 +31,6 @@ public final class ChatListener implements Listener {
 
     private final GigaChat plugin;
     private final ChatValues chatValues;
-    private final NewbieChatValues newbieValues;
     private final Messages messages;
     private final Cooldowns cooldowns;
 
@@ -41,7 +39,6 @@ public final class ChatListener implements Listener {
     public ChatListener(final GigaChat plugin) {
         this.plugin = plugin;
         this.chatValues = plugin.getChatValues();
-        this.newbieValues = plugin.getNewbieChat();
         this.messages = plugin.getMessages();
         this.cooldowns = plugin.getCooldowns();
     }

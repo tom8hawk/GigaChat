@@ -2,12 +2,8 @@ package groundbreaking.gigachat.utils;
 
 import groundbreaking.gigachat.GigaChat;
 import lombok.Getter;
-import org.bukkit.Bukkit;
 
 public final class ServerInfo {
-
-    @Getter
-    private final boolean isPapiExist = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 
     @Getter
     private final boolean isPaperOrFork = checkIsPaperOrFork();
