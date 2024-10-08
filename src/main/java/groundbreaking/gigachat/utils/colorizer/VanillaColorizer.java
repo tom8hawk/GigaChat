@@ -1,6 +1,6 @@
 package groundbreaking.gigachat.utils.colorizer;
 
-public final class VanillaColorize implements IColorizer {
+public final class VanillaColorizer implements IColorizer {
 
     @Override
     public String colorize(final String message) {
