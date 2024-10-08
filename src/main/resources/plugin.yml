@@ -6,6 +6,9 @@ depend: [ PlaceholderAPI, Vault, LuckPerms ]
 softdepend: [ Essentials, CMI, SuperVanish ]
 authors: [ Groundbreaking, OverwriteMC ]
 
+libraries:
+  - com.github.ben-manes.caffeine:caffeine:3.1.8
+
 commands:
   gigachat:
     aliases: [ "gc", "gchat" ]
