@@ -65,7 +65,7 @@ Plugin was made by [OverwriteMC](https://github.com/Overwrite987) and forked by 
 - gigachat.command.clearchat - allows to use "/gchat clearchat" command
 - gigachat.command.localspy - allows to use "/gchat localspy" command
 - gigachat.command.broadcast - allows to use "/broadcast <message>" command
-- gigachat.automessages
+- gigachat.automessages - disables receiving auto-messages
 
 
 ## Permissions for colors/styles usage in chat
