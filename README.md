@@ -56,6 +56,7 @@ Plugin was made by [OverwriteMC](https://github.com/Overwrite987) and forked by 
 - gigachat.bypass.commandsnewbie - allows to white in the chat bypassing the newbie commands check
 - gigachat.bypass.clearchat - allows to save chat history on "/gchat clearchat" command usage
 - gigachat.bypass.disabledchat - allows to write in the chat bypassing disabled chat
+- gigachat.bypass.ignore.private - allows to write in the pm bypassing ignore
 - gigachat.command.ignore.chat - allows to use "/ignore chat <player>" command
 - gigachat.command.ignore.private - allows to use "/ignore private <player>" command
 - gigachat.command.socialspy - allows to use "/socialspy" command

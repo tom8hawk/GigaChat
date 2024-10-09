@@ -50,6 +50,9 @@ permissions:
   gigachat.bypass.disabledchat:
     default: op
 
+  gigachat.bypass.ignore.private:
+    default: op
+
   gigachat.command.pm:
     default: op
 
