@@ -63,6 +63,7 @@ Plugin was made by [OverwriteMC](https://github.com/Overwrite987) and forked by 
 - gigachat.command.reply - allows to use "/reply <message>" command
 - gigachat.command.setpmsound - allows to use "/gchat setpmsound <player> <sound/disable>" command
 - gigachat.command.disablechat - allows to use "/gchat disablechat" command
+- gigachat.command.disableownchat - allows to use "/disablechat" command
 - gigachat.command.clearchat - allows to use "/gchat clearchat" command
 - gigachat.command.localspy - allows to use "/gchat localspy" command
 - gigachat.command.broadcast - allows to use "/broadcast <message>" command

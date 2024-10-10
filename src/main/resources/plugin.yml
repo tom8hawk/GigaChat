@@ -74,6 +74,9 @@ permissions:
   gigachat.command.disablechat:
     default: op
 
+  gigachat.command.disableownchat:
+    default: op
+
   gigachat.command.clearchat:
     default: op
 
