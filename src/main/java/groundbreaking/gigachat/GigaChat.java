@@ -150,8 +150,11 @@ public final class GigaChat extends JavaPlugin {
         this.messages = new Messages(this);
         this.autoMessagesValues = new AutoMessagesValues(this);
         this.broadcastValues = new BroadcastValues(this);
-        this.chatValues = new ChatValues(this);
-        this.newbieChat = new NewbieChatValues(this);
+        final PluginManager pluginManager = super.getServer().getPluginManager();
+        if (pluginManager.getPlugin("NewbieGuard") == null) {
+            this.chatValues = new ChatValues(this);
+            this.newbieChat = new NewbieChatValues(this);
+        }
         this.pmValues = new PrivateMessagesValues(this);
         this.newbieCommands = new NewbieCommandsValues(this);
         this.cooldowns = new Cooldowns(this);
@@ -162,8 +165,11 @@ public final class GigaChat extends JavaPlugin {
         messages.setupMessages();
         autoMessagesValues.setValues();
         broadcastValues.setValues();
-        chatValues.setValues();
-        newbieChat.setValues();
+        final PluginManager pluginManager = super.getServer().getPluginManager();
+        if (pluginManager.getPlugin("NewbieGuard") == null) {
+            chatValues.setValues();
+            newbieChat.setValues();
+        }
         pmValues.setValues();
         newbieCommands.setValues();
         cooldowns.setCooldowns();
@@ -202,8 +208,12 @@ public final class GigaChat extends JavaPlugin {
     private void registerEvents() {
         final PluginManager pluginManager = getServer().getPluginManager();
         pluginManager.registerEvents(new ChatListener(this), this);
-        pluginManager.registerEvents(new NewbieChatListener(this), this);
-        pluginManager.registerEvents(new CommandListener(this), this);
+        if (pluginManager.getPlugin("NewbieGuard") == null) {
+            pluginManager.registerEvents(new NewbieChatListener(this), this);
+            pluginManager.registerEvents(new CommandListener(this), this);
+        } else {
+            this.myLogger.warning("Newbie protections will be disabled because NewbieGuard is detected.");
+        }
         pluginManager.registerEvents(new DisconnectListener(this), this);
     }
 
