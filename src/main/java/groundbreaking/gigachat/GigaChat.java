@@ -14,10 +14,10 @@ import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
 import groundbreaking.gigachat.listeners.NewbieChatListener;
 import groundbreaking.gigachat.utils.ServerInfo;
-import groundbreaking.gigachat.utils.colorizer.IColorizer;
-import groundbreaking.gigachat.utils.colorizer.LegacyColorizer;
-import groundbreaking.gigachat.utils.colorizer.MiniMessagesColorizer;
-import groundbreaking.gigachat.utils.colorizer.VanillaColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.LegacyColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.MiniMessagesColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.VanillaColorizer;
 import groundbreaking.gigachat.utils.config.values.*;
 import groundbreaking.gigachat.utils.logging.BukkitLogger;
 import groundbreaking.gigachat.utils.logging.ILogger;
@@ -74,17 +74,18 @@ public final class GigaChat extends JavaPlugin {
 
         final ServerInfo serverInfo = new ServerInfo();
         if (!serverInfo.isPaperOrFork()) {
-            logPaperWarning();
+            this.logPaperWarning();
             Bukkit.getPluginManager().disablePlugin(this);
+            return;
         }
 
         final int subVersion = serverInfo.getSubVersion(this);
-        setupLogger(subVersion);
+        this.setupLogger(subVersion);
 
-        saveDefaultConfig();
-        setupVanishChecker();
-        loadClasses();
-        setupAll();
+        super.saveDefaultConfig();
+        this.setupVanishChecker();
+        this.loadClasses();
+        this.setupAll();
 
         new DatabaseHandler(this).createConnection();
         DatabaseQueries.createTables();
@@ -92,18 +93,18 @@ public final class GigaChat extends JavaPlugin {
         autoMessages = new AutoMessages(this);
         autoMessages.run();
 
-        final ServicesManager servicesManager = getServer().getServicesManager();
-        setupChat(servicesManager);
-        setupPerms(servicesManager);
+        final ServicesManager servicesManager = super.getServer().getServicesManager();
+        this.setupChat(servicesManager);
+        this.setupPerms(servicesManager);
 
-        registerEvents();
-        registerCommands();
-        registerBroadcastCommand();
+        this.registerEvents();
+        this.registerCommands();
+        this.registerBroadcastCommand();
 
-        logLoggerType();
+        this.logLoggerType();
 
         final long endTime = System.currentTimeMillis();
-        getMyLogger().info("Plugin successfully started in " + (endTime - startTime) + "ms.");
+        this.myLogger.info("Plugin successfully started in " + (endTime - startTime) + "ms.");
     }
 
     @Override
@@ -112,7 +113,7 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void logPaperWarning() {
-        final Logger logger = getLogger();
+        final Logger logger = super.getLogger();
         logger.warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
         logger.warning("\u001b[91mThe plugin dev is against using Bukkit, Spigot etc.!\u001b[0m");
         logger.warning("\u001b[91mSwitch to Paper or its fork. To download Paper visit:\u001b[0m");
@@ -121,15 +122,15 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void logLoggerType() {
-        if (myLogger instanceof PaperLogger) {
-            myLogger.info("Plugin will use new ComponentLogger for logging.");
-        } else if (myLogger instanceof BukkitLogger) {
-            myLogger.info("Plugin will use default old BukkitLogger for logging. Because your server version is under 19!");
+        if (this.myLogger instanceof PaperLogger) {
+            this.myLogger.info("Plugin will use new ComponentLogger for logging.");
+        } else if (this.myLogger instanceof BukkitLogger) {
+            this.myLogger.info("Plugin will use default old BukkitLogger for logging. Because your server version is under 19!");
         }
     }
 
     private void setupLogger(final int subVersion) {
-        myLogger = subVersion >= 19
+        this.myLogger = subVersion >= 19
                 ? new PaperLogger(this)
                 : new BukkitLogger(this);
     }
@@ -137,27 +138,27 @@ public final class GigaChat extends JavaPlugin {
     private void setupChat(final ServicesManager servicesManager) {
         final RegisteredServiceProvider<Chat> chatProvider = servicesManager.getRegistration(Chat.class);
         if (chatProvider != null) {
-            chat = chatProvider.getProvider();
+            this.chat = chatProvider.getProvider();
         }
     }
 
     private void setupPerms(final ServicesManager servicesManager) {
         final RegisteredServiceProvider<Permission> permissionProvider = servicesManager.getRegistration(Permission.class);
         if (permissionProvider != null) {
-            perms = permissionProvider.getProvider();
+            this.perms = permissionProvider.getProvider();
         }
     }
 
     private void loadClasses() {
-        messages = new Messages(this);
-        autoMessagesValues = new AutoMessagesValues(this);
-        broadcastValues = new BroadcastValues(this);
-        chatValues = new ChatValues(this);
-        newbieChat = new NewbieChatValues(this);
-        pmValues = new PrivateMessagesValues(this);
-        newbieCommands = new NewbieCommandsValues(this);
-        cooldowns = new Cooldowns(this);
-        disabled = new DisabledPrivateMessages();
+        this.messages = new Messages(this);
+        this.autoMessagesValues = new AutoMessagesValues(this);
+        this.broadcastValues = new BroadcastValues(this);
+        this.chatValues = new ChatValues(this);
+        this.newbieChat = new NewbieChatValues(this);
+        this.pmValues = new PrivateMessagesValues(this);
+        this.newbieCommands = new NewbieCommandsValues(this);
+        this.cooldowns = new Cooldowns(this);
+        this.disabled = new DisabledPrivateMessages();
     }
 
     public void setupAll() {
@@ -172,32 +173,32 @@ public final class GigaChat extends JavaPlugin {
     }
 
     public void setupVanishChecker() {
-        final String checker = getConfig().getString("vanish-provider", "SUPER_VANISH").toUpperCase(Locale.ENGLISH);
-        final PluginManager pluginManager = getServer().getPluginManager();
+        final String checker = super.getConfig().getString("vanish-provider", "SUPER_VANISH").toUpperCase(Locale.ENGLISH);
+        final PluginManager pluginManager = super.getServer().getPluginManager();
         switch (checker) {
             case "SUPER_VANISH":
                 if (pluginManager.getPlugin("SuperVanish") != null) {
-                    this.getMyLogger().warning("SuperVanish will be used as vanish provider.");
-                    vanishChecker = new SuperVanishChecker();
+                    this.myLogger.warning("SuperVanish will be used as vanish provider.");
+                    this.vanishChecker = new SuperVanishChecker();
                     break;
                 }
             case "ESSENTIALS":
                 final Plugin essentials = pluginManager.getPlugin("Essentials");
                 if (essentials != null) {
-                    this.getMyLogger().warning("Essentials will be used as vanish provider.");
-                    vanishChecker = new EssentialsChecker(essentials);
+                    this.myLogger.warning("Essentials will be used as vanish provider.");
+                    this.vanishChecker = new EssentialsChecker(essentials);
                     break;
                 }
             case "CMI":
                 if (pluginManager.getPlugin("CMI") != null) {
-                    this.getMyLogger().warning("CMI will be used as vanish provider.");
-                    vanishChecker = new CMIChecker();
+                    this.myLogger.warning("CMI will be used as vanish provider.");
+                    this.vanishChecker = new CMIChecker();
                     break;
                 }
             default:
-                this.getMyLogger().warning("No vanish provider were found! Plugin will not check if the player is vanished.");
-                this.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-                vanishChecker = new NoChecker();
+                this.myLogger.warning("No vanish provider were found! Plugin will not check if the player is vanished.");
+                this.myLogger.warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                this.vanishChecker = new NoChecker();
         }
     }
 
@@ -232,8 +233,8 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void registerBroadcastCommand() {
-        final String command = getConfig().getString("broadcast.command");
-        final List<String> aliases = getConfig().getStringList("broadcast.aliases");
+        final String command = super.getConfig().getString("broadcast.command");
+        final List<String> aliases = super.getConfig().getStringList("broadcast.aliases");
         final BroadcastCommand broadcast = new BroadcastCommand(this);
 
         registerCommand(command, aliases, broadcast, broadcast);
@@ -241,7 +242,7 @@ public final class GigaChat extends JavaPlugin {
 
     public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
         try {
-            CommandMap commandMap = getServer().getCommandMap();
+            CommandMap commandMap = super.getServer().getCommandMap();
             Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             constructor.setAccessible(true);
             PluginCommand pluginCommand = constructor.newInstance(command, this);
@@ -250,15 +251,15 @@ public final class GigaChat extends JavaPlugin {
             pluginCommand.setTabCompleter(tabCompleter);
             commandMap.register(getDescription().getName(), pluginCommand);
         } catch (Exception ex) {
-            this.getMyLogger().info("Unable to register" + command + " command! " + ex);
-            getServer().getPluginManager().disablePlugin(this);
+            this.myLogger.info("Unable to register" + command + " command! " + ex);
+            super.getServer().getPluginManager().disablePlugin(this);
         }
     }
 
     public IColorizer getColorizer(final FileConfiguration config, final String configPath) {
         return config.getBoolean(configPath)
                 ? new MiniMessagesColorizer()
-                : getColorizerByVersion();
+                : this.getColorizerByVersion();
     }
 
     public IColorizer getColorizerByVersion() {

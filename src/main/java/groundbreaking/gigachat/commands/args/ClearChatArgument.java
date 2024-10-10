@@ -16,7 +16,7 @@ public final class ClearChatArgument extends ArgsConstructor {
     public ClearChatArgument(final GigaChat plugin, String name, String permission) {
         super(name, permission);
         this.messages = plugin.getMessages();
-        clearMessage = "\n ".repeat(100);
+        this.clearMessage = "\n ".repeat(100);
     }
 
     // todo проверить player != sender если отправитель игрок, ибо не факт, что жаба сама умеет кастовать
@@ -25,14 +25,14 @@ public final class ClearChatArgument extends ArgsConstructor {
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
             if (!player.hasPermission("gigachat.bypass.clearchat")) {
-                player.sendMessage(clearMessage);
+                player.sendMessage(this.clearMessage);
             }
             if (player != sender) {
-                player.sendMessage(messages.getChatHasBeenClearedByAdministrator());
+                player.sendMessage(this.messages.getChatHasBeenClearedByAdministrator());
             }
         }
 
-        sender.sendMessage(messages.getChatHasBeenClearedByAdministrator());
+        sender.sendMessage(this.messages.getChatHasBeenClearedByAdministrator());
         return true;
     }
 }
