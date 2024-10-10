@@ -15,15 +15,22 @@ vanish-provider: ESSENTIALS
 broadcast:
   command: "broadcast"
   aliases: [ "bc", "notify" ]
+
   # Поддерживаемые плейсхолдеры:
   # {prefix} {player} {suffix} {message}
   format: |-
     &7[&eОБЪЯВЛЕНИЕ&7] &f{message}
     &fОт: &6{player}
+
   # Указывать в миллисекундах
   cooldown: 30000
-  # Использовать ли формат <color></color>, для форматирования сообщения? (Не влияет на {message}!)
-  use-minimessages: false
+
+  # Форматирование текста.
+  # LEGACY - цвет через & и hex &#
+  # LEGACY_ADVANCED - улучшенный аналог legacy с поддержкой &## формата hex (&##123 = &#112233)
+  # MINIMESSAGE - цвет через <цвет></цвет> (был добавлен в новых версиях (1.17+))
+  serializer: LEGACY
+
   hover:
     # Включение модуля
     enable: false

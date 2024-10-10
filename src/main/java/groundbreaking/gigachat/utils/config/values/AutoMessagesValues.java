@@ -37,7 +37,7 @@ public final class AutoMessagesValues {
 
     public void setValues() {
         final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("auto-messages", 1.0);
-        final IColorizer colorizer = this.plugin.getColorizer(config, "settings.use-minimessage");
+        final IColorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
 
         this.setupSettings(config);
         this.setupAutoMessages(config, colorizer);

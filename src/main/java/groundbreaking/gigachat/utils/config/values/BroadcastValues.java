@@ -37,7 +37,7 @@ public final class BroadcastValues {
     public void setValues() {
         final ConfigurationSection broadcast = plugin.getConfig().getConfigurationSection("broadcast");
         if (broadcast != null) {
-            this.colorizer = plugin.getColorizer(plugin.getConfig(), "broadcast.use-minimessages");
+            this.colorizer = plugin.getColorizer(plugin.getConfig(), "broadcast.serializer");
             this.format = colorizer.colorize(broadcast.getString("format"));
             this.cooldown = broadcast.getInt("cooldown");
 

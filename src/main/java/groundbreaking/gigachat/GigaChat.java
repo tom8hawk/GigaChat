@@ -14,10 +14,7 @@ import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
 import groundbreaking.gigachat.listeners.NewbieChatListener;
 import groundbreaking.gigachat.utils.ServerInfo;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
-import groundbreaking.gigachat.utils.colorizer.basic.LegacyColorizer;
-import groundbreaking.gigachat.utils.colorizer.basic.MiniMessagesColorizer;
-import groundbreaking.gigachat.utils.colorizer.basic.VanillaColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.*;
 import groundbreaking.gigachat.utils.config.values.*;
 import groundbreaking.gigachat.utils.logging.BukkitLogger;
 import groundbreaking.gigachat.utils.logging.ILogger;
@@ -257,9 +254,14 @@ public final class GigaChat extends JavaPlugin {
     }
 
     public IColorizer getColorizer(final FileConfiguration config, final String configPath) {
-        return config.getBoolean(configPath)
-                ? new MiniMessagesColorizer()
-                : this.getColorizerByVersion();
+        final String colorizerMode = config.getString(configPath).toUpperCase();
+
+        return switch (colorizerMode) {
+            case "MINIMESSAGE" -> new MiniMessageColorizer();
+            case "LEGACY" -> new LegacyColorizer();
+            case "LEGACY_ADVANCED" -> new LegacyAdvancedColorizer();
+            default -> new VanillaColorizer();
+        };
     }
 
     public IColorizer getColorizerByVersion() {

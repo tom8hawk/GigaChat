@@ -60,7 +60,7 @@ public final class PrivateMessagesValues {
 
             this.setupSound(settings);
 
-            this.formatsColorizer = plugin.getColorizer(config, "settings.use-minimessage-for-formats");
+            this.formatsColorizer = plugin.getColorizer(config, "settings.serializer-for-formats");
         }
         else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
