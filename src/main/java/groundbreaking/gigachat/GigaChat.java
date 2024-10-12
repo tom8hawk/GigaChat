@@ -213,17 +213,22 @@ public final class GigaChat extends JavaPlugin {
 
     private void registerEvents() {
         final PluginManager pluginManager = super.getServer().getPluginManager();
+        pluginManager.registerEvents(new DisconnectListener(this), this);
+        this.registerReloadableEvents();
+    }
+
+    public void registerReloadableEvents() {
         this.chatListener.unregisterEvent();
         this.chatListener.registerEvent();
         this.commandListener.unregisterEvent();
         this.newbieChatListener.unregisterEvent();
+        final PluginManager pluginManager = super.getServer().getPluginManager();
         if (pluginManager.getPlugin("NewbieGuard") == null) {
             this.commandListener.registerEvent();
             this.newbieChatListener.registerEvent();
         } else {
             this.myLogger.warning("Newbie protections will be disabled because NewbieGuard is detected.");
         }
-        pluginManager.registerEvents(new DisconnectListener(this), this);
     }
 
     private void registerCommands() {
