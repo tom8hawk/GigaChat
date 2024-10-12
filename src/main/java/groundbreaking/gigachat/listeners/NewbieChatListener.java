@@ -19,7 +19,7 @@ public final class NewbieChatListener implements Listener {
 
     public NewbieChatListener(final GigaChat plugin) {
         this.plugin = plugin;
-        this.newbieValues = plugin.getNewbieChat();
+        this.newbieValues = plugin.getNewbieChatValues();
     }
 
     @EventHandler

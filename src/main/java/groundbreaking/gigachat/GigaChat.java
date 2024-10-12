@@ -55,8 +55,8 @@ public final class GigaChat extends JavaPlugin {
     private BroadcastValues broadcastValues;
     private ChatValues chatValues;
     private Messages messages;
-    private NewbieChatValues newbieChat;
-    private NewbieCommandsValues newbieCommands;
+    private NewbieChatValues newbieChatValues;
+    private NewbieCommandsValues newbieCommandsValues;
     private PrivateMessagesValues pmValues;
 
     private Cooldowns cooldowns;
@@ -93,8 +93,7 @@ public final class GigaChat extends JavaPlugin {
         new DatabaseHandler(this).createConnection();
         DatabaseQueries.createTables();
 
-        autoMessages = new AutoMessages(this);
-        autoMessages.run();
+        this.autoMessages.run();
 
         final ServicesManager servicesManager = super.getServer().getServicesManager();
         this.setupChat(servicesManager);
@@ -157,28 +156,29 @@ public final class GigaChat extends JavaPlugin {
         this.autoMessagesValues = new AutoMessagesValues(this);
         this.broadcastValues = new BroadcastValues(this);
         this.chatValues = new ChatValues(this);
-        this.newbieChat = new NewbieChatValues(this);
+        this.newbieChatValues = new NewbieChatValues(this);
         this.pmValues = new PrivateMessagesValues(this);
-        this.newbieCommands = new NewbieCommandsValues(this);
+        this.newbieCommandsValues = new NewbieCommandsValues(this);
         this.cooldowns = new Cooldowns(this);
         this.disabled = new DisabledPrivateMessages();
         this.chatListener = new ChatListener(this);
         this.commandListener = new CommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
+        this.autoMessages = new AutoMessages(this);
     }
 
     public void setupAll() {
-        messages.setupMessages();
-        autoMessagesValues.setValues();
-        broadcastValues.setValues();
+        this.messages.setupMessages();
+        this.autoMessagesValues.setValues();
+        this.broadcastValues.setValues();
         final PluginManager pluginManager = super.getServer().getPluginManager();
         if (pluginManager.getPlugin("NewbieGuard") == null) {
-            chatValues.setValues();
-            newbieChat.setValues();
+            this.chatValues.setValues();
+            this.newbieChatValues.setValues();
         }
-        pmValues.setValues();
-        newbieCommands.setValues();
-        cooldowns.setCooldowns();
+        this.pmValues.setValues();
+        this.newbieCommandsValues.setValues();
+        this.cooldowns.setCooldowns();
     }
 
     public void setupVanishChecker() {
@@ -212,7 +212,7 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void registerEvents() {
-        final PluginManager pluginManager = getServer().getPluginManager();
+        final PluginManager pluginManager = super.getServer().getPluginManager();
         this.chatListener.unregisterEvent();
         this.chatListener.registerEvent();
         this.commandListener.unregisterEvent();
@@ -228,12 +228,13 @@ public final class GigaChat extends JavaPlugin {
 
     private void registerCommands() {
         final MainCommandHandler mainCommandHandler = new MainCommandHandler(this);
-        getCommand("gigachat").setExecutor(mainCommandHandler);
+        super.getCommand("gigachat").setExecutor(mainCommandHandler);
 
+        final String disableOwnChatCommand = super.getConfig().getString("disable-own-chat.command");
+        final List<String> disableOwnChatAliases = super.getConfig().getStringList("disable-own-chat.aliases");
         final DisableOwnChatExecutor disableOwnChat = new DisableOwnChatExecutor(this);
-        final String disableOwnChatCommand = getConfig().getString("disable-own-chat.command");
-        final List<String> disableOwnChatAliases = getConfig().getStringList("disable-own-chat.aliases");
-        registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
+
+        this.registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
 
         final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
         final DisableServerChatArgument disableServerChat = new DisableServerChatArgument(this, "disablechat", "gigachat.command.disablechat");
@@ -258,16 +259,16 @@ public final class GigaChat extends JavaPlugin {
 
     public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
         try {
-            CommandMap commandMap = super.getServer().getCommandMap();
-            Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+            final CommandMap commandMap = super.getServer().getCommandMap();
+            final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             constructor.setAccessible(true);
-            PluginCommand pluginCommand = constructor.newInstance(command, this);
+            final PluginCommand pluginCommand = constructor.newInstance(command, this);
             pluginCommand.setAliases(aliases);
             pluginCommand.setExecutor(commandExecutor);
             pluginCommand.setTabCompleter(tabCompleter);
-            commandMap.register(getDescription().getName(), pluginCommand);
-        } catch (Exception ex) {
-            this.myLogger.info("Unable to register" + command + " command! " + ex);
+            commandMap.register(super.getDescription().getName(), pluginCommand);
+        } catch (final Exception ex) {
+            this.myLogger.warning("Unable to register" + command + " command! " + ex);
             super.getServer().getPluginManager().disablePlugin(this);
         }
     }

@@ -19,7 +19,7 @@ public final class CommandListener implements Listener {
 
     public CommandListener(final GigaChat plugin) {
         this.plugin = plugin;
-        this.newbieValues = plugin.getNewbieCommands();
+        this.newbieValues = plugin.getNewbieCommandsValues();
     }
 
     @EventHandler
