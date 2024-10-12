@@ -9,6 +9,7 @@ import groundbreaking.gigachat.commands.other.BroadcastCommand;
 import groundbreaking.gigachat.commands.other.DisableOwnChatExecutor;
 import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
+import groundbreaking.gigachat.exceptions.UnsupportedPrioritySpecified;
 import groundbreaking.gigachat.listeners.ChatListener;
 import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
@@ -29,6 +30,7 @@ import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -64,6 +66,10 @@ public final class GigaChat extends JavaPlugin {
     private IVanishChecker vanishChecker;
 
     private ILogger myLogger;
+
+    private ChatListener chatListener;
+    private CommandListener commandListener;
+    private NewbieChatListener newbieChatListener;
 
     @Override
     public void onEnable() {
@@ -150,15 +156,15 @@ public final class GigaChat extends JavaPlugin {
         this.messages = new Messages(this);
         this.autoMessagesValues = new AutoMessagesValues(this);
         this.broadcastValues = new BroadcastValues(this);
-        final PluginManager pluginManager = super.getServer().getPluginManager();
-        if (pluginManager.getPlugin("NewbieGuard") == null) {
-            this.chatValues = new ChatValues(this);
-            this.newbieChat = new NewbieChatValues(this);
-        }
+        this.chatValues = new ChatValues(this);
+        this.newbieChat = new NewbieChatValues(this);
         this.pmValues = new PrivateMessagesValues(this);
         this.newbieCommands = new NewbieCommandsValues(this);
         this.cooldowns = new Cooldowns(this);
         this.disabled = new DisabledPrivateMessages();
+        this.chatListener = new ChatListener(this);
+        this.commandListener = new CommandListener(this);
+        this.newbieChatListener = new NewbieChatListener(this);
     }
 
     public void setupAll() {
@@ -207,10 +213,13 @@ public final class GigaChat extends JavaPlugin {
 
     private void registerEvents() {
         final PluginManager pluginManager = getServer().getPluginManager();
-        pluginManager.registerEvents(new ChatListener(this), this);
+        this.chatListener.unregisterEvent();
+        this.chatListener.registerEvent();
+        this.commandListener.unregisterEvent();
+        this.newbieChatListener.unregisterEvent();
         if (pluginManager.getPlugin("NewbieGuard") == null) {
-            pluginManager.registerEvents(new NewbieChatListener(this), this);
-            pluginManager.registerEvents(new CommandListener(this), this);
+            this.commandListener.registerEvent();
+            this.newbieChatListener.registerEvent();
         } else {
             this.myLogger.warning("Newbie protections will be disabled because NewbieGuard is detected.");
         }
@@ -280,5 +289,20 @@ public final class GigaChat extends JavaPlugin {
         return is16OrAbove
                 ? new LegacyColorizer()
                 : new VanillaColorizer();
+    }
+
+    public EventPriority getEventPriority(final String priority, final String fileName) {
+        return switch (priority) {
+            case "LOWEST" -> EventPriority.LOWEST;
+            case "LOW" -> EventPriority.LOW;
+            case "NORMAL" -> EventPriority.NORMAL;
+            case "HIGH" -> EventPriority.HIGH;
+            case "HIGHEST" -> EventPriority.HIGHEST;
+            default -> {
+                this.myLogger.warning("Failed to parse value from \"settings.listener-priority\" from file \"" + fileName + "\". Please check your configuration file, or delete it and restart your server!");
+                this.myLogger.warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                throw new UnsupportedPrioritySpecified("Failed to get event priority, please check your configuration files!");
+            }
+        };
     }
 }

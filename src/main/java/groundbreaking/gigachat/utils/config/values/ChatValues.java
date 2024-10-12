@@ -45,12 +45,7 @@ public final class ChatValues {
             globalGroupsColors = new HashMap<>();
 
     @Getter
-    private boolean
-            isListenerPriorityLowest,
-            isListenerPriorityLow,
-            isListenerPriorityNormal,
-            isListenerPriorityHigh,
-            isListenerPriorityHighest;
+    private String priority;
 
     @Getter
     private IColorizer formatsColorizer;
@@ -84,9 +79,7 @@ public final class ChatValues {
     private void setupSettings(final FileConfiguration config) {
         final ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings != null) {
-            final String priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
-            this.setupPriority(priority);
-
+            this.priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
             this.formatsColorizer = plugin.getColorizer(config, "settings.serializer-for-formats");
         }
         else {
@@ -176,46 +169,6 @@ public final class ChatValues {
         else {
             this.plugin.getMyLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-        }
-    }
-
-    private void setupPriority(final String priority) { // todo remake for unregistration of events
-        switch (priority) {
-            case "LOWEST" -> {
-                isListenerPriorityLowest = true;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = false;
-            }
-            case "LOW" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = true;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = false;
-            }
-            case "NORMAL" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = true;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = false;
-            }
-            case "HIGH" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = true;
-                isListenerPriorityHighest = false;
-            }
-            case "HIGHEST" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = true;
-            }
         }
     }
 }

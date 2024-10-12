@@ -1,14 +1,13 @@
 package groundbreaking.gigachat.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.NewbieCommandsValues;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 public final class CommandListener implements Listener {
@@ -16,44 +15,42 @@ public final class CommandListener implements Listener {
     private final GigaChat plugin;
     private final NewbieCommandsValues newbieValues;
 
+    private boolean isRegistered = false;
+
     public CommandListener(final GigaChat plugin) {
         this.plugin = plugin;
         this.newbieValues = plugin.getNewbieCommands();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onCommandUseLowest(final PlayerCommandPreprocessEvent event) {
-        if (this.newbieValues.isListenerPriorityLowest()) {
-            this.processEvent(event);
-        }
+    @EventHandler
+    public void onCommandUse(final PlayerCommandPreprocessEvent event) {
+        this.processEvent(event);
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onCommandUseLow(final PlayerCommandPreprocessEvent event) {
-        if (this.newbieValues.isListenerPriorityLow()) {
-            this.processEvent(event);
+    public void registerEvent() {
+        if (this.isRegistered || !this.newbieValues.isEnabled()) {
+            return;
         }
+
+        final Class<? extends Event> eventClass = PlayerJumpEvent.class;
+        final EventPriority eventPriority = this.plugin.getEventPriority(this.newbieValues.getPriority(), "newbie-commands.yml");
+
+        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority, (listener, event) -> {
+            if (event instanceof PlayerCommandPreprocessEvent commandPreprocessEvent) {
+                this.onCommandUse(commandPreprocessEvent);
+            }
+        }, this.plugin);
+
+        this.isRegistered = true;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onCommandUseNormal(final PlayerCommandPreprocessEvent event) {
-        if (this.newbieValues.isListenerPriorityNormal()) {
-            this.processEvent(event);
+    public void unregisterEvent() {
+        if (!this.isRegistered) {
+            return;
         }
-    }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onCommandUseHigh(final PlayerCommandPreprocessEvent event) {
-        if (this.newbieValues.isListenerPriorityHigh()) {
-            this.processEvent(event);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onCommandUseHighest(final PlayerCommandPreprocessEvent event) {
-        if (this.newbieValues.isListenerPriorityHighest()) {
-            this.processEvent(event);
-        }
+        HandlerList.unregisterAll(this);
+        this.isRegistered = false;
     }
 
     private void processEvent(final PlayerCommandPreprocessEvent event) {

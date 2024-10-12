@@ -1,14 +1,13 @@
 package groundbreaking.gigachat.listeners;
 
+import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.NewbieChatValues;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
+import org.bukkit.event.*;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public final class NewbieChatListener implements Listener {
@@ -16,44 +15,46 @@ public final class NewbieChatListener implements Listener {
     private final GigaChat plugin;
     private final NewbieChatValues newbieValues;
 
+    private boolean isRegistered = false;
+
     public NewbieChatListener(final GigaChat plugin) {
         this.plugin = plugin;
         this.newbieValues = plugin.getNewbieChat();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onMessageSendLowest(final AsyncPlayerChatEvent event) {
-        if (this.newbieValues.isListenerPriorityLowest()) {
-            processEvent(event);
-        }
+    @EventHandler
+    public void onMessageSend(final AsyncPlayerChatEvent event) {
+        processEvent(event);
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onMessageSendLow(final AsyncPlayerChatEvent event) {
-        if (this.newbieValues.isListenerPriorityLow()) {
-            this.processEvent(event);
+    public boolean registerEvent() {
+        if (this.isRegistered || !this.newbieValues.isEnabled()) {
+            return false;
         }
+
+        final Class<? extends Event> eventClass = PlayerJumpEvent.class;
+        final EventPriority eventPriority = this.plugin.getEventPriority(this.newbieValues.getPriority(), "newbie-chat.yml");
+
+        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority, (listener, event) -> {
+            if (event instanceof AsyncPlayerChatEvent chatEvent) {
+                this.onMessageSend(chatEvent);
+            }
+        }, this.plugin);
+
+        this.isRegistered = true;
+
+        return true;
     }
 
-    @EventHandler(priority = EventPriority.NORMAL)
-    public void onMessageSendNormal(final AsyncPlayerChatEvent event) {
-        if (this.newbieValues.isListenerPriorityNormal()) {
-            this.processEvent(event);
+    public boolean unregisterEvent() {
+        if (!this.isRegistered) {
+            return false;
         }
-    }
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onMessageSendHigh(final AsyncPlayerChatEvent event) {
-        if (this.newbieValues.isListenerPriorityHigh()) {
-            this.processEvent(event);
-        }
-    }
+        HandlerList.unregisterAll(this);
+        this.isRegistered = false;
 
-    @EventHandler(priority = EventPriority.HIGHEST)
-    public void onMessageSendHighest(final AsyncPlayerChatEvent event) {
-        if (this.newbieValues.isListenerPriorityHighest()) {
-            this.processEvent(event);
-        }
+        return true;
     }
 
     private void processEvent(final AsyncPlayerChatEvent event) {

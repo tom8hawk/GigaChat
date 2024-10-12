@@ -23,12 +23,8 @@ public final class NewbieCommandsValues {
     private boolean isEnabled;
 
     @Getter
-    private boolean
-            isListenerPriorityLowest,
-            isListenerPriorityLow,
-            isListenerPriorityNormal,
-            isListenerPriorityHigh,
-            isListenerPriorityHighest;
+    private String priority;
+
     @Getter
     private ICounter counter;
 
@@ -68,10 +64,7 @@ public final class NewbieCommandsValues {
         final ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings != null) {
             this.isEnabled = settings.getBoolean("enable");
-            final String priority = settings.getString("listener-priority").toLowerCase(Locale.ENGLISH);
-
-            this.setupPriority(priority);
-
+            this.priority = settings.getString("listener-priority").toLowerCase(Locale.ENGLISH);
             this.counter = settings.getBoolean("count-time-from-first-join") ? new FirstEntryCounter() : new OnlineTimeCounter();
             this.requiredTime = settings.getInt("required-time");
             this.isGiveBypassPermissionEnabled = settings.getBoolean("if-reached.give-permission");
@@ -103,46 +96,6 @@ public final class NewbieCommandsValues {
             this.denySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
             this.denySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
             this.denySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
-        }
-    }
-
-    private void setupPriority(final String priority) { // todo remake for unregistration of events
-        switch (priority) {
-            case "LOWEST" -> {
-                isListenerPriorityLowest = true;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = false;
-            }
-            case "LOW" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = true;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = false;
-            }
-            case "NORMAL" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = true;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = false;
-            }
-            case "HIGH" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = true;
-                isListenerPriorityHighest = false;
-            }
-            case "HIGHEST" -> {
-                isListenerPriorityLowest = false;
-                isListenerPriorityLow = false;
-                isListenerPriorityNormal = false;
-                isListenerPriorityHigh = false;
-                isListenerPriorityHighest = true;
-            }
         }
     }
 }
