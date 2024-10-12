@@ -5,6 +5,7 @@ import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.ChatColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -13,50 +14,40 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+@Getter
 public final class ChatValues {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    @Getter
     private String localFormat, localSpyFormat, globalFormat;
 
-    @Getter
     private int localDistance;
 
-    @Getter
     private int localCooldown, globalCooldown;
 
-    @Getter
     private char globalSymbol;
 
-    @Getter
     private boolean
             noOneHearEnabled,
             noOneHearHideHidden,
             noOneHearHideVanished,
             noOneHearHideSpectators;
 
-    @Getter
     private boolean isGlobalForce;
 
-    @Getter
     private final Map<String, String>
             localGroupsColors = new HashMap<>(),
             globalGroupsColors = new HashMap<>();
 
-    @Getter
     private String priority;
 
-    @Getter
     private IColorizer formatsColorizer;
 
-    @Getter
     private final AbstractColorizer chatsColorizer;
 
-    @Getter
     private boolean isHoverEnabled, isAdminHoverEnabled;
 
-    @Getter
     private String
             hoverText, hoverAction, hoverValue,
             adminHoverText, adminHoverAction, adminHoverValue;

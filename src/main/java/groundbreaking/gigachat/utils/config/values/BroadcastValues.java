@@ -4,29 +4,26 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.BroadcastColorizer;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 
+@Getter
 public final class BroadcastValues {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    @Getter
     private String format;
 
-    @Getter
     private int cooldown;
 
-    @Getter
     private boolean isHoverEnabled;
 
-    @Getter
     private String hoverAction, hoverValue, hoverText;
 
-    @Getter
     private IColorizer colorizer;
 
-    @Getter
     private final AbstractColorizer messageColorizer;
 
     public BroadcastValues(final GigaChat plugin) {

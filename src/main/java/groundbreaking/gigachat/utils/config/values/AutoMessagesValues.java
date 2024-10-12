@@ -3,6 +3,7 @@ package groundbreaking.gigachat.utils.config.values;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -10,24 +11,21 @@ import org.bukkit.configuration.file.FileConfiguration;
 import java.util.HashMap;
 import java.util.List;
 
+@Getter
 public final class AutoMessagesValues {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    @Getter
     private boolean isEnabled, isRandom;
 
-    @Getter
     private int sendInterval;
 
-    @Getter
     private String defaultSound;
 
-    @Getter
     private final HashMap<String, String>
             autoMessagesSounds = new HashMap<>();
 
-    @Getter
     private final HashMap<String, List<String>>
             autoMessages = new HashMap<>();
 

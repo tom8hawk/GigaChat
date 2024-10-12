@@ -6,6 +6,7 @@ import groundbreaking.gigachat.utils.config.ConfigLoader;
 import groundbreaking.gigachat.utils.counter.FirstEntryCounter;
 import groundbreaking.gigachat.utils.counter.ICounter;
 import groundbreaking.gigachat.utils.counter.OnlineTimeCounter;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
@@ -15,38 +16,30 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+@Getter
 public final class NewbieCommandsValues {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    @Getter
     private boolean isEnabled;
 
-    @Getter
     private String priority;
 
-    @Getter
     private ICounter counter;
 
-    @Getter
     private boolean isGiveBypassPermissionEnabled;
 
-    @Getter
     private int requiredTime, requiredTimeToGetBypassPerm;
 
-    @Getter
     private String denyMessage;
 
-    @Getter
     private boolean isDenySoundEnabled;
 
-    @Getter
     private Sound denySound;
 
-    @Getter
     private float denySoundVolume, denySoundPitch;
 
-    @Getter
     private final List<String> blockedCommands = new ArrayList<>();
 
     public NewbieCommandsValues(final GigaChat plugin) {

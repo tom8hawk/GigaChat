@@ -9,35 +9,30 @@ import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.PrivateMessagesColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Locale;
 
+@Getter(AccessLevel.NONE)
 public final class PrivateMessagesValues {
 
     private final GigaChat plugin;
 
-    @Getter
     private boolean printLogsToConsole, isSoundEnabled, commandsRegistered = false;
 
-    @Getter
     private int pmCooldown, ignoreCooldown, spyCooldown;
 
-    @Getter
     private String sound;
 
-    @Getter
     private float soundVolume, soundPitch;
 
-    @Getter
     private String senderFormat, recipientFormat, socialSpyFormat, consoleFormat;
 
-    @Getter
     public IColorizer formatsColorizer;
 
-    @Getter
     public final AbstractColorizer messagesColorizer;
 
     public PrivateMessagesValues(final GigaChat plugin) {
