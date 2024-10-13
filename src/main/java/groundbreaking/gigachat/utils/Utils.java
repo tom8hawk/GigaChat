@@ -26,11 +26,11 @@ public final class Utils {
 
         final StringBuilder result = new StringBuilder(text);
 
-        for(int i = 0; i < searchList.length; ++i) {
+        for (int i = 0; i < searchList.length; ++i) {
             final String search = searchList[i];
             final String replacement = replacementList[i];
 
-            for(int start = 0; (start = result.indexOf(search, start)) != -1; start += replacement.length()) {
+            for (int start = 0; (start = result.indexOf(search, start)) != -1; start += replacement.length()) {
                 result.replace(start, start + search.length(), replacement);
             }
         }
