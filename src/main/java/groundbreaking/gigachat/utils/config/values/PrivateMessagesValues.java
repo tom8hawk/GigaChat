@@ -16,9 +16,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Locale;
 
-@Getter(AccessLevel.NONE)
+@Getter
 public final class PrivateMessagesValues {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
     private boolean printLogsToConsole, isSoundEnabled, commandsRegistered = false;
