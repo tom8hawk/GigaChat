@@ -84,6 +84,7 @@ public final class GigaChat extends JavaPlugin {
 
         final int subVersion = serverInfo.getSubVersion(this);
         this.setupLogger(subVersion);
+        this.logLoggerType();
 
         super.saveDefaultConfig();
         this.setupVanishChecker();
@@ -102,8 +103,6 @@ public final class GigaChat extends JavaPlugin {
         this.registerEvents();
         this.registerCommands();
         this.registerBroadcastCommand();
-
-        this.logLoggerType();
 
         final long endTime = System.currentTimeMillis();
         this.myLogger.info("Plugin successfully started in " + (endTime - startTime) + "ms.");
@@ -171,13 +170,13 @@ public final class GigaChat extends JavaPlugin {
         this.messages.setupMessages();
         this.autoMessagesValues.setValues();
         this.broadcastValues.setValues();
+        this.chatValues.setValues();
         final PluginManager pluginManager = super.getServer().getPluginManager();
         if (pluginManager.getPlugin("NewbieGuard") == null) {
-            this.chatValues.setValues();
             this.newbieChatValues.setValues();
+            this.newbieCommandsValues.setValues();
         }
         this.pmValues.setValues();
-        this.newbieCommandsValues.setValues();
         this.cooldowns.setCooldowns();
     }
 
@@ -259,7 +258,7 @@ public final class GigaChat extends JavaPlugin {
         final List<String> aliases = super.getConfig().getStringList("broadcast.aliases");
         final BroadcastCommand broadcast = new BroadcastCommand(this);
 
-        registerCommand(command, aliases, broadcast, broadcast);
+        this.registerCommand(command, aliases, broadcast, broadcast);
     }
 
     public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {

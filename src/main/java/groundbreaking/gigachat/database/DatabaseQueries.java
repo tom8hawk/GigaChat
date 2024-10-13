@@ -72,7 +72,7 @@ public final class DatabaseQueries {
     public static void addPlayerToDisabledChat(final String username) {
         final String query = "INSERT OR IGNORE INTO disabledChat(username) VALUES(?)";
 
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+        try (final PreparedStatement statement = getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
         }
