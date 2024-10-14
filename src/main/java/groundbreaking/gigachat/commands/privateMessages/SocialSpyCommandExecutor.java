@@ -3,6 +3,7 @@ package groundbreaking.gigachat.commands.privateMessages;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.Cooldowns;
 import groundbreaking.gigachat.collections.SocialSpy;
+import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.config.values.PrivateMessagesValues;
@@ -50,6 +51,7 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
 
         if (SocialSpy.contains(senderName)) {
             SocialSpy.remove(senderName);
+            DatabaseQueries.removePlayerFromSocialSpy(senderName);
             sender.sendMessage(this.messages.getSpyDisabled());
         }
         else {

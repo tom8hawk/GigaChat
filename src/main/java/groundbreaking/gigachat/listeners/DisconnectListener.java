@@ -55,7 +55,7 @@ public final class DisconnectListener implements Listener {
         if (DatabaseQueries.localSpyContainsPlayer(name)) {
             LocalSpy.add(name);
         }
-        if (PmSounds.contains(name)) {
+        if (DatabaseQueries.privateMessagesSoundsContainsPlayer(name)) {
             PmSounds.setSound(name, DatabaseQueries.getSound(name));
         }
         if (DatabaseQueries.socialSpyContainsPlayer(name)) {
