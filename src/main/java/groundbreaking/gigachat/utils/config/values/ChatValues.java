@@ -22,7 +22,7 @@ public final class ChatValues {
 
     private String localFormat, localSpyFormat, globalFormat;
 
-    private int localDistance;
+    private int localDistance, caseCheckThreshold;
 
     private int localCooldown, globalCooldown;
 
@@ -32,7 +32,8 @@ public final class ChatValues {
             noOneHearEnabled,
             noOneHearHideHidden,
             noOneHearHideVanished,
-            noOneHearHideSpectators;
+            noOneHearHideSpectators,
+            caseCheckBlockMessage;
 
     private boolean isGlobalForce;
 
@@ -46,7 +47,7 @@ public final class ChatValues {
 
     private final AbstractColorizer chatsColorizer;
 
-    private boolean isHoverEnabled, isAdminHoverEnabled;
+    private boolean isCaseCheckEnabled, isHoverEnabled, isAdminHoverEnabled;
 
     private String
             hoverText, hoverAction, hoverValue,
@@ -64,6 +65,7 @@ public final class ChatValues {
         this.setupGlobal(config);
         this.setupSettings(config);
         this.setupHover(config);
+        this.setupCaseCheck(config);
         this.setupAdminHover(config);
     }
 
@@ -131,6 +133,19 @@ public final class ChatValues {
         }
         else {
             this.plugin.getMyLogger().warning("Failed to load section \"global\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+        }
+    }
+
+    private void setupCaseCheck(final FileConfiguration config) {
+        final ConfigurationSection caseCheck = config.getConfigurationSection("case-check");
+        if (caseCheck != null) {
+            this.isCaseCheckEnabled = caseCheck.getBoolean("enable");
+            this.caseCheckThreshold = caseCheck.getInt("threshold");
+            this.caseCheckBlockMessage = caseCheck.getBoolean("block-message");
+        }
+        else {
+            this.plugin.getMyLogger().warning("Failed to load section \"case-check\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }

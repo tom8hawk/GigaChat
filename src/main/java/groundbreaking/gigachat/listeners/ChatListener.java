@@ -96,7 +96,7 @@ public final class ChatListener implements Listener {
 
         final String[] replacementList = { name, prefix, suffix, "" };
 
-        final String message = event.getMessage();
+        String message = event.getMessage();
 
         final String formattedMessage;
         if (this.chatValues.isGlobalForce() || this.isValidForGlobal(message)) {
@@ -108,6 +108,15 @@ public final class ChatListener implements Listener {
                 messageSender.sendMessage(cooldownMessage);
                 event.setCancelled(true);
                 return;
+            }
+
+            if (this.chatValues.isCaseCheckEnabled() && checkCase(message, this.chatValues.getCaseCheckThreshold())) {
+                if (this.chatValues.isCaseCheckBlockMessage()) {
+                    messageSender.sendMessage(this.messages.getChatBlockedCase());
+                    event.setCancelled(true);
+                    return;
+                }
+                message = message.toLowerCase();
             }
 
             event.getRecipients().clear();
@@ -158,7 +167,7 @@ public final class ChatListener implements Listener {
             }
 
             final List<Player> localSpyRecipients = LocalSpy.getAll();
-            if (localSpyRecipients.size() != 0) {
+            if (!localSpyRecipients.isEmpty()) {
                 for (int i = localSpyRecipients.size() - 1; i >= 0; i--) {
                     if (event.getRecipients().contains(localSpyRecipients.get(i))) {
                         localSpyRecipients.remove(i);
@@ -194,6 +203,18 @@ public final class ChatListener implements Listener {
         else {
             event.setFormat(formattedMessage);
         }
+    }
+
+    private boolean checkCase(String message, double threshold) {
+        int totalChars = message.length();
+        int uppercaseCount = 0;
+        for (int i = 0; i < totalChars; i++) {
+            if (Character.isUpperCase(message.charAt(i))) {
+                uppercaseCount++;
+            }
+        }
+        double percentage = (double) uppercaseCount / totalChars * 100;
+        return percentage > threshold;
     }
 
     private void sendBothHover(final Player player, final String formattedMessage, final List<Player> recipients, final String[] replacementList) {

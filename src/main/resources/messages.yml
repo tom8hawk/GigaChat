@@ -69,6 +69,7 @@ server-chat-disabled: "&cЧат сервера был отключен."
 server-chat-is-disabled: "&cЧат сервера временно отключен администрацией."
 
 no-one-hear: "&cВас никто не услышал."
+chat-blocked-case: "&cВаше сообщение превышает лимит использования капса!"
 
 target-pm-sound-set: "&aЗвук в личных сообщениях {player} был установлен на {sound}."
 target-pm-sound-removed: "&cЗвук в личных сообщениях {player} был убран."

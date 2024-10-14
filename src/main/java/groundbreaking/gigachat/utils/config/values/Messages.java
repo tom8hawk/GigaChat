@@ -50,6 +50,7 @@ public final class Messages {
             serverChatDisabled,
             serverChatIsDisabled,
             noOneHear,
+            chatBlockedCase,
             targetPmSoundSet,
             targetPmSoundRemoved,
             PmSoundSet,
@@ -111,6 +112,7 @@ public final class Messages {
         this.serverChatDisabled = this.getMessage(config, "server-chat-disabled", colorizer);
         this.serverChatIsDisabled = this.getMessage(config, "server-chat-is-disabled", colorizer);
         this.noOneHear = this.getMessage(config, "no-one-hear", colorizer);
+        this.chatBlockedCase = this.getMessage(config, "chat-blocked-case", colorizer);
         this.targetPmSoundSet = this.getMessage(config, "target-pm-sound-set", colorizer);
         this.targetPmSoundRemoved = this.getMessage(config, "target-pm-sound-removed", colorizer);
         this.PmSoundSet = this.getMessage(config, "pm-sound-set", colorizer);
