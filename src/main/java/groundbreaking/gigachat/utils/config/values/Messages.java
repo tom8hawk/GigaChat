@@ -4,6 +4,7 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.Getter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public final class Messages {
@@ -125,8 +126,14 @@ public final class Messages {
     }
 
     private void setupTimes(final FileConfiguration config) {
-        hours = config.getString("time.hours");
-        minutes = config.getString("time.minutes");
-        seconds = config.getString("time.seconds");
+        final ConfigurationSection time = config.getConfigurationSection("time");
+        if (time != null) {
+            hours = time.getString("time.hours");
+            minutes = time.getString("time.minutes");
+            seconds = time.getString("time.seconds");
+        } else {
+            this.plugin.getMyLogger().warning("Failed to load section \"time\" from file \"messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+        }
     }
 }
