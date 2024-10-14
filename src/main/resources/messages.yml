@@ -80,6 +80,7 @@ pm-sound-removed: "&cТвой звук в личных сообщениях бы
 local-spy-enabled: "&aОтображение локального чата включено."
 local-spy-disabled: "&cОтображение локального чата выключено."
 
+chars-check-failed-message: "&cТвоё сообщение содержит запрещённые символы!"
 caps-check-failed-message: "&cТвоё сообщение содержит слишком много заглавных символов!"
 
 help-message: |-

@@ -7,6 +7,7 @@ import groundbreaking.gigachat.collections.DisabledChat;
 import groundbreaking.gigachat.collections.Ignore;
 import groundbreaking.gigachat.collections.LocalSpy;
 import groundbreaking.gigachat.commands.args.DisableServerChatArgument;
+import groundbreaking.gigachat.utils.StringUtil;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -32,6 +33,8 @@ public final class ChatListener implements Listener {
     private final Messages messages;
     private final Cooldowns cooldowns;
 
+    private final StringUtil stringUtil = new StringUtil();
+
     private boolean isRegistered = false;
 
     private final String[] placeholders = { "{player}", "{prefix}", "{suffix}", "{color}" };
@@ -41,6 +44,8 @@ public final class ChatListener implements Listener {
         this.chatValues = plugin.getChatValues();
         this.messages = plugin.getMessages();
         this.cooldowns = plugin.getCooldowns();
+
+        this.setupValidator();
     }
 
     @EventHandler
@@ -90,12 +95,22 @@ public final class ChatListener implements Listener {
         final String[] replacementList = { name, prefix, suffix, "" };
 
         String message = event.getMessage();
-        final boolean isUpperCasePercentageExceeded = this.isUpperCasePercentageExceeded(message);
 
-        if (this.chatValues.isCapsCheckEnabled() && isUpperCasePercentageExceeded) {
+        if (this.chatValues.isTextValidatorEnabled() && !this.stringUtil.isValid(message)) {
+            if (this.chatValues.isTextValidatorBlockMessage()) {
+                messageSender.sendMessage(this.messages.getTextValidationFailedMessage());
+                this.playDenySoundCharsFailed(messageSender);
+                event.setCancelled(true);
+                return;
+            }
+
+            message = this.stringUtil.getFormattedMessage(message);
+        }
+
+        if (this.chatValues.isCapsCheckEnabled() && this.stringUtil.isUpperCasePercentageExceeded(message, this.chatValues.getCapsCheckMaxPercentage())) {
             if (this.chatValues.isCapsCheckBlockMessageSend()) {
                 messageSender.sendMessage(this.messages.getCapsCheckFailedMessage());
-                this.playDenySound(messageSender);
+                this.playDenySoundCapsFailed(messageSender);
                 event.setCancelled(true);
                 return;
             }
@@ -261,7 +276,18 @@ public final class ChatListener implements Listener {
         }
     }
 
-    private void playDenySound(final Player messageSender) {
+    private void playDenySoundCharsFailed(final Player messageSender) {
+        if (this.chatValues.isCapsCheckDenySoundEnabled()) {
+            final Location location = messageSender.getLocation();
+            final Sound sound = this.chatValues.getTextValidatorDenySound();
+            final float volume = this.chatValues.getTextValidatorDenySoundVolume();
+            final float pitch = this.chatValues.getTextValidatorDenySoundPitch();
+
+            messageSender.playSound(location, sound, volume, pitch);
+        }
+    }
+
+    private void playDenySoundCapsFailed(final Player messageSender) {
         if (this.chatValues.isCapsCheckDenySoundEnabled()) {
             final Location location = messageSender.getLocation();
             final Sound sound = this.chatValues.getCapsCheckDenySound();
@@ -297,22 +323,6 @@ public final class ChatListener implements Listener {
 
     public boolean isValidForGlobal(final String message) {
         return message.trim().length() != 1 && message.charAt(0) == this.chatValues.getGlobalSymbol();
-    }
-
-    private boolean isUpperCasePercentageExceeded(final String message) {
-        final int totalChars = message.length();
-        int uppercaseCount = 0;
-        for (int i = 0; i < totalChars; i++) {
-            final char currentChar = message.charAt(i);
-            if (Character.isUpperCase(currentChar)) {
-                uppercaseCount++;
-            }
-        }
-
-        final double maxPercentage = this.chatValues.getCapsCheckMaxPercentage();
-        final double percentage = (double) uppercaseCount / totalChars * 100;
-
-        return percentage > maxPercentage;
     }
 
     public String removeGlobalPrefix(final String message) {
@@ -372,5 +382,9 @@ public final class ChatListener implements Listener {
         message = this.chatValues.getChatsColorizer().colorize(messageSender, message);
 
         return formattedMessage.replace("{message}", message).replace("%", "%%");
+    }
+
+    public void setupValidator() {
+        this.stringUtil.setupChars(this.chatValues.getTextValidatorAllowedChars());
     }
 }

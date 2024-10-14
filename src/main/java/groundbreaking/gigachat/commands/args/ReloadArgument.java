@@ -29,6 +29,7 @@ public final class ReloadArgument extends ArgsConstructor {
         plugin.getCooldowns().setCooldowns();
         plugin.getAutoMessages().run();
         plugin.registerReloadableEvents();
+        plugin.getChatListener().setupValidator();
 
         long endTime = System.currentTimeMillis();
         if (sender instanceof Player) {

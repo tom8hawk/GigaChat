@@ -102,17 +102,19 @@ admin-hover:
     &fХП: &6%player_health%
     &fОпыт: &6%player_exp%
 
-##################### For future #####################
-## Проверка сообщения на запрещенные символы
-#chars-validator:
-#  # Включение модуля
-#  enable: true
-#  # Разрешенные символы
-#  allowed: "AaBbCcDdEeFfGgHhIiGgKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890!@#$%^&*()-=_+<>/?\\|"
-#  # Звук при нарушении (Формат: звук;громкость;высота (громкость и высота - необязательны))
-#  # Оставь "disabled", чтобы отключить
-#  deny-sound: ENTITY_VILLAGER_NO
-######################################################
+# Проверка сообщения на запрещенные символы
+text-validator:
+  # Включение модуля
+  enable: true
+  # Если false, то найденые запрещённые символы будут заменяться на символ из "censorship-char"
+  block-message: false
+  # Указывать только 1 символ!
+  censorship-char: '*'
+  # Разрешенные символы
+  allowed: " AaBbCcDdEeFfGgHhIiGgKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890,.!@#$%^&*()-=_+<>/?\\|"
+  # Звук при нарушении (Формат: звук;громкость;высота (громкость и высота - необязательны))
+  # Оставь "disabled", чтобы отключить
+  deny-sound: ENTITY_VILLAGER_NO
 
 # Проверка сообщения на регистр
 caps-check:
