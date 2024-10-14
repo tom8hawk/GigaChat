@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-public class LocalSpyArgument extends ArgsConstructor {
+public final class LocalSpyArgument extends ArgsConstructor {
 
     private final Messages messages;
 
