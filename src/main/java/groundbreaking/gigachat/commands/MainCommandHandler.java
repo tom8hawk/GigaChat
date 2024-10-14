@@ -116,7 +116,7 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
 
     private List<String> getPlayers(final String input) {
         final List<String> players = new ArrayList<>();
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (final Player player : Bukkit.getOnlinePlayers()) {
             final String playerName = player.getName();
             if (playerName.toLowerCase().startsWith(input)) {
                 players.add(playerName);
