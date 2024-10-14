@@ -138,6 +138,15 @@ public final class ChatListener implements Listener {
                 return;
             }
 
+            if (this.chatValues.isCaseCheckEnabled() && checkCase(message, this.chatValues.getCaseCheckThreshold())) {
+                if (this.chatValues.isCaseCheckBlockMessage()) {
+                    messageSender.sendMessage(this.messages.getChatBlockedCase());
+                    event.setCancelled(true);
+                    return;
+                }
+                message = message.toLowerCase();
+            }
+
             final String color = this.getLocalColor(messageSender);
             replacementList[3] = color;
 
