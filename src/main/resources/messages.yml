@@ -80,7 +80,7 @@ pm-sound-removed: "&cТвой звук в личных сообщениях бы
 local-spy-enabled: "&aОтображение локального чата включено."
 local-spy-disabled: "&cОтображение локального чата выключено."
 
-help-messaпe: |-
+help-message: |-
   &fИнструкция по использованию GigaChat:
   &8- &6/gigachat reload &f- перезагрузить плагин 
   &8- &6/gigachat disablechat &f- отключить чат всему серверу 
