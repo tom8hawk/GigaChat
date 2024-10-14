@@ -10,6 +10,10 @@ import java.util.List;
 
 public final class DatabaseQueries {
 
+    /**
+     * Creates tables in the database if they do not already exist
+     * If the tables are already present, no changes will be made
+     */
     public static void createTables() {
         final String disabledChatQuery = """
                     CREATE TABLE IF NOT EXISTS disabledChat (
@@ -69,169 +73,218 @@ public final class DatabaseQueries {
         }
     }
 
+    /**
+     * Adds the player name to the "disabledChat" table, to save the player's choice
+     * 
+     * @param username of the player
+     */
     public static void addPlayerToDisabledChat(final String username) {
         final String query = "INSERT OR IGNORE INTO disabledChat(username) VALUES(?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "disabledChat" table
+     * 
+     * @param username of the player
+     */
     public static void removePlayerFromDisabledChat(final String username) {
         final String query = "DELETE FROM disabledChat WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Checks the "disabledChat" table for a player's name, to see if he has chat disabled. 
+     * 
+     * @param username of the player
+     * @return true if the table contains the player's name
+     */
     public static boolean disabledChatContainsPlayer(final String username) {
         final String query = "SELECT * FROM disabledChat WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             final ResultSet result = statement.executeQuery();
+            
             return result.next();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
         return false;
     }
 
+    /**
+     * Adds the player name to the "ignoreChat" table, to save the player's choice
+     * 
+     * @param username of the player
+     */
     public static void addPlayerToIgnoreChat(final String username, final List<String> ignored) {
         final String query = "INSERT OR IGNORE INTO ignoreChat(username, ignored) VALUES(?, ?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.setString(2, String.join(";", ignored));
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "ignoreChat" table
+     * 
+     * @param username of the player
+     */
     public static void removePlayerFromIgnoreChat(final String username) {
         final String query = "DELETE FROM ignoreChat WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Checks the "ignoreChat" table for a player's name, to see if he ignores anybody.
+     *
+     * @param username of the player
+     * @return true if the table contains the player's name
+     */
     public static boolean ignoreChatContains(final String username) {
         final String query = "SELECT * FROM ignoreChat WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             final ResultSet result = statement.executeQuery();
+            
             return result.next();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
         return false;
     }
 
+    /**
+     * Checks the "ignoreChat" table for a player's name, to see if he ignores anybody.
+     *
+     * @param username of the player
+     * @return a list of ignored players' names
+     */
     public static List<String> getIgnoredChat(final String username) {
         final String query = "SELECT ignored FROM ignoreChat WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet rs = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
 
-            if (rs.next()) {
-                final String listString = rs.getString("ignored");
+            if (result.next()) {
+                final String listString = result.getString("ignored");
+                
                 return Arrays.asList(listString.split(";"));
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             System.out.println(e.getMessage());
         }
 
         return Collections.emptyList();
     }
 
-    // disabledPrivateMessages
+    /**
+     * Adds the player name to the "disabledPrivateMessages" table, to save the player's choice
+     * 
+     * @param username of the player
+     */
     public static void addPlayerToDisabledPrivateMessages(final String username) {
         final String query = "INSERT OR IGNORE INTO disabledPrivateMessages(username) VALUES(?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "disabledPrivateMessages" table
+     * 
+     * @param username of the player
+     */
     public static void removePlayerFromDisabledPrivateMessages(final String username) {
         final String query = "DELETE FROM disabledPrivateMessages WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
-    
+
+    /**
+     * Checks the "disabledPrivateMessages" table for a player's name, to see if he has private messages disabled.
+     *
+     * @param username of the player
+     * @return true if the player has disabled
+     */
     public static boolean disabledPrivateMessagesContainsPlayer(final String username) {
         final String query = "SELECT * FROM disabledPrivateMessages WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             final ResultSet result = statement.executeQuery();
+            
             return result.next();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
         return false;
     }
 
-    // ignorePrivate
+    /**
+     * Adds the player name to the "ignorePrivate" table, to save the player's choice
+     * 
+     * @param username of the player
+     */
     public static void addPlayerToIgnorePrivate(final String username, final List<String> ignored) {
         final String query = "INSERT OR IGNORE INTO ignorePrivate(username, ignored) VALUES(?, ?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.setString(2, String.join(";", ignored));
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "ignorePrivate" table
+     * 
+     * @param username of the player
+     */
     public static void removePlayerFromIgnorePrivate(final String username) {
         final String query = "DELETE FROM ignorePrivate WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Checks the "ignorePrivate" table for a player's name, to see if he ignores anybody.
+     *
+     * @param username of the player
+     * @return true if the player is ignoring someone
+     */
     public static boolean ignorePrivateContainsPlayer(final String username) {
         final String query = "SELECT * FROM ignorePrivate WHERE username = ?";
 
@@ -239,149 +292,204 @@ public final class DatabaseQueries {
             statement.setString(1, username);
             final ResultSet result = statement.executeQuery();
             return result.next();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
         return false;
     }
 
+    /**
+     * Retrieves all players ignored by the player from the "ignorePrivate" table.
+     *
+     * @param username of the player
+     * @return a list of ignored players' names
+     */
     public static List<String> getIgnoredPrivate(final String username) {
         final String query = "SELECT ignored FROM ignorePrivate WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet rs = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
 
-            if (rs.next()) {
-                final String listString = rs.getString("ignored");
+            if (result.next()) {
+                final String listString = result.getString("ignored");
+                
                 return Arrays.asList(listString.split(";"));
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             System.out.println(e.getMessage());
         }
 
         return Collections.emptyList();
     }
 
-    // localSpy
+    /**
+     * Adds the player name to the "localSpy" table, to save the player's choice
+     *
+     * @param username of the player
+     */
     public static void addPlayerToLocalSpy(final String username) {
         final String query = "INSERT OR IGNORE INTO localSpy(username) VALUES(?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "localSpy" table
+     *
+     * @param username of the player
+     */
     public static void removePlayerFromLocalSpy(final String username) {
         final String query = "DELETE FROM localSpy WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Checks the "localSpy" table for a player's name, to see if he is spying on the local chat.
+     *
+     * @param username of the player
+     * @return true if the table contains the player's name
+     */
     public static boolean localSpyContainsPlayer(final String username) {
         final String query = "SELECT * FROM localSpy WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             final ResultSet result = statement.executeQuery();
+            
             return result.next();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
         return false;
     }
 
-    // privateMessagesSounds
+    /**
+     * Adds the player name to the "privateMessagesSounds" table, to save the player's choice
+     * 
+     * @param username of the player
+     */
     public static void addPlayerPmSoundToPmSounds(final String username, final String sound) {
         final String query = "INSERT OR IGNORE INTO privateMessagesSounds(username, sound) VALUES(?, ?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.setString(2, sound);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "privateMessagesSounds" table
+     * 
+     * @param username of the player
+     */
     public static void removePlayerFromPmSounds(final String username) {
         final String query = "DELETE FROM privateMessagesSounds WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
-    public static String getSound(final String username) {
-        final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ?";
-
+    /**
+     * Checks the "privateMessagesSounds" table for the player's name.
+     *
+     * @param username of the player
+     * @return true if the table contains the player's name
+     */
+    public static boolean privateMessagesSoundsContainsPlayer(final String username) {
+        final String query = "SELECT * FROM privateMessagesSounds WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet rs = statement.executeQuery();
+            final ResultSet result = statement.executeQuery();
 
-            if (rs.next()) {
-                return rs.getString("sound");
+            return result.next();
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Retrieves the sound selected by player from the "privateMessagesSounds" table.
+     *
+     * @param username of the player
+     * @return name of the sound player has chosen
+     */
+    public static String getSound(final String username) {
+        final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ?";
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            statement.setString(1, username);
+            final ResultSet result = statement.executeQuery();
+
+            if (result.next()) {
+                return result.getString("sound");
             }
-        } catch (SQLException e) {
+        } catch (final SQLException e) {
             System.out.println(e.getMessage());
         }
 
         return null;
     }
 
-    // socialSpy
+    /**
+     * Adds the player name to the "socialSpy" table, to save the player's choice
+     * 
+     * @param username of the player
+     */
     public static void addPlayerToSocialSpy(final String username) {
         final String query = "INSERT OR IGNORE INTO socialSpy(username) VALUES(?)";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Removes the player's name from the "socialSpy" table
+     * 
+     * @param username of the player
+     */
     public static void removePlayerFromSocialSpy(final String username) {
         final String query = "DELETE FROM socialSpy WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
 
+    /**
+     * Checks the "localSpy" table for a player's name, to see if he is spying on the private messages.
+     *
+     * @param username of the player
+     * @return true if the table contains the player's name
+     */
     public static boolean socialSpyContainsPlayer(final String username) {
         final String query = "SELECT * FROM socialSpy WHERE username = ?";
-
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             final ResultSet result = statement.executeQuery();
+            
             return result.next();
-        }
-        catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
