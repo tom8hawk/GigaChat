@@ -75,7 +75,7 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return Collections.emptyList();
     }
 }

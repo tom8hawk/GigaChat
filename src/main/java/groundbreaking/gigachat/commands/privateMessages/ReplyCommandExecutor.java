@@ -167,7 +167,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return Collections.emptyList();
     }
 }

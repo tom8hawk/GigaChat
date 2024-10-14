@@ -219,7 +219,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     @Override
-    public @Nullable List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
             final String input = args[0].toLowerCase();
             final List<String> players = new ArrayList<>();
