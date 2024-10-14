@@ -21,7 +21,7 @@ public final class ClearChatArgument extends ArgsConstructor {
 
     // todo проверить player != sender если отправитель игрок, ибо не факт, что жаба сама умеет кастовать
     @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {;
+    public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
             if (!player.hasPermission("gigachat.bypass.clearchat")) {
