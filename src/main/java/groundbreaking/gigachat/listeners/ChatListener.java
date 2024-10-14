@@ -51,9 +51,9 @@ public final class ChatListener implements Listener {
         this.processEvent(event);
     }
 
-    public boolean registerEvent() {
+    public void registerEvent() {
         if (this.isRegistered) {
-            return false;
+            return;
         }
 
         final Class<? extends Event> eventClass = PlayerJumpEvent.class;
@@ -66,19 +66,15 @@ public final class ChatListener implements Listener {
         }, this.plugin);
 
         this.isRegistered = true;
-
-        return true;
     }
 
-    public boolean unregisterEvent() {
+    public void unregisterEvent() {
         if (!this.isRegistered) {
-            return false;
+            return;
         }
 
         HandlerList.unregisterAll(this);
         this.isRegistered = false;
-
-        return true;
     }
 
     private void processEvent(final AsyncPlayerChatEvent event) {
@@ -118,8 +114,7 @@ public final class ChatListener implements Listener {
 
             final String globalMessage = this.removeGlobalPrefix(message);
             formattedMessage = this.getFormattedMessage(messageSender, globalMessage, chatValues.getGlobalFormat(), replacementList);
-        }
-        else {
+        } else {
             if (cooldowns.hasCooldown(messageSender, name, "gigachat.bypass.cooldown.local", cooldowns.getLocalCooldowns())) {
                 String restTime = Utils.getTime(
                         (int) (chatValues.getLocalCooldown() / 1000 + (cooldowns.getLocalCooldowns().get(name) - System.currentTimeMillis()) / 1000)
@@ -143,11 +138,9 @@ public final class ChatListener implements Listener {
                     final Player recipient = validRecipients.get(i);
                     if (chatValues.isNoOneHearHideHidden() && !messageSender.canSee(recipient)) {
                         validRecipients.remove(i);
-                    }
-                    else if (chatValues.isNoOneHearHideVanished() && plugin.getVanishChecker().isVanished(recipient)) {
+                    } else if (chatValues.isNoOneHearHideVanished() && plugin.getVanishChecker().isVanished(recipient)) {
                         validRecipients.remove(i);
-                    }
-                    else if (chatValues.isNoOneHearHideSpectators() && recipient.getGameMode() == GameMode.SPECTATOR) {
+                    } else if (chatValues.isNoOneHearHideSpectators() && recipient.getGameMode() == GameMode.SPECTATOR) {
                         validRecipients.remove(i);
                     }
                 }
@@ -169,29 +162,30 @@ public final class ChatListener implements Listener {
             }
         }
 
+        final List<Player> recipients = new ArrayList<>(event.getRecipients());
         if (chatValues.isHoverEnabled() && chatValues.isAdminHoverEnabled()) {
             event.setCancelled(true);
-            this.sendBothHover(messageSender, formattedMessage, new ArrayList<>(event.getRecipients()), replacementList);
-        }
-        else if (chatValues.isHoverEnabled()) {
-            event.setCancelled(true);
+            this.sendBothHover(messageSender, formattedMessage, recipients, replacementList);
+        } else if (chatValues.isHoverEnabled()) {
             final String hoverText = chatValues.getHoverText();
             final String hoverAction = chatValues.getHoverAction();
             final String hoverValue = chatValues.getHoverValue();
             final List<Player> recipient = new ArrayList<>(event.getRecipients());
 
             this.sendHover(messageSender, formattedMessage, hoverText, hoverAction, hoverValue, recipient, replacementList);
-        }
-        else if (chatValues.isAdminHoverEnabled()) {
+
             event.setCancelled(true);
+
+        } else if (chatValues.isAdminHoverEnabled()) {
             final String adminHoverText = chatValues.getAdminHoverText();
             final String adminHoverAction = chatValues.getHoverAction();
             final String adminHoverValue = chatValues.getHoverValue();
-            final List<Player> adminRecipients = this.getAdminRecipients(new ArrayList<>(event.getRecipients()));
+            final List<Player> adminRecipients = this.getAdminRecipients(recipients);
 
             this.sendHover(messageSender, formattedMessage, adminHoverText, adminHoverAction, adminHoverValue, adminRecipients, replacementList);
-        }
-        else {
+
+            event.setCancelled(true);
+        } else {
             event.setFormat(formattedMessage);
         }
     }
@@ -206,7 +200,7 @@ public final class ChatListener implements Listener {
 
             this.sendHover(player, formattedMessage, hoverText, hoverAction, hoverValue, recipients, replacementList);
         }
-        
+
         if (!adminRecipients.isEmpty()) {
             final String adminHoverText = chatValues.getAdminHoverText();
             final String adminHoverAction = chatValues.getHoverAction();

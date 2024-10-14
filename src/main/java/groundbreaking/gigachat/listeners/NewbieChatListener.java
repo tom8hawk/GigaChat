@@ -27,9 +27,9 @@ public final class NewbieChatListener implements Listener {
         processEvent(event);
     }
 
-    public boolean registerEvent() {
+    public void registerEvent() {
         if (this.isRegistered || !this.newbieValues.isEnabled()) {
-            return false;
+            return;
         }
 
         final Class<? extends Event> eventClass = PlayerJumpEvent.class;
@@ -42,19 +42,15 @@ public final class NewbieChatListener implements Listener {
         }, this.plugin);
 
         this.isRegistered = true;
-
-        return true;
     }
 
-    public boolean unregisterEvent() {
+    public void unregisterEvent() {
         if (!this.isRegistered) {
-            return false;
+            return;
         }
 
         HandlerList.unregisterAll(this);
         this.isRegistered = false;
-
-        return true;
     }
 
     private void processEvent(final AsyncPlayerChatEvent event) {

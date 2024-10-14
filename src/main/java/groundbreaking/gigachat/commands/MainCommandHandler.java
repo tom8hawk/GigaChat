@@ -96,8 +96,7 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
             if (args.length == 2 && hasSetpmsoundPerm) {
                 final List<String> playerNames = this.getPlayers(input);
                 list.addAll(playerNames);
-            }
-            else if (args.length == 3 && hasSetpmsoundPerm) {
+            } else if (args.length == 3 && hasSetpmsoundPerm) {
                 if ("none".startsWith(input.toLowerCase())) {
                     list.add("none");
                 }
