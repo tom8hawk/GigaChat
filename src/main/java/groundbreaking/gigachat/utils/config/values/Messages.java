@@ -4,6 +4,7 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.Getter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
 public final class Messages {
@@ -125,8 +126,9 @@ public final class Messages {
     }
 
     private void setupTimes(final FileConfiguration config) {
-        hours = config.getString("time.hours");
-        minutes = config.getString("time.minutes");
-        seconds = config.getString("time.seconds");
+        final ConfigurationSection time = config.getConfigurationSection("time");
+        hours = time.getString("hours");
+        minutes = time.getString("minutes");
+        seconds = time.getString("seconds");
     }
 }
