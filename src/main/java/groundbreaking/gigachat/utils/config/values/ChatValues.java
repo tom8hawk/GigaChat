@@ -7,6 +7,7 @@ import groundbreaking.gigachat.utils.colorizer.messages.ChatColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
+import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
@@ -52,6 +53,14 @@ public final class ChatValues {
             hoverText, hoverAction, hoverValue,
             adminHoverText, adminHoverAction, adminHoverValue;
 
+    private boolean isCapsCheckEnabled, capsCheckBlockMessageSend, isCapsCheckDenySoundEnabled;
+
+    private int capsCheckMaxPercentage;
+
+    private Sound capsCheckDenySound;
+
+    private float capsCheckDenySoundVolume, capsCheckDenySoundPitch;
+
     public ChatValues(final GigaChat plugin) {
         this.plugin = plugin;
         this.chatsColorizer = new ChatColorizer(plugin);
@@ -65,6 +74,7 @@ public final class ChatValues {
         this.setupSettings(config);
         this.setupHover(config);
         this.setupAdminHover(config);
+        this.setupCapsCheck(config);
     }
 
     private void setupSettings(final FileConfiguration config) {
@@ -160,6 +170,40 @@ public final class ChatValues {
         else {
             this.plugin.getMyLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+        }
+    }
+
+    private void setupCapsCheck(final FileConfiguration config) {
+        final ConfigurationSection caseCheck = config.getConfigurationSection("caps-check");
+        if (caseCheck != null) {
+            this.isCapsCheckEnabled = caseCheck.getBoolean("enable");
+            this.capsCheckMaxPercentage = caseCheck.getInt("max-percent");
+            this.capsCheckBlockMessageSend = caseCheck.getBoolean("block-message-send");
+
+            this.setupCapsCheckDenySound(caseCheck);
+        }
+        else {
+            this.plugin.getMyLogger().warning("Failed to load section \"case-check\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+        }
+    }
+
+    private void setupCapsCheckDenySound(final ConfigurationSection caseCheck) {
+        final String soundString = caseCheck.getString("deny-sound");
+        if (soundString == null) {
+            this.plugin.getMyLogger().warning("Failed to load sound on path \"case-check.deny-sound\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            this.isCapsCheckDenySoundEnabled = false;
+        }
+        else if (soundString.equalsIgnoreCase("disabled")) {
+            this.isCapsCheckDenySoundEnabled = false;
+        }
+        else {;
+            final String[] params = soundString.split(";");
+            this.capsCheckDenySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            this.capsCheckDenySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+            this.capsCheckDenySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            this.isCapsCheckDenySoundEnabled = true;
         }
     }
 }

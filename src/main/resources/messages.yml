@@ -80,6 +80,8 @@ pm-sound-removed: "&cТвой звук в личных сообщениях бы
 local-spy-enabled: "&aОтображение локального чата включено."
 local-spy-disabled: "&cОтображение локального чата выключено."
 
+caps-check-failed-message: "&cТвоё сообщение содержит слишком много заглавных символов!"
+
 help-message: |-
   &fИнструкция по использованию GigaChat:
   &8- &6/gigachat reload &f- перезагрузить плагин 

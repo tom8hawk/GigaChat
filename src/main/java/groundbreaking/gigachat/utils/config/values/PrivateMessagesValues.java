@@ -14,6 +14,7 @@ import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.List;
 import java.util.Locale;
 
 @Getter
@@ -57,8 +58,7 @@ public final class PrivateMessagesValues {
             this.setupSound(settings);
 
             this.formatsColorizer = plugin.getColorizer(config, "settings.serializer-for-formats");
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -73,8 +73,7 @@ public final class PrivateMessagesValues {
                 this.plugin.registerCommand(pmCommand.getString("command"),
                         pmCommand.getStringList("aliases"), pmExecutor, pmExecutor);
             }
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"private-message-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -86,8 +85,7 @@ public final class PrivateMessagesValues {
                 this.plugin.registerCommand(replyCommand.getString("command"),
                         replyCommand.getStringList("aliases"), replyExecutor, replyExecutor);
             }
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"reply-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -101,8 +99,7 @@ public final class PrivateMessagesValues {
                         ignoreCommand.getStringList("aliases"), ignoreExecutor, ignoreExecutor);
 
             }
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"ignore-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -112,11 +109,11 @@ public final class PrivateMessagesValues {
             this.spyCooldown = spyCommand.getInt("cooldown");
             if (!this.commandsRegistered) {
                 final SocialSpyCommandExecutor socialspyExecutor = new SocialSpyCommandExecutor(plugin);
-                this.plugin.registerCommand(spyCommand.getString("command"),
-                        spyCommand.getStringList("aliases"), socialspyExecutor, socialspyExecutor);
+                final String command = spyCommand.getString("command");
+                final List<String> aliases = spyCommand.getStringList("aliases");
+                this.plugin.registerCommand(command, aliases, socialspyExecutor, socialspyExecutor);
             }
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"socialspy-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -131,8 +128,7 @@ public final class PrivateMessagesValues {
             this.recipientFormat = formats.getString("recipient-format");
             this.socialSpyFormat = formats.getString("socialspy-format");
             this.consoleFormat = formats.getString("console-format");
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"formats\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -141,19 +137,17 @@ public final class PrivateMessagesValues {
     private void setupSound(final ConfigurationSection settings) {
         final String soundString = settings.getString("sound");
         if (soundString == null) {
-            this.plugin.getMyLogger().warning("Failed to load sound on path \"settings.deny-sound\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("Failed to load sound on path \"settings.sound\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             this.isSoundEnabled = false;
-        }
-        else if (soundString.equalsIgnoreCase("disabled")) {
+        } else if (soundString.equalsIgnoreCase("disabled")) {
             this.isSoundEnabled = false;
-        }
-        else {
-            this.isSoundEnabled = true;
+        } else {
             final String[] params = soundString.split(";");
             this.sound = params.length == 1 && params[0] != null ? params[0].toUpperCase(Locale.ENGLISH) : "BLOCK_BREWING_STAND_BREW";
             this.soundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
             this.soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            this.isSoundEnabled = true;
         }
     }
 }

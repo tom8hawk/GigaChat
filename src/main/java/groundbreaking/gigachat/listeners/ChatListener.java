@@ -16,10 +16,7 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.HoverEvent.Action;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
@@ -92,7 +89,19 @@ public final class ChatListener implements Listener {
 
         final String[] replacementList = { name, prefix, suffix, "" };
 
-        final String message = event.getMessage();
+        String message = event.getMessage();
+        final boolean isUpperCasePercentageExceeded = this.isUpperCasePercentageExceeded(message);
+
+        if (this.chatValues.isCapsCheckEnabled() && isUpperCasePercentageExceeded) {
+            if (this.chatValues.isCapsCheckBlockMessageSend()) {
+                messageSender.sendMessage(this.messages.getCapsCheckFailedMessage());
+                this.playDenySound(messageSender);
+                event.setCancelled(true);
+                return;
+            }
+
+            message = message.toLowerCase();
+        }
 
         final String formattedMessage;
         if (this.chatValues.isGlobalForce() || this.isValidForGlobal(message)) {
@@ -151,7 +160,7 @@ public final class ChatListener implements Listener {
             }
 
             final List<Player> localSpyRecipients = LocalSpy.getAll();
-            if (localSpyRecipients.size() != 0) {
+            if (!localSpyRecipients.isEmpty()) {
                 for (int i = localSpyRecipients.size() - 1; i >= 0; i--) {
                     if (event.getRecipients().contains(localSpyRecipients.get(i))) {
                         localSpyRecipients.remove(i);
@@ -252,6 +261,17 @@ public final class ChatListener implements Listener {
         }
     }
 
+    private void playDenySound(final Player messageSender) {
+        if (this.chatValues.isCapsCheckDenySoundEnabled()) {
+            final Location location = messageSender.getLocation();
+            final Sound sound = this.chatValues.getCapsCheckDenySound();
+            final float volume = this.chatValues.getCapsCheckDenySoundVolume();
+            final float pitch = this.chatValues.getCapsCheckDenySoundPitch();
+
+            messageSender.playSound(location, sound, volume, pitch);
+        }
+    }
+
     private String getLocalColor(final Player player) {
         final String playerGroup = this.plugin.getPerms().getPrimaryGroup(player);
         return this.chatValues.getLocalGroupsColors().getOrDefault(playerGroup, "");
@@ -277,6 +297,22 @@ public final class ChatListener implements Listener {
 
     public boolean isValidForGlobal(final String message) {
         return message.trim().length() != 1 && message.charAt(0) == this.chatValues.getGlobalSymbol();
+    }
+
+    private boolean isUpperCasePercentageExceeded(final String message) {
+        final int totalChars = message.length();
+        int uppercaseCount = 0;
+        for (int i = 0; i < totalChars; i++) {
+            final char currentChar = message.charAt(i);
+            if (Character.isUpperCase(currentChar)) {
+                uppercaseCount++;
+            }
+        }
+
+        final double maxPercentage = this.chatValues.getCapsCheckMaxPercentage();
+        final double percentage = (double) uppercaseCount / totalChars * 100;
+
+        return percentage > maxPercentage;
     }
 
     public String removeGlobalPrefix(final String message) {
