@@ -44,7 +44,8 @@ public final class AutoMessages {
         final String soundString = this.autoMessagesValues.getAutoMessagesSounds().get(key);
 
         boolean isSoundEnabled = false;
-        Sound sound = null; float soundVolume = 1.0f, soundPitch = 1.0f;
+        Sound sound = null;
+        float soundVolume = 1.0f, soundPitch = 1.0f;
         if (soundString != null) {
             isSoundEnabled = true;
             final String[] params = soundString.split(";");
