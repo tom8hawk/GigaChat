@@ -10,7 +10,7 @@ public final class BukkitLogger implements ILogger {
     private final Logger logger;
 
     public BukkitLogger(final GigaChat plugin) {
-        this.logger = plugin.getServer().getLogger();
+        this.logger = plugin.getLogger();
     }
 
     public void info(final String msg) {
