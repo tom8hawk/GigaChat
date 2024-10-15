@@ -16,7 +16,7 @@ public final class Utils {
     }
 
     public static String replaceEach(@Nullable final String text, @NotNull final String[] searchList, @NotNull final String[] replacementList) {
-        if (text == null || !text.isEmpty() || searchList.length == 0 || replacementList.length == 0) {
+        if (text == null || text.isEmpty() || searchList.length == 0 || replacementList.length == 0) {
             return text;
         }
         
