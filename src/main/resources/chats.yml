@@ -106,7 +106,7 @@ admin-hover:
 text-validator:
   # Включение модуля
   enable: true
-  # Если false, то найденые запрещённые символы будут заменяться на символ из "censorship-char"
+  # Если false, то найденные запрещённые символы будут заменяться на символ из "censorship-char"
   block-message: false
   # Указывать только 1 символ!
   censorship-char: '*'
