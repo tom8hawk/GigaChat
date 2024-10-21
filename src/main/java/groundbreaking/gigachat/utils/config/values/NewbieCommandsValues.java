@@ -57,7 +57,7 @@ public final class NewbieCommandsValues {
         final ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings != null) {
             this.isEnabled = settings.getBoolean("enable");
-            this.priority = settings.getString("listener-priority").toLowerCase(Locale.ENGLISH);
+            this.priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
             this.counter = settings.getBoolean("count-time-from-first-join") ? new FirstEntryCounter() : new OnlineTimeCounter();
             this.requiredTime = settings.getInt("required-time");
             this.isGiveBypassPermissionEnabled = settings.getBoolean("if-reached.give-permission");
