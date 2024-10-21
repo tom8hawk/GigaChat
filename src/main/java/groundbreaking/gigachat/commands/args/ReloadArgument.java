@@ -23,19 +23,21 @@ public final class ReloadArgument extends ArgsConstructor {
 
         final long startTime = System.currentTimeMillis();
 
-        plugin.reloadConfig();
-        plugin.setupVanishChecker();
-        plugin.setupAll();
-        plugin.getCooldowns().setCooldowns();
-        plugin.getAutoMessages().run();
-        plugin.registerReloadableEvents();
-        plugin.getChatListener().setupValidator();
+        this.plugin.reloadConfig();
+        this.plugin.setupVanishChecker();
+        this.plugin.setupAll();
+        this.plugin.getCooldowns().setCooldowns();
+        this.plugin.getAutoMessages().run();
+        this.plugin.registerReloadableEvents();
+        this.plugin.getPmSounds().setDefaultSound(this.plugin);
 
-        long endTime = System.currentTimeMillis();
+        final long endTime = System.currentTimeMillis();
+        final String result = String.valueOf(endTime - startTime);
+        final String message = this.messages.getReloadMessage().replace("{time}", result);
         if (sender instanceof Player) {
-            plugin.getServer().getConsoleSender().sendMessage(messages.getReloadMessage().replace("{time}", String.valueOf(endTime - startTime)));
+            this.plugin.getServer().getConsoleSender().sendMessage();
         }
-        sender.sendMessage(messages.getReloadMessage().replace("{time}", String.valueOf(endTime - startTime)));
+        sender.sendMessage(message);
 
         return true;
     }

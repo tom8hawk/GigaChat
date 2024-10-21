@@ -3,6 +3,7 @@ package groundbreaking.gigachat;
 import groundbreaking.gigachat.automessages.AutoMessages;
 import groundbreaking.gigachat.collections.Cooldowns;
 import groundbreaking.gigachat.collections.DisabledPrivateMessages;
+import groundbreaking.gigachat.collections.PmSounds;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.commands.args.*;
 import groundbreaking.gigachat.commands.other.BroadcastCommand;
@@ -10,9 +11,9 @@ import groundbreaking.gigachat.commands.other.DisableOwnChatExecutor;
 import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.exceptions.UnsupportedPrioritySpecified;
-import groundbreaking.gigachat.listeners.ChatListener;
 import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
+import groundbreaking.gigachat.listeners.NewListener;
 import groundbreaking.gigachat.listeners.NewbieChatListener;
 import groundbreaking.gigachat.utils.ServerInfo;
 import groundbreaking.gigachat.utils.colorizer.basic.*;
@@ -60,6 +61,7 @@ public final class GigaChat extends JavaPlugin {
     private PrivateMessagesValues pmValues;
 
     private Cooldowns cooldowns;
+    private PmSounds pmSounds;
 
     private DisabledPrivateMessages disabled;
 
@@ -67,7 +69,7 @@ public final class GigaChat extends JavaPlugin {
 
     private ILogger myLogger;
 
-    private ChatListener chatListener;
+    private NewListener chatListener;
     private CommandListener commandListener;
     private NewbieChatListener newbieChatListener;
 
@@ -160,10 +162,11 @@ public final class GigaChat extends JavaPlugin {
         this.newbieCommandsValues = new NewbieCommandsValues(this);
         this.cooldowns = new Cooldowns(this);
         this.disabled = new DisabledPrivateMessages();
-        this.chatListener = new ChatListener(this);
+        this.chatListener = new NewListener(this);
         this.commandListener = new CommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
         this.autoMessages = new AutoMessages(this);
+        this.pmSounds = new PmSounds(this);
     }
 
     public void setupAll() {
@@ -217,7 +220,6 @@ public final class GigaChat extends JavaPlugin {
     }
 
     public void registerReloadableEvents() {
-        this.chatListener.unregisterEvent();
         this.chatListener.registerEvent();
         this.commandListener.unregisterEvent();
         this.newbieChatListener.unregisterEvent();
@@ -226,7 +228,7 @@ public final class GigaChat extends JavaPlugin {
             this.commandListener.registerEvent();
             this.newbieChatListener.registerEvent();
         } else {
-            this.myLogger.warning("Newbie protections will be disabled because NewbieGuard is detected.");
+            this.myLogger.info("Newbie protections will be disabled because NewbieGuard is detected.");
         }
     }
 

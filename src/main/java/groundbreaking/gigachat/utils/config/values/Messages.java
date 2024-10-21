@@ -56,8 +56,9 @@ public final class Messages {
             PmSoundRemoved,
             localSpyEnabled,
             localSpyDisabled,
-            textValidationFailedMessage,
-            capsCheckFailedMessage,
+            charsValidationFailedMessage,
+            capsValidationFailedMessage,
+            wordsValidationFailedMessage,
             helpMessage;
 
     @Getter
@@ -119,8 +120,9 @@ public final class Messages {
         this.PmSoundRemoved = this.getMessage(config, "pm-sound-removed", colorizer);
         this.localSpyEnabled = this.getMessage(config, "local-spy-enabled", colorizer);
         this.localSpyDisabled = this.getMessage(config, "local-spy-disabled", colorizer);
-        this.textValidationFailedMessage = this.getMessage(config, "chars-check-failed-message", colorizer);
-        this.capsCheckFailedMessage = this.getMessage(config, "caps-check-failed-message", colorizer);
+        this.charsValidationFailedMessage = this.getMessage(config, "chars-check-failed-message", colorizer);
+        this.capsValidationFailedMessage = this.getMessage(config, "caps-check-failed-message", colorizer);
+        this.wordsValidationFailedMessage = this.getMessage(config, "words-check-failed-message", colorizer);
         this.helpMessage = this.getMessage(config, "help-message", colorizer);
     }
 

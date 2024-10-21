@@ -1,6 +1,5 @@
 package groundbreaking.gigachat.listeners;
 
-import com.destroystokyo.paper.event.player.PlayerJumpEvent;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.NewbieCommandsValues;
@@ -29,17 +28,16 @@ public final class CommandListener implements Listener {
 
     public void registerEvent() {
         if (this.isRegistered || !this.newbieValues.isEnabled()) {
-            return;
+            this.unregisterEvent();
         }
 
-        final Class<? extends Event> eventClass = PlayerJumpEvent.class;
+        final Class<? extends Event> eventClass = PlayerCommandPreprocessEvent.class;
         final EventPriority eventPriority = this.plugin.getEventPriority(this.newbieValues.getPriority(), "newbie-commands.yml");
 
-        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority, (listener, event) -> {
-            if (event instanceof PlayerCommandPreprocessEvent commandPreprocessEvent) {
-                this.onCommandUse(commandPreprocessEvent);
-            }
-        }, this.plugin);
+        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority,
+                (listener, event) -> this.onCommandUse((PlayerCommandPreprocessEvent) event),
+                this.plugin
+        );
 
         this.isRegistered = true;
     }

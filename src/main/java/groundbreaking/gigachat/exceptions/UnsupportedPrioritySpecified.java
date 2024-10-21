@@ -1,8 +1,8 @@
 package groundbreaking.gigachat.exceptions;
 
-public class UnsupportedPrioritySpecified extends RuntimeException {
+public final class UnsupportedPrioritySpecified extends RuntimeException {
 
-    public UnsupportedPrioritySpecified(String message) {
+    public UnsupportedPrioritySpecified(final String message) {
         super(message);
     }
 

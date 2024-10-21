@@ -82,6 +82,7 @@ local-spy-disabled: "&cОтображение локального чата вы
 
 chars-check-failed-message: "&cТвоё сообщение содержит запрещённые символы!"
 caps-check-failed-message: "&cТвоё сообщение содержит слишком много заглавных символов!"
+words-check-failed-message: "&cТвоё сообщение содержит запрещённые слова!"
 
 help-message: |-
   &fИнструкция по использованию GigaChat:

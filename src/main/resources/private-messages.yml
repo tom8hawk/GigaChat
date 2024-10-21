@@ -71,3 +71,43 @@ formats:
 
   # Сообщение, которое отправится в консоль ("settings.print-to-console" должно быть включено, для этого)
   console-format: "&f[&r{from-prefix}{from-name}{from-suffix} &f-> &r{to-prefix}{to-name}{to-suffix}&f] &r{message}"
+
+validators:
+  chars:
+    # Включение модуля
+    enable: true
+    # Если false, то найденные запрещённые символы будут заменяться на символ из "censorship-char"
+    block-message: false
+    # Указывать только 1 символ!
+    censorship-char: '*'
+    # Разрешенные символы
+    allowed: " AaBbCcDdEeFfGgHhIiGgKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890,.!@#$%^&*()-=_+<>/?\\|"
+    # Звук при нарушении (Формат: звук;громкость;высота (громкость и высота - необязательны))
+    # Оставь "disabled", чтобы отключить
+    deny-sound: ENTITY_VILLAGER_NO
+
+  caps:
+    # Включение модуля
+    enable: false
+    # Настройка максимального количества символов в верхнем регистре (В процентах)
+    max-percent: 70
+    # Заблокировать ли отправку сообщения?
+    block-message-send: false
+    # Звук при нарушении (Формат: звук;громкость;высота (громкость и высота - необязательны))
+    # Оставь "disabled", чтобы отключить
+    deny-sound: ENTITY_VILLAGER_NO
+
+  words:
+    # Включение модуля
+    enable: true
+    # Если false, то найденные запрещённые символы будут заменяться на символ из "censorship-char"
+    block-message: false
+    # Указывать только 1 символ!
+    censorship-char: '*'
+    # Разрешенные символы
+    blocked:
+      - "monkey"
+      - "churka"
+    # Звук при нарушении (Формат: звук;громкость;высота (громкость и высота - необязательны))
+    # Оставь "disabled", чтобы отключить
+    deny-sound: ENTITY_VILLAGER_NO

@@ -2,6 +2,7 @@ package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.*;
+import groundbreaking.gigachat.utils.StringUtil;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.config.values.PrivateMessagesValues;
@@ -24,6 +25,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     private final IVanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
     private final Cooldowns cooldowns;
+    private final PmSounds pmSounds;
 
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
 
@@ -34,6 +36,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         this.vanishChecker = plugin.getVanishChecker();
         this.consoleSender = plugin.getServer().getConsoleSender();
         this.cooldowns = plugin.getCooldowns();
+        this.pmSounds = plugin.getPmSounds();
     }
 
     @Override
@@ -86,19 +89,24 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
             }
         }
 
+        String message = this.getMessage(playerSender, args);
+
+        message = this.getValidMessage(playerSender, message);
+        if (message == null) {
+            return true;
+        }
 
         final String senderPrefix = this.getPrefix(playerSender);
         final String senderSuffix = this.getSuffix(playerSender);
         final String recipientPrefix = this.getPrefix(recipient), recipientSuffix = getSuffix(recipient);
 
-        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix};
+        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix };
         final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;
 
-        final String message = this.getMessage(playerSender, args);
         formattedMessageForSender = this.getFormattedMessage(playerSender, message, this.pmValues.getSenderFormat(), replacementList);
-        formattedMessageForRecipient = this.getFormattedMessage(playerSender, message, this.pmValues.getRecipientFormat(),replacementList);
-        formattedMessageForConsole = this.getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(),replacementList);
-        formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(),replacementList);
+        formattedMessageForRecipient = this.getFormattedMessage(playerSender, message, this.pmValues.getRecipientFormat(), replacementList);
+        formattedMessageForConsole = this.getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
+        formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
 
         Reply.add(recipientName, senderName);
         this.processLogs(formattedMessageForConsole);
@@ -148,16 +156,104 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private String getMessage(final Player sender, final String[] args) {
-        return this.pmValues.getMessagesColorizer().colorize(sender, String.join(" ", args).trim() );
+        return this.pmValues.getMessagesColorizer().colorize(sender, String.join(" ", args).trim());
+    }
+
+    private void playDenySoundCharsFailed(final Player messageSender) {
+        if (this.pmValues.isCharsValidatorDenySoundEnabled()) {
+            final Location location = messageSender.getLocation();
+            final Sound sound = this.pmValues.getTextValidatorDenySound();
+            final float volume = this.pmValues.getTextValidatorDenySoundVolume();
+            final float pitch = this.pmValues.getTextValidatorDenySoundPitch();
+
+            messageSender.playSound(location, sound, volume, pitch);
+        }
     }
 
     private void playSound(final Player recipient) {
-        final Sound sound = PmSounds.getSound(recipient.getName());
+        final Sound sound = this.pmSounds.getSound(recipient.getName());
         if (this.pmValues.isSoundEnabled()) {
             final Location recipientLocation = recipient.getLocation();
             final float volume = this.pmValues.getSoundVolume();
             final float pitch = this.pmValues.getSoundPitch();
             recipient.playSound(recipientLocation, sound, volume, pitch);
+        }
+    }
+
+    private String getValidMessage(final Player sender, String message) {
+        final StringUtil stringUtil = this.pmValues.getStringUtil();
+        if (stringUtil.hasBlockedChars(message)) {
+            if (this.pmValues.isCharsValidatorBlockMessage()) {
+                final String denyMessage = this.messages.getCharsValidationFailedMessage();
+                if (!denyMessage.isEmpty()) {
+                    sender.sendMessage(denyMessage);
+                }
+                this.playDenySoundCharsCheckFailed(sender);
+                return null;
+            }
+
+            message = stringUtil.getFormattedCharsMessage(message);
+        }
+
+        if (stringUtil.isUpperCasePercentageExceeded(message)) {
+            if (this.pmValues.isCapsValidatorBlockMessageSend()) {
+                final String denyMessage = this.messages.getCharsValidationFailedMessage();
+                if (!denyMessage.isEmpty()) {
+                    sender.sendMessage(denyMessage);
+                }
+                this.playDenySoundCapsCheckFailed(sender);
+                return null;
+            }
+
+            message = message.toLowerCase();
+        }
+
+        if (stringUtil.hasBlockedWords(message)) {
+            if (this.pmValues.isWordsValidatorBlockMessageSend()) {
+                final String denyMessage = this.messages.getWordsValidationFailedMessage();
+                if (!denyMessage.isEmpty()) {
+                    sender.sendMessage(denyMessage);
+                }
+                this.playDenySoundWordsCheckFailed(sender);
+                return null;
+            }
+
+            message = stringUtil.getFormattedWordsMessage(message);
+        }
+
+        return message;
+    }
+
+    private void playDenySoundCharsCheckFailed(final Player messageSender) {
+        if (this.pmValues.isCharsValidatorDenySoundEnabled()) {
+            final Location location = messageSender.getLocation();
+            final Sound sound = this.pmValues.getTextValidatorDenySound();
+            final float volume = this.pmValues.getTextValidatorDenySoundVolume();
+            final float pitch = this.pmValues.getTextValidatorDenySoundPitch();
+
+            messageSender.playSound(location, sound, volume, pitch);
+        }
+    }
+
+    private void playDenySoundCapsCheckFailed(final Player messageSender) {
+        if (this.pmValues.isCapsValidatorDenySoundEnabled()) {
+            final Location location = messageSender.getLocation();
+            final Sound sound = this.pmValues.getCapsValidatorDenySound();
+            final float volume = this.pmValues.getCapsValidatorDenySoundVolume();
+            final float pitch = this.pmValues.getCapsValidatorDenySoundPitch();
+
+            messageSender.playSound(location, sound, volume, pitch);
+        }
+    }
+
+    private void playDenySoundWordsCheckFailed(final Player messageSender) {
+        if (this.pmValues.isWordsValidatorDenySoundEnabled()) {
+            final Location location = messageSender.getLocation();
+            final Sound sound = this.pmValues.getWordsValidatorDenySound();
+            final float volume = this.pmValues.getWordsValidatorDenySoundVolume();
+            final float pitch = this.pmValues.getWordsValidatorDenySoundPitch();
+
+            messageSender.playSound(location, sound, volume, pitch);
         }
     }
 

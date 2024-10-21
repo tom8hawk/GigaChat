@@ -12,10 +12,12 @@ import org.bukkit.event.player.PlayerQuitEvent;
 public final class DisconnectListener implements Listener {
 
     private final Cooldowns cooldowns;
+    private final PmSounds pmSounds;
     private final DisabledPrivateMessages disabledPrivateMessages;
 
     public DisconnectListener(final GigaChat plugin) {
         this.cooldowns = plugin.getCooldowns();
+        this.pmSounds = plugin.getPmSounds();
         this.disabledPrivateMessages = plugin.getDisabled();
     }
 
@@ -56,7 +58,7 @@ public final class DisconnectListener implements Listener {
             LocalSpy.add(name);
         }
         if (DatabaseQueries.privateMessagesSoundsContainsPlayer(name)) {
-            PmSounds.setSound(name, DatabaseQueries.getSound(name));
+            this.pmSounds.setSound(name, DatabaseQueries.getSound(name));
         }
         if (DatabaseQueries.socialSpyContainsPlayer(name)) {
             SocialSpy.add(name);
@@ -79,8 +81,8 @@ public final class DisconnectListener implements Listener {
         if (LocalSpy.contains(name)) {
             DatabaseQueries.addPlayerToLocalSpy(name);
         }
-        if (PmSounds.contains(name)) {
-            DatabaseQueries.addPlayerPmSoundToPmSounds(name, PmSounds.getSound(name).toString());
+        if (this.pmSounds.contains(name)) {
+            DatabaseQueries.addPlayerPmSoundToPmSounds(name, this.pmSounds.getSound(name).toString());
         }
         if (SocialSpy.contains(name)) {
             DatabaseQueries.addPlayerToSocialSpy(name);
@@ -99,7 +101,7 @@ public final class DisconnectListener implements Listener {
         Ignore.removeFromIgnoredChat(name);
         Ignore.removeFromIgnoredPrivate(name);
         LocalSpy.remove(name);
-        PmSounds.remove(name);
+        this.pmSounds.remove(name);
         Reply.removeFromAll(name);
         SocialSpy.remove(name);
     }

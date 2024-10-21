@@ -58,8 +58,9 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
         if (hasChatIgnorePerm && hasPrivateIgnorePerm) {
             argsLength = 2;
 
-            switch(args[0].toLowerCase()) {
-                case "chat" -> {}
+            switch (args[0].toLowerCase()) {
+                case "chat" -> {
+                }
                 case "private" -> ignoreType = IgnoreCommandExecutor.IgnoreType.PRIVATE;
                 default -> {
                     playerSender.sendMessage(this.messages.getIgnoreUsageError());
@@ -87,7 +88,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
         final String targetName = target.getName();
 
-        switch(ignoreType) {
+        switch (ignoreType) {
             case CHAT -> this.processChat(playerSender, senderName, targetName);
             case PRIVATE -> this.processPrivate(playerSender, senderName, targetName);
             default -> playerSender.sendMessage(this.messages.getIgnoreUsageError());
@@ -119,8 +120,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             Ignore.removeFromIgnoredChat(senderName, targetName);
             DatabaseQueries.removePlayerFromIgnoreChat(senderName);
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
-        }
-        else {
+        } else {
             Ignore.addToIgnoredChat(senderName, targetName);
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
@@ -139,8 +139,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             Ignore.removeFromIgnoredPrivate(senderName, targetName);
             DatabaseQueries.removePlayerFromIgnorePrivate(senderName);
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
-        }
-        else {
+        } else {
             Ignore.addToIgnoredPrivate(senderName, targetName);
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
@@ -164,8 +163,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
                     final String input = args[1].toLowerCase();
                     return this.getPlayer(playerSender, input);
                 }
-            }
-            else if (args.length == 1) {
+            } else if (args.length == 1) {
                 final String input = args[0].toLowerCase();
                 return this.getPlayer(playerSender, input);
             }

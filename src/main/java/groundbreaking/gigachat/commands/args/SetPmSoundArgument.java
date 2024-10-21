@@ -14,10 +14,12 @@ import org.jetbrains.annotations.NotNull;
 public final class SetPmSoundArgument extends ArgsConstructor {
 
     private final Messages messages;
+    private final PmSounds pmSounds;
 
     public SetPmSoundArgument(final GigaChat plugin, String name, String permission) {
         super(name, permission);
         this.messages = plugin.getMessages();
+        this.pmSounds = plugin.getPmSounds();
     }
 
     @Override
@@ -35,7 +37,7 @@ public final class SetPmSoundArgument extends ArgsConstructor {
         }
 
         if (args[2].equalsIgnoreCase("none")) {
-            PmSounds.remove(target.getName());
+            this.pmSounds.remove(target.getName());
             DatabaseQueries.removePlayerFromPmSounds(target.getName());
 
             final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
@@ -60,7 +62,7 @@ public final class SetPmSoundArgument extends ArgsConstructor {
             return true;
         }
 
-        PmSounds.setSound(target.getName(), sound.name());
+        this.pmSounds.setSound(target.getName(), sound.name());
 
         final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
         if (sender != target || messageForTargetIsEmpty) {
