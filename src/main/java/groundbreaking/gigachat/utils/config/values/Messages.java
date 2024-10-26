@@ -3,66 +3,68 @@ package groundbreaking.gigachat.utils.config.values;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
+@Getter
 public final class Messages {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    @Getter
-    private String
-            playerOnly,
-            noPermission,
-            reloadMessage,
-            nobodyToAnswer,
-            playerNotFound,
-            soundNotFound,
-            chatCooldownMessage,
-            commandCooldownMessage,
-            pmUsageError,
-            ignoreUsageError,
-            replyUsageError,
-            setpmsoundUsageError,
-            broadcastUsageError,
-            nonExistArgument,
-            argumentUsageError,
-            soundAdditionalArgs,
-            cannotChatWithHimself,
-            cannotIgnoreHimself,
-            recipientIgnoresSender,
-            senderIgnoresRecipient,
-            hasDisabledPm,
-            spyEnabled,
-            spyDisabled,
-            chatIgnoreEnabled,
-            chatIgnoreDisabled,
-            ownChatEnabled,
-            ownChatDisabled,
-            privateIgnoreEnabled,
-            privateIgnoreDisabled,
-            pmEnabled,
-            pmDisabled,
-            chatHasBeenClearedByAdministrator,
-            chatHasBeenCleared,
-            serverChatEnabled,
-            serverChatDisabled,
-            serverChatIsDisabled,
-            noOneHear,
-            targetPmSoundSet,
-            targetPmSoundRemoved,
-            PmSoundSet,
-            PmSoundRemoved,
-            localSpyEnabled,
-            localSpyDisabled,
-            charsValidationFailedMessage,
-            capsValidationFailedMessage,
-            wordsValidationFailedMessage,
-            helpMessage;
+    private String playerOnly;
+    private String noPermission;
+    private String reloadMessage;
+    private String nobodyToAnswer;
+    private String playerNotFound;
+    private String soundNotFound;
+    private String chatCooldownMessage;
+    private String commandCooldownMessage;
+    private String pmUsageError;
+    private String ignoreUsageError;
+    private String replyUsageError;
+    private String setpmsoundUsageError;
+    private String broadcastUsageError;
+    private String nonExistArgument;
+    private String argumentUsageError;
+    private String soundAdditionalArgs;
+    private String cannotChatWithHimself;
+    private String cannotIgnoreHimself;
+    private String recipientIgnoresSender;
+    private String senderIgnoresRecipient;
+    private String hasDisabledPm;
+    private String spyEnabled;
+    private String spyDisabled;
+    private String chatIgnoreEnabled;
+    private String chatIgnoreDisabled;
+    private String ownChatEnabled;
+    private String ownChatDisabled;
+    private String privateIgnoreEnabled;
+    private String privateIgnoreDisabled;
+    private String pmEnabled;
+    private String pmDisabled;
+    private String chatHasBeenClearedByAdministrator;
+    private String chatHasBeenCleared;
+    private String serverChatEnabled;
+    private String serverChatDisabled;
+    private String serverChatIsDisabled;
+    private String noOneHear;
+    private String targetPmSoundSet;
+    private String targetPmSoundRemoved;
+    private String pmSoundSet;
+    private String pmSoundRemoved;
+    private String localSpyEnabled;
+    private String localSpyDisabled;
+    private String charsValidationFailedMessage;
+    private String capsValidationFailedMessage;
+    private String wordsValidationFailedMessage;
+    private String helpMessage;
 
-    @Getter
-    private static String hours, minutes, seconds;
+    @Getter private static String hours;
+    @Getter private static String minutes;
+    @Getter private static String seconds;
 
     public Messages(final GigaChat plugin) {
         this.plugin = plugin;
@@ -116,8 +118,8 @@ public final class Messages {
         this.noOneHear = this.getMessage(config, "no-one-hear", colorizer);
         this.targetPmSoundSet = this.getMessage(config, "target-pm-sound-set", colorizer);
         this.targetPmSoundRemoved = this.getMessage(config, "target-pm-sound-removed", colorizer);
-        this.PmSoundSet = this.getMessage(config, "pm-sound-set", colorizer);
-        this.PmSoundRemoved = this.getMessage(config, "pm-sound-removed", colorizer);
+        this.pmSoundSet = this.getMessage(config, "pm-sound-set", colorizer);
+        this.pmSoundRemoved = this.getMessage(config, "pm-sound-removed", colorizer);
         this.localSpyEnabled = this.getMessage(config, "local-spy-enabled", colorizer);
         this.localSpyDisabled = this.getMessage(config, "local-spy-disabled", colorizer);
         this.charsValidationFailedMessage = this.getMessage(config, "chars-check-failed-message", colorizer);

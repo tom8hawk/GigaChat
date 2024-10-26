@@ -18,8 +18,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -35,7 +35,7 @@ public final class Chat {
     private final boolean isNoOneHeardHideHidden;
     private final boolean isNoOneHeardHideVanished;
     private final boolean isNoOneHeardHideSpectators;
-    private final HashMap<String, String> groupsColors;
+    private final Map<String, String> groupsColors;
     private final ExpiringMap<String, Long> cooldowns;
     private final List<Player> spyListeners;
 
@@ -49,7 +49,7 @@ public final class Chat {
             final boolean isNoOneHeardHideHidden,
             final boolean isNoOneHeardHideVanished,
             final boolean isNoOneHeardHideSpectators,
-            final HashMap<String, String> groupsColors
+            final Map<String, String> groupsColors
     ) {
         this.name = name;
         this.bypassCooldownPermission = "gigachat.bypass.cooldown." + name;
@@ -158,20 +158,31 @@ public final class Chat {
     public boolean isNoOneHeard(final Player sender, final List<Player> recipients, final IVanishChecker vanishChecker) {
         if (this.isNoOneHeardEnabled) {
             final List<Player> validRecipients = new ArrayList<>(recipients);
-            for (int i = validRecipients.size() - 1; i >= 0; i--) {
-                final Player recipient = validRecipients.get(i);
-                if (this.isNoOneHeardHideHidden && !sender.canSee(recipient)) {
-                    validRecipients.remove(i);
-                } else if (this.isNoOneHeardHideVanished && vanishChecker.isVanished(recipient)) {
-                    validRecipients.remove(i);
-                } else if (this.isNoOneHeardHideSpectators && recipient.getGameMode() == GameMode.SPECTATOR) {
-                    validRecipients.remove(i);
-                }
-            }
+            validRecipients.removeIf(recipient ->
+                    !this.isRecipientValid(sender, recipient, vanishChecker)
+            );
 
             return validRecipients.size() == 1;
         }
 
         return false;
+    }
+
+    private boolean isRecipientValid(final Player sender, final Player recipient, final IVanishChecker vanishChecker) {
+        return this.isRecipientVisible(sender, recipient)
+                && this.isRecipientNotVanished(recipient, vanishChecker)
+                && this.isRecipientNotSpectator(recipient);
+    }
+
+    private boolean isRecipientVisible(final Player sender, final Player recipient) {
+        return !this.isNoOneHeardHideHidden || sender.canSee(recipient);
+    }
+
+    private boolean isRecipientNotVanished(final Player recipient, final IVanishChecker vanishChecker) {
+        return !this.isNoOneHeardHideVanished || !vanishChecker.isVanished(recipient);
+    }
+
+    private boolean isRecipientNotSpectator(final Player recipient) {
+        return !this.isNoOneHeardHideSpectators || recipient.getGameMode() != GameMode.SPECTATOR;
     }
 }
