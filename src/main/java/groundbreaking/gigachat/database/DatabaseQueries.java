@@ -190,8 +190,8 @@ public final class DatabaseQueries {
                 final String listString = result.getString("ignored");
                 return Arrays.asList(listString.split(";"));
             }
-        } catch (final SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
         }
 
         return Collections.emptyList();
@@ -315,8 +315,8 @@ public final class DatabaseQueries {
                 final String listString = result.getString("ignored");
                 return Arrays.asList(listString.split(";"));
             }
-        } catch (final SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
         }
 
         return Collections.emptyList();
@@ -438,8 +438,8 @@ public final class DatabaseQueries {
             if (result.next()) {
                 return result.getString("sound");
             }
-        } catch (final SQLException e) {
-            System.out.println(e.getMessage());
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
         }
 
         return null;
