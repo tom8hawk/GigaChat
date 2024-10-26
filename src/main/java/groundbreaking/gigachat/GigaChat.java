@@ -21,6 +21,7 @@ import groundbreaking.gigachat.utils.config.values.*;
 import groundbreaking.gigachat.utils.logging.BukkitLogger;
 import groundbreaking.gigachat.utils.logging.ILogger;
 import groundbreaking.gigachat.utils.logging.PaperLogger;
+import groundbreaking.gigachat.utils.updateschecker.UpdatesChecker;
 import groundbreaking.gigachat.utils.vanish.*;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
@@ -105,6 +106,8 @@ public final class GigaChat extends JavaPlugin {
         this.registerEvents();
         this.registerCommands();
         this.registerBroadcastCommand();
+
+        super.getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new UpdatesChecker(this).check(), 300L);
 
         final long endTime = System.currentTimeMillis();
         this.myLogger.info("Plugin successfully started in " + (endTime - startTime) + "ms.");

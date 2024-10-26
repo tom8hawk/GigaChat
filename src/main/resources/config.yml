@@ -11,6 +11,13 @@
 # ESSENTIALS / SUPER_VANISH / CMI
 vanish-provider: ESSENTIALS
 
+# Настройка авто-абновлений
+updates:
+  # Проверять и уведомлять если найдены обновления?
+  check: true
+  # Скачивать обновления автоматически, если было найдено? (После скачки, сервер - нужно перезапустить!)
+  auto-download: false
+
 # Мне стало лень выносить в отдельный конфиг
 broadcast:
   command: "broadcast"
