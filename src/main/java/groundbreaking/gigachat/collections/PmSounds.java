@@ -1,13 +1,14 @@
 package groundbreaking.gigachat.collections;
 
 import groundbreaking.gigachat.GigaChat;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.bukkit.Sound;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public final class PmSounds {
 
-    private final HashMap<String, String> sounds = new HashMap<>();
+    private final Map<String, String> sounds = new Object2ObjectOpenHashMap<>();
     private String defaultSound; public void setDefaultSound(final GigaChat plugin) {
         this.defaultSound = plugin.getPmValues().getSound();
     }
