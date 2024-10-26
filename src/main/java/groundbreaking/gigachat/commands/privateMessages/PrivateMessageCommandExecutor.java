@@ -288,17 +288,6 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         return this.hexColorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 1, args.length)).trim());
     }
 
-    private void playDenySoundCharsFailed(final Player messageSender) {
-        if (this.pmValues.isCharsValidatorDenySoundEnabled()) {
-            final Location location = messageSender.getLocation();
-            final Sound sound = this.pmValues.getTextValidatorDenySound();
-            final float volume = this.pmValues.getTextValidatorDenySoundVolume();
-            final float pitch = this.pmValues.getTextValidatorDenySoundPitch();
-
-            messageSender.playSound(location, sound, volume, pitch);
-        }
-    }
-
     private void playSound(final Player recipient) {
         if (pmValues.isSoundEnabled()) {
             final Sound sound = this.pmSounds.getSound(recipient.getName());
