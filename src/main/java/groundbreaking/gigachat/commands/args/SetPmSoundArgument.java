@@ -2,7 +2,7 @@ package groundbreaking.gigachat.commands.args;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.PmSounds;
-import groundbreaking.gigachat.commands.ArgsConstructor;
+import groundbreaking.gigachat.constructors.ArgsConstructor;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import org.bukkit.Bukkit;

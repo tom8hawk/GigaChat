@@ -1,4 +1,4 @@
-package groundbreaking.gigachat.commands;
+package groundbreaking.gigachat.constructors;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.args;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.commands.ArgsConstructor;
+import groundbreaking.gigachat.constructors.ArgsConstructor;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
