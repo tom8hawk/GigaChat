@@ -113,8 +113,8 @@ public final class DatabaseQueries {
         final String query = "SELECT * FROM disabledChat WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
+
             final ResultSet result = statement.executeQuery();
-            
             return result.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
@@ -164,8 +164,8 @@ public final class DatabaseQueries {
         final String query = "SELECT * FROM ignoreChat WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
+
             final ResultSet result = statement.executeQuery();
-            
             return result.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
@@ -184,11 +184,10 @@ public final class DatabaseQueries {
         final String query = "SELECT ignored FROM ignoreChat WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet result = statement.executeQuery();
 
+            final ResultSet result = statement.executeQuery();
             if (result.next()) {
                 final String listString = result.getString("ignored");
-                
                 return Arrays.asList(listString.split(";"));
             }
         } catch (final SQLException e) {
@@ -238,8 +237,8 @@ public final class DatabaseQueries {
         final String query = "SELECT * FROM disabledPrivateMessages WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
+
             final ResultSet result = statement.executeQuery();
-            
             return result.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
@@ -290,6 +289,7 @@ public final class DatabaseQueries {
 
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
+
             final ResultSet result = statement.executeQuery();
             return result.next();
         } catch (final SQLException ex) {
@@ -309,11 +309,10 @@ public final class DatabaseQueries {
         final String query = "SELECT ignored FROM ignorePrivate WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet result = statement.executeQuery();
 
+            final ResultSet result = statement.executeQuery();
             if (result.next()) {
                 final String listString = result.getString("ignored");
-                
                 return Arrays.asList(listString.split(";"));
             }
         } catch (final SQLException e) {
@@ -363,8 +362,8 @@ public final class DatabaseQueries {
         final String query = "SELECT * FROM localSpy WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
+
             final ResultSet result = statement.executeQuery();
-            
             return result.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
@@ -414,8 +413,8 @@ public final class DatabaseQueries {
         final String query = "SELECT * FROM privateMessagesSounds WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet result = statement.executeQuery();
 
+            final ResultSet result = statement.executeQuery();
             return result.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
@@ -434,8 +433,8 @@ public final class DatabaseQueries {
         final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
-            final ResultSet result = statement.executeQuery();
 
+            final ResultSet result = statement.executeQuery();
             if (result.next()) {
                 return result.getString("sound");
             }
@@ -486,8 +485,8 @@ public final class DatabaseQueries {
         final String query = "SELECT * FROM socialSpy WHERE username = ?";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
+
             final ResultSet result = statement.executeQuery();
-            
             return result.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
