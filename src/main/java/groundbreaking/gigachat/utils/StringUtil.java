@@ -19,7 +19,7 @@ public final class StringUtil {
     private String wordsCensorshipChar;
 
     public boolean hasBlockedChars(final String message) {
-        if (!isCharsValidatorEnabled) {
+        if (!this.isCharsValidatorEnabled) {
             return false;
         }
 
@@ -27,11 +27,11 @@ public final class StringUtil {
         for (int i = 0; i < messageLength; i++) {
             final char currentChar = message.charAt(i);
             if (currentChar != ' ' && !this.allowedCharsHashSet.contains(currentChar)) {
-                return false;
+                return true;
             }
         }
 
-        return true;
+        return false;
     }
 
     public String getFormattedCharsMessage(final String message) {
@@ -50,7 +50,7 @@ public final class StringUtil {
     }
 
     public boolean isUpperCasePercentageExceeded(final String message) {
-        if (!isCapsValidatorEnabled) {
+        if (!this.isCapsValidatorEnabled) {
             return false;
         }
 
@@ -69,7 +69,7 @@ public final class StringUtil {
     }
 
     public boolean hasBlockedWords(final String message) {
-        if (!isWordsValidatorEnabled) {
+        if (!this.isWordsValidatorEnabled) {
             return false;
         }
 
