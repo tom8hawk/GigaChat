@@ -24,6 +24,12 @@ public class UpdatesChecker {
 
     public void check() {
         final ConfigurationSection updates = this.plugin.getConfig().getConfigurationSection("updates");
+        if (updates == null) {
+            this.plugin.getMyLogger().warning("Failed to load section \"updates\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            return;
+        }
+
         if (!updates.getBoolean("check")) {
             this.plugin.getMyLogger().warning("Updates checker wes disabled, but it's not recommend by the author to do it!");
             return;
