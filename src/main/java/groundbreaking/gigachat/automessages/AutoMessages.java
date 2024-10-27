@@ -16,7 +16,7 @@ import java.util.Random;
 public final class AutoMessages {
 
     private final Random random = new Random();
-    private int i = 0;
+    private int lastIndex = 0;
 
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
@@ -46,7 +46,7 @@ public final class AutoMessages {
         boolean isSoundEnabled = false;
         Sound sound = null;
         float soundVolume = 1.0f, soundPitch = 1.0f;
-        if (soundString != null) {
+        if (soundString != null && !soundString.equalsIgnoreCase("disabled")) {
             isSoundEnabled = true;
             final String[] params = soundString.split(";");
             sound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
@@ -54,7 +54,7 @@ public final class AutoMessages {
             soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
         }
 
-        for (Player player : Bukkit.getOnlinePlayers()) {
+        for (final Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("gigachat.automessages")) {
                 continue;
             }
@@ -74,21 +74,19 @@ public final class AutoMessages {
 
     private String getAutoMessage() {
         final int size = this.autoMessagesValues.getAutoMessages().size();
-        final int iterationsAmount = this.autoMessagesValues.isRandom() ? this.random.nextInt(size) : i;
+        final int iterationsAmount = this.autoMessagesValues.isRandom() ? this.random.nextInt(size) : this.lastIndex;
 
-        if (i >= size) {
-            i = 0;
+        if (this.lastIndex >= size) {
+            this.lastIndex = 0;
         }
-
-        String randomKey = null;
 
         final Iterator<String> iterator = this.autoMessagesValues.getAutoMessages().keySet().iterator();
         for (int i = 0; i < iterationsAmount; i++) {
             if (iterator.hasNext()) {
-                randomKey = iterator.next();
+                return iterator.next();
             }
         }
 
-        return randomKey;
+        return null;
     }
 }

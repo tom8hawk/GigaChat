@@ -3,13 +3,15 @@ package groundbreaking.gigachat.utils.config.values;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Getter
 public final class AutoMessagesValues {
@@ -17,17 +19,18 @@ public final class AutoMessagesValues {
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    private boolean isEnabled, isRandom;
+    private boolean isEnabled;
+    private boolean isRandom;
 
     private int sendInterval;
 
     private String defaultSound;
 
-    private final HashMap<String, String>
-            autoMessagesSounds = new HashMap<>();
+    private final Map<String, String>
+            autoMessagesSounds = new Object2ObjectOpenHashMap<>();
 
-    private final HashMap<String, List<String>>
-            autoMessages = new HashMap<>();
+    private final Map<String, List<String>>
+            autoMessages = new Object2ObjectOpenHashMap<>();
 
     public AutoMessagesValues(final GigaChat plugin) {
         this.plugin = plugin;
@@ -61,12 +64,12 @@ public final class AutoMessagesValues {
             this.autoMessagesSounds.clear();
             this.autoMessages.clear();
 
-            final List<String> autoMessagesKeys = autoMessagesSection.getKeys(false).stream().toList();
+            final List<String> autoMessagesKeys = new ObjectArrayList<>(autoMessagesSection.getKeys(false));
             for (int i = 0; i < autoMessagesKeys.size(); i++) {
                 final String key = autoMessagesKeys.get(i);
                 this.autoMessagesSounds.put(key, autoMessagesSection.getString(key + ".sound", defaultSound));
 
-                final List<String> messages = autoMessagesSection.getStringList(key + ".messages");
+                final List<String> messages = new ObjectArrayList<>(autoMessagesSection.getStringList(key + ".messages"));
                 for (int r = 0; r < messages.size(); r++) {
                     messages.set(r, colorizer.colorize(messages.get(r)));
                 }
