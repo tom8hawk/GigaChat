@@ -1,0 +1,2 @@
+1.0-beta->https://github.com/groundbreakingmc/GigaChat/releases/download/1.0-beta/GigaChat-1.0-beta.jar
+Beta release
