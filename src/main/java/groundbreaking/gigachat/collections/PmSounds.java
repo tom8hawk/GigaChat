@@ -18,7 +18,7 @@ public final class PmSounds {
     }
 
     public Sound getSound(final String name) {
-        if (sounds.isEmpty() || !sounds.containsKey(name)) {
+        if (sounds.isEmpty()) {
             return Sound.valueOf(defaultSound);
         }
 
