@@ -25,7 +25,7 @@ public class UpdatesChecker {
     public void check() {
         final ConfigurationSection updates = this.plugin.getConfig().getConfigurationSection("updates");
         if (!updates.getBoolean("check")) {
-            this.plugin.getMyLogger().warning("Updates checker were disabled, but it's not recommend by author to do it!");
+            this.plugin.getMyLogger().warning("Updates checker wes disabled, but it's not recommend by the author to do it!");
             return;
         }
 
