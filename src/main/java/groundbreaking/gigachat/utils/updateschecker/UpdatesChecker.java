@@ -53,7 +53,7 @@ public class UpdatesChecker {
                 this.plugin.getMyLogger().warning("\u001b[31mCheck was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
                 this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
             }
-        });
+        }).join();
     }
 
     private boolean isHigher(final String newVersion) {
