@@ -57,8 +57,13 @@ public class UpdatesChecker {
     }
 
     private boolean isHigher(final String newVersion) {
-        final int currentVersionNum = Integer.parseInt(plugin.getDescription().getVersion().replace(".", ""));
-        final int newVersionNum = Integer.parseInt(newVersion.replace(".", ""));
+        final String pluginVersion = plugin.getDescription().getVersion();
+        if (!newVersion.contains("beta")) {
+            return true;
+        }
+
+        final int currentVersionNum = Integer.parseInt(pluginVersion.replace("-beta", "").replace(".", ""));
+        final int newVersionNum = Integer.parseInt(newVersion.replace("-beta", "").replace(".", ""));
 
         return currentVersionNum < newVersionNum;
     }
