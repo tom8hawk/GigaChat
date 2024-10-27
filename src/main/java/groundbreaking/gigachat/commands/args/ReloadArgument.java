@@ -34,7 +34,7 @@ public final class ReloadArgument extends ArgsConstructor {
         final String result = String.valueOf(endTime - startTime);
         final String message = this.messages.getReloadMessage().replace("{time}", result);
         if (sender instanceof Player) {
-            this.plugin.getServer().getConsoleSender().sendMessage();
+            this.plugin.getServer().getConsoleSender().sendMessage(message);
         }
         sender.sendMessage(message);
 
