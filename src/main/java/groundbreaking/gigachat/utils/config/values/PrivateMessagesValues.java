@@ -29,8 +29,6 @@ public final class PrivateMessagesValues {
 
     private int pmCooldown, ignoreCooldown, spyCooldown;
 
-    private String sound;
-
     private float soundVolume, soundPitch;
 
     private Sound
@@ -164,7 +162,12 @@ public final class PrivateMessagesValues {
             this.isSoundEnabled = false;
         } else {
             final String[] params = soundString.split(";");
-            this.sound = params.length == 1 && params[0] != null ? params[0].toUpperCase(Locale.ENGLISH) : "BLOCK_BREWING_STAND_BREW";
+            final String sound = params.length == 1 && params[0] != null ? params[0].toUpperCase(Locale.ENGLISH) : "BLOCK_BREWING_STAND_BREW";
+            this.plugin.getMyLogger().info("");
+            this.plugin.getMyLogger().info("Params 0: " + params[0]);
+            this.plugin.getMyLogger().info("Value for pm sound: " + sound);
+            this.plugin.getMyLogger().info("");
+            this.plugin.getPmSounds().setDefaultSound(sound);
             this.soundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
             this.soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
             this.isSoundEnabled = true;

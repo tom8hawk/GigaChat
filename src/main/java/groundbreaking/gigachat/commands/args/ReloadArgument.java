@@ -29,7 +29,6 @@ public final class ReloadArgument extends ArgsConstructor {
         this.plugin.getCooldowns().setCooldowns();
         this.plugin.getAutoMessages().run();
         this.plugin.registerReloadableEvents();
-        this.plugin.getPmSounds().setDefaultSound(this.plugin);
 
         final long endTime = System.currentTimeMillis();
         final String result = String.valueOf(endTime - startTime);
