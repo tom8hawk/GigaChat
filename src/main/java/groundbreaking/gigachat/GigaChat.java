@@ -11,9 +11,9 @@ import groundbreaking.gigachat.commands.other.DisableOwnChatExecutor;
 import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.exceptions.UnsupportedPrioritySpecified;
+import groundbreaking.gigachat.listeners.ChatListener;
 import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
-import groundbreaking.gigachat.listeners.NewListener;
 import groundbreaking.gigachat.listeners.NewbieChatListener;
 import groundbreaking.gigachat.utils.ServerInfo;
 import groundbreaking.gigachat.utils.colorizer.basic.*;
@@ -70,7 +70,7 @@ public final class GigaChat extends JavaPlugin {
 
     private ILogger myLogger;
 
-    private NewListener chatListener;
+    private ChatListener chatListener;
     private CommandListener commandListener;
     private NewbieChatListener newbieChatListener;
 
@@ -165,7 +165,7 @@ public final class GigaChat extends JavaPlugin {
         this.newbieCommandsValues = new NewbieCommandsValues(this);
         this.cooldowns = new Cooldowns(this);
         this.disabled = new DisabledPrivateMessages();
-        this.chatListener = new NewListener(this);
+        this.chatListener = new ChatListener(this);
         this.commandListener = new CommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
         this.autoMessages = new AutoMessages(this);
