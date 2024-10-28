@@ -29,7 +29,6 @@ public final class ReloadArgument extends ArgsConstructor {
         this.plugin.getCooldownsMap().setCooldowns();
         this.plugin.getAutoMessages().run();
         this.plugin.registerReloadableEvents();
-        this.plugin.unregisterCommands();
         this.plugin.registerPluginCommands();
 
         final long endTime = System.currentTimeMillis();

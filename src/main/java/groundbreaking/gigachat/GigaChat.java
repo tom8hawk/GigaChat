@@ -265,6 +265,10 @@ public final class GigaChat extends JavaPlugin {
         final ConfigurationSection broadcast = super.getConfig().getConfigurationSection("broadcast");
         if (broadcast != null) {
             final String command = broadcast.getString("command");
+            try {
+                final CommandMap commandMap = super.getServer().getCommandMap();
+                commandMap.getCommand(command).unregister(commandMap);
+            } catch (final NullPointerException ignore) {}
             final List<String> aliases = broadcast.getStringList("aliases");
             final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
 
@@ -276,6 +280,10 @@ public final class GigaChat extends JavaPlugin {
         final ConfigurationSection disableOwnChat = super.getConfig().getConfigurationSection("disable-own-chat");
         if (disableOwnChat != null) {
             final String command = disableOwnChat.getString("command");
+            try {
+                final CommandMap commandMap = super.getServer().getCommandMap();
+                commandMap.getCommand(command).unregister(commandMap);
+            } catch (final NullPointerException ignore) {}
             final List<String> aliases = disableOwnChat.getStringList("aliases");
             final DisableOwnChatExecutor disableOwnChatCommand = new DisableOwnChatExecutor(this);
 
@@ -287,15 +295,15 @@ public final class GigaChat extends JavaPlugin {
         final ConfigurationSection disableAutoMessages = super.getConfig().getConfigurationSection("disable-auto-messages");
         if (disableAutoMessages != null) {
             final String command = disableAutoMessages.getString("command");
+            try {
+                final CommandMap commandMap = super.getServer().getCommandMap();
+                commandMap.getCommand(command).unregister(commandMap);
+            } catch (final NullPointerException ignore) {}
             final List<String> aliases = disableAutoMessages.getStringList("aliases");
             final DisableAutoMessagesCommand disableAutoMessagesCommand = new DisableAutoMessagesCommand(this);
 
             this.registerCommand(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
         }
-    }
-
-    public void unregisterCommands() {
-        super.getServer().getCommandMap().clearCommands();
     }
 
     public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
