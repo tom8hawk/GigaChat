@@ -2,17 +2,19 @@ package groundbreaking.gigachat.automessages;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.config.values.AutoMessagesValues;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.IntSet;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
+import java.util.Set;
 
-// todo Ускорить
 public final class AutoMessages {
 
     private final Random random = new Random();
@@ -20,6 +22,8 @@ public final class AutoMessages {
 
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
+
+    private final Set<Integer> sentMessages = new ObjectOpenHashSet<>();
 
     public AutoMessages(final GigaChat plugin) {
         this.plugin = plugin;
@@ -29,64 +33,75 @@ public final class AutoMessages {
     public void run() {
         (new BukkitRunnable() {
             public void run() {
-                process();
+                this.process();
             }
-        }).runTaskTimerAsynchronously(this.plugin, 20L, this.autoMessagesValues.getSendInterval() * 20L);
+        }).runTaskTimerAsynchronously(this.plugin, 0L, this.autoMessagesValues.getSendInterval() * 20L);
     }
 
     private void process() {
-        final String key = getAutoMessage();
-        if (key == null) {
-            return;
+        final List<String> autoMessages = this.getAutoMessage();
+        if (!this.sendWithSound(autoMessages)) {
+            this.sendSimple(autoMessages);
+        }
+    }
+
+    private boolean sendWithSound(final List<String> autoMessages) {
+        final String soundString = this.autoMessagesValues.getAutoMessagesSounds().get(this.lastIndex);
+        if (soundString == null || soundString.equalsIgnoreCase("disabled")) {
+            return false;
         }
 
-        final List<String> autoMessages = this.autoMessagesValues.getAutoMessages().get(key);
-        final String soundString = this.autoMessagesValues.getAutoMessagesSounds().get(key);
-
-        boolean isSoundEnabled = false;
-        Sound sound = null;
-        float soundVolume = 1.0f, soundPitch = 1.0f;
-        if (soundString != null && !soundString.equalsIgnoreCase("disabled")) {
-            isSoundEnabled = true;
-            final String[] params = soundString.split(";");
-            sound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
-            soundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-            soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
-        }
+        final String[] params = soundString.split(";");
+        final Sound sound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+        final float soundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
+        final float soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("gigachat.automessages")) {
                 continue;
             }
 
-            if (isSoundEnabled) {
-                for (int i = 0; i < autoMessages.size(); i++) {
-                    player.sendMessage(autoMessages.get(i));
-                    player.playSound(player.getLocation(), sound, soundVolume, soundPitch);
-                }
-            } else {
-                for (int i = 0; i < autoMessages.size(); i++) {
-                    player.sendMessage(autoMessages.get(i));
-                }
+            for (int i = 0; i < autoMessages.size(); i++) {
+                player.sendMessage(autoMessages.get(i));
+                player.playSound(player.getLocation(), sound, soundVolume, soundPitch);
+            }
+        }
+
+        return true;
+    }
+
+    private void sendSimple(final List<String> autoMessages) {
+        for (final Player player : Bukkit.getOnlinePlayers()) {
+            for (int i = 0; i < autoMessages.size(); i++) {
+                player.sendMessage(autoMessages.get(i));
             }
         }
     }
 
-    private String getAutoMessage() {
-        final int size = this.autoMessagesValues.getAutoMessages().size();
-        final int iterationsAmount = this.autoMessagesValues.isRandom() ? this.random.nextInt(size) : this.lastIndex;
-
-        if (this.lastIndex >= size) {
-            this.lastIndex = 0;
+    private List<String> getAutoMessage() {
+        final Int2ObjectMap<List<String>> autoMessages = this.autoMessagesValues.getAutoMessages();
+        if (this.sentMessages.isEmpty()) {
+            final IntSet autoMessagesKeys = autoMessages.keySet();
+            this.sentMessages.addAll(autoMessagesKeys);
         }
 
-        final Iterator<String> iterator = this.autoMessagesValues.getAutoMessages().keySet().iterator();
-        for (int i = 0; i < iterationsAmount; i++) {
-            if (iterator.hasNext()) {
-                return iterator.next();
+        final int autoMessagesSize = autoMessages.size();
+        if (this.autoMessagesValues.isRandom()) {
+            while (true) {
+                final int randomNumb = this.random.nextInt(autoMessagesSize - 1);
+                if (!this.sentMessages.contains(randomNumb)) {
+                    this.sentMessages.add(randomNumb);
+                    this.lastIndex = randomNumb;
+                    return autoMessages.get(randomNumb);
+                }
             }
+        } else {
+            if (this.lastIndex >= autoMessagesSize) {
+                this.lastIndex = 0;
+            }
+            final List<String> message = autoMessages.get(this.lastIndex);
+            lastIndex++;
+            return message;
         }
-
-        return null;
     }
 }
