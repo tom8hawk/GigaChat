@@ -33,7 +33,7 @@ public final class AutoMessages {
     public void run() {
         (new BukkitRunnable() {
             public void run() {
-                this.process();
+                process();
             }
         }).runTaskTimerAsynchronously(this.plugin, 0L, this.autoMessagesValues.getSendInterval() * 20L);
     }
