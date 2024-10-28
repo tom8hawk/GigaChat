@@ -12,7 +12,7 @@ public final class ReloadArgument extends ArgsConstructor {
     private final GigaChat plugin;
     private final Messages messages;
 
-    public ReloadArgument(final GigaChat plugin, String name, String permission) {
+    public ReloadArgument(final GigaChat plugin, final String name, final String permission) {
         super(name, permission);
         this.plugin = plugin;
         this.messages = plugin.getMessages();

@@ -14,7 +14,7 @@ public final class DisableServerChatArgument extends ArgsConstructor {
     @Getter
     private static boolean chatDisabled = false;
 
-    public DisableServerChatArgument(final GigaChat plugin, String name, String permission) {
+    public DisableServerChatArgument(final GigaChat plugin, final String name, final String permission) {
         super(name, permission);
         this.messages = plugin.getMessages();
     }

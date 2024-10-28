@@ -16,7 +16,7 @@ public final class SetPmSoundArgument extends ArgsConstructor {
     private final Messages messages;
     private final PmSoundsMap pmSoundsMap;
 
-    public SetPmSoundArgument(final GigaChat plugin, String name, String permission) {
+    public SetPmSoundArgument(final GigaChat plugin, final String name, final String permission) {
         super(name, permission);
         this.messages = plugin.getMessages();
         this.pmSoundsMap = plugin.getPmSoundsMap();

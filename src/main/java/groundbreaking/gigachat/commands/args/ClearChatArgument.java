@@ -13,7 +13,7 @@ public final class ClearChatArgument extends ArgsConstructor {
     private final Messages messages;
     private final String clearMessage;
 
-    public ClearChatArgument(final GigaChat plugin, String name, String permission) {
+    public ClearChatArgument(final GigaChat plugin, final String name, final String permission) {
         super(name, permission);
         this.messages = plugin.getMessages();
         this.clearMessage = "\n ".repeat(100);
