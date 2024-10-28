@@ -169,7 +169,7 @@ public final class GigaChat extends JavaPlugin {
         this.commandListener = new CommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
         this.autoMessages = new AutoMessages(this);
-        this.pmSoundsMap = new PmSoundsMap(this);
+        this.pmSoundsMap = new PmSoundsMap();
     }
 
     public void setupAll() {

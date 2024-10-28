@@ -1,6 +1,5 @@
 package groundbreaking.gigachat.collections;
 
-import groundbreaking.gigachat.GigaChat;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.bukkit.Sound;
 
@@ -11,12 +10,6 @@ public final class PmSoundsMap {
     private final Map<String, String> sounds = new Object2ObjectOpenHashMap<>();
     private String defaultSound; public void setDefaultSound(final String defaultSound) {
         this.defaultSound = defaultSound;
-    }
-
-    private final GigaChat plugin;
-
-    public PmSoundsMap(final GigaChat plugin) {
-        this.plugin = plugin;
     }
 
     public Sound getSound(final String name) {
