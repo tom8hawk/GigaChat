@@ -1,6 +1,7 @@
 package groundbreaking.gigachat.automessages;
 
 import groundbreaking.gigachat.GigaChat;
+import groundbreaking.gigachat.collections.AutoMessagesMap;
 import groundbreaking.gigachat.utils.config.values.AutoMessagesValues;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.IntSet;
@@ -57,8 +58,7 @@ public final class AutoMessages {
         final float soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
-            // todo Настроить отключение через команду
-            if (player.hasPermission("gigachat.automessages")) {
+            if (AutoMessagesMap.contains(player.getName())) {
                 continue;
             }
 
