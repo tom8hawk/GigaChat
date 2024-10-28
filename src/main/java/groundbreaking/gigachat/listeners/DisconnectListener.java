@@ -2,7 +2,11 @@ package groundbreaking.gigachat.listeners;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.*;
+import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.database.DatabaseQueries;
+import groundbreaking.gigachat.utils.config.values.ChatValues;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -11,11 +15,13 @@ import org.bukkit.event.player.PlayerQuitEvent;
 
 public final class DisconnectListener implements Listener {
 
+    private final ChatValues chatValues;
     private final Cooldowns cooldowns;
     private final PmSounds pmSounds;
     private final DisabledPrivateMessages disabledPrivateMessages;
 
     public DisconnectListener(final GigaChat plugin) {
+        this.chatValues = plugin.getChatValues();
         this.cooldowns = plugin.getCooldowns();
         this.pmSounds = plugin.getPmSounds();
         this.disabledPrivateMessages = plugin.getDisabled();
@@ -90,8 +96,11 @@ public final class DisconnectListener implements Listener {
     }
 
     private void removeCooldown(final String name) {
-        this.cooldowns.removePlayerLocalCooldown(name);
-        this.cooldowns.removePlayerGlobalCooldown(name);
+        final Object2ObjectOpenHashMap<Character, Chat> chats = this.chatValues.getChats();
+        final ObjectIterator<Character> iterator = chats.keySet().iterator();
+        while (iterator.hasNext()) {
+            chats.get(iterator.next()).getCooldowns().remove(name);
+        }
         this.cooldowns.removePlayerPrivateCooldown(name);
         this.cooldowns.removePlayerIgnoreCooldown(name);
         this.cooldowns.removePlayerSpyCooldown(name);
