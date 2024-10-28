@@ -258,7 +258,9 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private void processLogs(final String formattedMessage) {
-        this.consoleSender.sendMessage(formattedMessage);
+        if (this.pmValues.isPrintLogsToConsole()) {
+            this.consoleSender.sendMessage(formattedMessage);
+        }
     }
 
     @Override
