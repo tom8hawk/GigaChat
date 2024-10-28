@@ -70,6 +70,9 @@ public final class DisconnectListener implements Listener {
         if (DatabaseQueries.socialSpyContainsPlayer(name)) {
             SocialSpyMap.add(name);
         }
+        if (DatabaseQueries.containsPlayerFromAutoMessages(name)) {
+            AutoMessagesMap.add(name);
+        }
     }
 
     private void saveData(final String name) {
@@ -94,6 +97,9 @@ public final class DisconnectListener implements Listener {
         if (SocialSpyMap.contains(name)) {
             DatabaseQueries.addPlayerToSocialSpy(name);
         }
+        if (AutoMessagesMap.contains(name)) {
+            DatabaseQueries.addPlayerToAutoMessages(name);
+        }
     }
 
     private void removeCooldown(final String name) {
@@ -113,5 +119,6 @@ public final class DisconnectListener implements Listener {
         this.pmSoundsMap.remove(name);
         ReplyMap.removeFromAll(name);
         SocialSpyMap.remove(name);
+        AutoMessagesMap.remove(name);
     }
 }

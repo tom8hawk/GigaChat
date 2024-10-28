@@ -7,6 +7,7 @@ import groundbreaking.gigachat.collections.PmSoundsMap;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.commands.args.*;
 import groundbreaking.gigachat.commands.other.BroadcastCommand;
+import groundbreaking.gigachat.commands.other.DisableAutoMessagesCommand;
 import groundbreaking.gigachat.commands.other.DisableOwnChatExecutor;
 import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
@@ -31,6 +32,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.Plugin;
@@ -106,6 +108,7 @@ public final class GigaChat extends JavaPlugin {
         this.registerEvents();
         this.registerCommands();
         this.registerBroadcastCommand();
+        this.registerDisableAutoMessagesCommand();
 
         super.getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new UpdatesChecker(this).check(), 300L);
 
@@ -246,12 +249,14 @@ public final class GigaChat extends JavaPlugin {
         this.registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
 
         final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
+        final DisableAutoMessagesArgument disableAutoMessagesArgument = new DisableAutoMessagesArgument(this, "disableam", "gigachat.command.disableautomessages.other");
         final DisableServerChatArgument disableServerChat = new DisableServerChatArgument(this, "disablechat", "gigachat.command.disablechat");
         final LocalSpyArgument localSpy = new LocalSpyArgument(this, "localspy", "gigachat.command.localspy");
         final ReloadArgument reload = new ReloadArgument(this, "reload", "gigachat.command.reload");
         final SetPmSoundArgument pmSoundSetter = new SetPmSoundArgument(this, "setpmsound", "gigachat.command.setpmsound");
 
         mainCommandHandler.registerArgument(clearChat);
+        mainCommandHandler.registerArgument(disableAutoMessagesArgument);
         mainCommandHandler.registerArgument(disableServerChat);
         mainCommandHandler.registerArgument(localSpy);
         mainCommandHandler.registerArgument(reload);
@@ -259,11 +264,25 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void registerBroadcastCommand() {
-        final String command = super.getConfig().getString("broadcast.command");
-        final List<String> aliases = super.getConfig().getStringList("broadcast.aliases");
-        final BroadcastCommand broadcast = new BroadcastCommand(this);
+        final ConfigurationSection broadcast = super.getConfig().getConfigurationSection("broadcast");
+        if (broadcast != null) {
+            final String command = broadcast.getString("command");
+            final List<String> aliases = broadcast.getStringList("aliases");
+            final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
 
-        this.registerCommand(command, aliases, broadcast, broadcast);
+            this.registerCommand(command, aliases, broadcastCommand, broadcastCommand);
+        }
+    }
+
+    private void registerDisableAutoMessagesCommand() {
+        final ConfigurationSection disableAutoMessages = super.getConfig().getConfigurationSection("disable-auto-messages");
+        if (disableAutoMessages != null) {
+            final String command = disableAutoMessages.getString("command");
+            final List<String> aliases = disableAutoMessages.getStringList("aliases");
+            final DisableAutoMessagesCommand disableAutoMessagesCommand = new DisableAutoMessagesCommand(this);
+
+            this.registerCommand(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
+        }
     }
 
     public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {

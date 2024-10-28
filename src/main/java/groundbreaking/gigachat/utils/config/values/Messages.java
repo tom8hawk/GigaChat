@@ -27,6 +27,7 @@ public final class Messages {
     private String replyUsageError;
     private String setpmsoundUsageError;
     private String broadcastUsageError;
+    private String disableAutoMessagesUsageError;
     private String nonExistArgument;
     private String argumentUsageError;
     private String soundAdditionalArgs;
@@ -61,6 +62,12 @@ public final class Messages {
     private String capsValidationFailedMessage;
     private String wordsValidationFailedMessage;
     private String helpMessage;
+    private String autoMessagesEnabledOther;
+    private String autoMessagesDisabledOther;
+    private String autoMessagesEnabledByOther;
+    private String autoMessagesDisabledByOther;
+    private String autoMessagesEnabled;
+    private String autoMessagesDisabled;
 
     @Getter private static String hours;
     @Getter private static String minutes;
@@ -92,6 +99,7 @@ public final class Messages {
         this.replyUsageError = this.getMessage(config, "reply-usage-error", colorizer);
         this.setpmsoundUsageError = this.getMessage(config, "setpmsound-usage-error", colorizer);
         this.broadcastUsageError = this.getMessage(config, "broadcast-usage-error", colorizer);
+        this.disableAutoMessagesUsageError = this.getMessage(config, "disable-auto-messages-usage-error", colorizer);
         this.nonExistArgument = this.getMessage(config, "non-exist-arg", colorizer);
         this.argumentUsageError = this.getMessage(config, "arg-usage-error", colorizer);
         this.soundAdditionalArgs = this.getMessage(config, "sound-additional-args", colorizer);
@@ -126,6 +134,12 @@ public final class Messages {
         this.capsValidationFailedMessage = this.getMessage(config, "caps-check-failed-message", colorizer);
         this.wordsValidationFailedMessage = this.getMessage(config, "words-check-failed-message", colorizer);
         this.helpMessage = this.getMessage(config, "help-message", colorizer);
+        this.autoMessagesEnabledOther = this.getMessage(config, "auto-messages-enabled-other", colorizer);
+        this.autoMessagesDisabledOther = this.getMessage(config, "auto-messages-disabled-other", colorizer);
+        this.autoMessagesEnabledByOther = this.getMessage(config, "auto-messages-enabled-by-other", colorizer);
+        this.autoMessagesDisabledByOther = this.getMessage(config, "auto-messages-disabled-by-other", colorizer);
+        this.autoMessagesEnabled = this.getMessage(config, "auto-messages-enabled", colorizer);
+        this.autoMessagesDisabled = this.getMessage(config, "auto-messages-disabled", colorizer);
     }
 
     public String getMessage(final FileConfiguration config, final String path, final IColorizer colorizer) {

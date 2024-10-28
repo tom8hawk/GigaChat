@@ -35,6 +35,7 @@ ignore-usage-error: "&cВы неправильно ввели команду! И
 reply-usage-error: "&cВы неправильно ввели команду! Используйте: /reply <сообщение>"
 setpmsound-usage-error: "&cВы неправильно ввели команду! Используйте: /setpmsound <сообщение>"
 broadcast-usage-error: "&cВы неправильно ввели команду! Используйте: /broadcast <сообщение>"
+disable-auto-messages-usage-error: "&cВы неправильно ввели команду! Используйте: /gigachat disableam <игрок>"
 
 non-exist-arg: "&cТакого аргумента нету! Используйте: /gigachat help"
 arg-usage-error: "&cВы неправильно ввели команду! Используйте: /gigachat help"
@@ -84,6 +85,15 @@ chars-check-failed-message: "&cТвоё сообщение содержит за
 caps-check-failed-message: "&cТвоё сообщение содержит слишком много заглавных символов!"
 words-check-failed-message: "&cТвоё сообщение содержит запрещённые слова!"
 
+auto-messages-enabled-other: "&aВы включили авто-сообщения для {player}."
+auto-messages-disabled-other: "&cВы отключили авто-сообщения для {player}."
+# Оставьте пустым, чтобы отключить
+auto-messages-enabled-by-other: "&aВаши авто-сообщения были включены."
+# Оставьте пустым, чтобы отключить
+auto-messages-disabled-by-other: "&cВаши авто-сообщения были включены."
+auto-messages-enabled: "&aВы включили авто-сообщения."
+auto-messages-disabled: "&aВы отключили авто-сообщения."
+
 help-message: |-
   &fИнструкция по использованию GigaChat:
   &8- &6/gigachat reload &f- перезагрузить плагин 
@@ -91,6 +101,7 @@ help-message: |-
   &8- &6/gigachat clearchat &f- очистить чат 
   &8- &6/gigachat localspy &f- ключить отображение локал чата
   &8- &6/gigachat setpmsound <ник> <звук> &f- перезагрузить плагин 
+  &8- &6/gigachat disableam <ник> &f- отключить авто-сообщения игроку 
 
 time:
   hours: "ч. "

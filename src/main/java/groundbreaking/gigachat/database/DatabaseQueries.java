@@ -60,6 +60,12 @@ public final class DatabaseQueries {
                     );
                 """;
 
+        final String autoMessagesQuery = """
+                    CREATE TABLE IF NOT EXISTS autoMessages (
+                        username TEXT NOT NULL UNIQUE
+                    );
+                """;
+
         try (final Statement statement = DatabaseHandler.getConnection().createStatement()) {
             statement.execute(disabledChatQuery);
             statement.execute(disabledPrivateMessagesQuery);
@@ -68,6 +74,7 @@ public final class DatabaseQueries {
             statement.execute(localSpyQuery);
             statement.execute(privateMessagesSoundsQuery);
             statement.execute(socialSpyQuery);
+            statement.execute(autoMessagesQuery);
         } catch(SQLException ex) {
             ex.printStackTrace();
         }
@@ -488,6 +495,40 @@ public final class DatabaseQueries {
 
             final ResultSet result = statement.executeQuery();
             return result.next();
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public static void addPlayerToAutoMessages(final String name) {
+        final String query = "INSERT OR IGNORE autoMessages(name) VALUES(?)";
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            statement.setString(1, name);
+            statement.execute();
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static void removePlayerFromAutoMessages(final String name) {
+        final String query = "DELETE FROM autoMessages WHERE username = ?";
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            statement.setString(1, name);
+            statement.executeUpdate();
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    public static boolean containsPlayerFromAutoMessages(final String name) {
+        final String query = "SELECT * FROM autoMessages WHERE username = ?";
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            statement.setString(1, name);
+
+            final ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
         } catch (final SQLException ex) {
             ex.printStackTrace();
         }

@@ -52,3 +52,7 @@ broadcast:
 disable-own-chat:
   command: "disablechat"
   aliases: []
+
+disable-auto-messages:
+  command: "disableautomessages"
+  aliases: [ "disableam" ]
