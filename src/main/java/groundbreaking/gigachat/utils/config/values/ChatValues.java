@@ -263,9 +263,9 @@ public final class ChatValues {
             this.isCharsValidatorDenySoundEnabled = false;
         } else {
             final String[] params = soundString.split(";");
-            this.textValidatorDenySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
-            this.textValidatorDenySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-            this.textValidatorDenySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            this.textValidatorDenySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            this.textValidatorDenySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            this.textValidatorDenySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
             this.isCharsValidatorDenySoundEnabled = true;
         }
     }
@@ -280,9 +280,9 @@ public final class ChatValues {
             this.isCapsValidatorDenySoundEnabled = false;
         } else {
             final String[] params = soundString.split(";");
-            this.capsValidatorDenySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
-            this.capsValidatorDenySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-            this.capsValidatorDenySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            this.capsValidatorDenySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            this.capsValidatorDenySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            this.capsValidatorDenySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
             this.isCapsValidatorDenySoundEnabled = true;
         }
     }
@@ -297,9 +297,9 @@ public final class ChatValues {
             this.isWordsValidatorDenySoundEnabled = false;
         } else {
             final String[] params = soundString.split(";");
-            this.wordsValidatorDenySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
-            this.wordsValidatorDenySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-            this.wordsValidatorDenySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            this.wordsValidatorDenySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            this.wordsValidatorDenySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            this.wordsValidatorDenySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
             this.isWordsValidatorDenySoundEnabled = true;
         }
     }

@@ -81,9 +81,9 @@ public final class NewbieChatValues {
         else {
             this.isDenySoundEnabled = true;
             final String[] params = soundString.split(";");
-            this.denySound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
-            this.denySoundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-            this.denySoundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+            this.denySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+            this.denySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            this.denySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
         }
     }
 }

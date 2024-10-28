@@ -53,9 +53,9 @@ public final class AutoMessages {
         }
 
         final String[] params = soundString.split(";");
-        final Sound sound = params.length == 1 && params[0] != null ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
-        final float soundVolume = params.length == 2 && params[1] != null ? Float.parseFloat(params[1]) : 1.0f;
-        final float soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
+        final Sound sound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
+        final float soundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+        final float soundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
             if (AutoMessagesMap.contains(player.getName())) {

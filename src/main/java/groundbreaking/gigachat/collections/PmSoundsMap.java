@@ -10,6 +10,9 @@ public final class PmSoundsMap {
 
     private final Map<String, String> sounds = new Object2ObjectOpenHashMap<>();
     private String defaultSound; public void setDefaultSound(final String defaultSound) {
+        this.plugin.getMyLogger().info("");
+        this.plugin.getMyLogger().info("Gave sound: " + defaultSound);
+        this.plugin.getMyLogger().info("");
         this.defaultSound = defaultSound;
     }
 
