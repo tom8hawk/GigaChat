@@ -17,7 +17,7 @@ public class CommandRegisterer {
 
     private final GigaChat plugin;
 
-    private final SimpleCommandMap COMMAND_MAP = this.getCommandMap();
+    private final SimpleCommandMap commandMap = this.getCommandMap();
 
     public CommandRegisterer(final GigaChat plugin) {
         this.plugin = plugin;
@@ -37,7 +37,7 @@ public class CommandRegisterer {
         custom.setExecutor(commandExecutor);
         custom.setTabCompleter(tabCompleter);
 
-        COMMAND_MAP.register(plugin.getDescription().getName(), custom);
+        commandMap.register(plugin.getDescription().getName(), custom);
     }
 
     public PluginCommand getCustomCommand(final String name) {
@@ -56,7 +56,7 @@ public class CommandRegisterer {
             final PluginCommand pluginCommand = this.getCustomCommand(command);
             final Field field = SimpleCommandMap.class.getDeclaredField("knownCommands");
             field.setAccessible(true);
-            final Object map = field.get(COMMAND_MAP);
+            final Object map = field.get(commandMap);
 
             final HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             knownCommands.remove(pluginCommand.getName());
