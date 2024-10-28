@@ -6,7 +6,6 @@ import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -97,9 +96,8 @@ public final class DisconnectListener implements Listener {
 
     private void removeCooldown(final String name) {
         final Object2ObjectOpenHashMap<Character, Chat> chats = this.chatValues.getChats();
-        final ObjectIterator<Character> iterator = chats.keySet().iterator();
-        while (iterator.hasNext()) {
-            chats.get(iterator.next()).getCooldowns().remove(name);
+        for (final Character character : chats.keySet()) {
+            chats.get(character).getCooldowns().remove(name);
         }
         this.cooldowns.removePlayerPrivateCooldown(name);
         this.cooldowns.removePlayerIgnoreCooldown(name);
