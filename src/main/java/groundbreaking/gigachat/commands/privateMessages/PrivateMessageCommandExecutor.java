@@ -289,12 +289,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private void playSound(final Player recipient) {
-        this.plugin.getMyLogger().info("");
-        this.plugin.getMyLogger().info("Recipient is: " + recipient.getName());
         if (pmValues.isSoundEnabled()) {
             final Sound sound = this.pmSounds.getSound(recipient.getName());
-            this.plugin.getMyLogger().info("");
-            this.plugin.getMyLogger().info("Recipient's sound: " + sound.toString());
             if (sound != null) {
                 final Location recipientLocation = recipient.getLocation();
                 final float volume = this.pmValues.getSoundVolume();
