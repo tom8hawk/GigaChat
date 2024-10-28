@@ -1,11 +1,12 @@
 package groundbreaking.gigachat.collections;
 
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.util.List;
 
 public final class DisabledPrivateMessagesMap {
 
-    private final List<String> players = new ArrayList<>();
+    private final List<String> players = new ObjectArrayList<>();
 
     public void add(final String name) {
         this.players.remove(name);

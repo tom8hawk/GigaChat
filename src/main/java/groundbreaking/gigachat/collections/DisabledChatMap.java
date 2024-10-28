@@ -1,11 +1,12 @@
 package groundbreaking.gigachat.collections;
 
-import java.util.ArrayList;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+
 import java.util.List;
 
 public final class DisabledChatMap {
 
-    private static final List<String> disabled = new ArrayList<>();
+    private static final List<String> disabled = new ObjectArrayList<>();
 
     public static boolean contains(final String name) {
         if (disabled.isEmpty()) {

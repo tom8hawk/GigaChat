@@ -1,14 +1,14 @@
 package groundbreaking.gigachat.collections;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
 import java.util.Set;
 
 public final class SocialSpyMap {
 
-    private static final Set<String> listening = new HashSet<>();
+    private static final Set<String> listening = new ObjectOpenHashSet<>();
 
     public static boolean contains(final String name) {
         return listening.contains(name);

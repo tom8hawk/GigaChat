@@ -1,16 +1,16 @@
 package groundbreaking.gigachat.collections;
 
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public final class LocalSpyMap {
 
-    private static final Set<String> PLAYERS = new HashSet<>();
+    private static final Set<String> PLAYERS = new ObjectOpenHashSet<>();
 
     public static void add(final String name) {
         PLAYERS.add(name);

@@ -1,13 +1,15 @@
 package groundbreaking.gigachat.collections;
 
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public final class IgnoreMap {
 
-    private static final HashMap<String, List<String>> ignoredChat = new HashMap<>();
-    private static final HashMap<String, List<String>> ignoredPrivate = new HashMap<>();
+    private static final Map<String, List<String>> ignoredChat = new Object2ObjectOpenHashMap<>();
+    private static final Map<String, List<String>> ignoredPrivate = new Object2ObjectOpenHashMap<>();
 
     public static boolean ignoredChatContains(final String name) {
         return !ignoredChat.isEmpty() && ignoredChat.containsKey(name);

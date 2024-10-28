@@ -1,10 +1,12 @@
 package groundbreaking.gigachat.collections;
 
-import java.util.HashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+
+import java.util.Map;
 
 public final class ReplyMap {
 
-    private static final HashMap<String, String> reply = new HashMap<>();
+    private static final Map<String, String> reply = new Object2ObjectOpenHashMap<>();
 
     public static String getRecipientName(String name) {
         return reply.get(name);
