@@ -63,7 +63,7 @@ public final class UpdatesChecker {
     }
 
     private boolean isHigher(final String newVersion) {
-        final String pluginVersion = plugin.getDescription().getVersion();
+        final String pluginVersion = this.plugin.getDescription().getVersion();
         if (!newVersion.contains("beta")) {
             return true;
         }
@@ -84,7 +84,7 @@ public final class UpdatesChecker {
             final HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
             if (response.statusCode() == 200) {
-                final Path savePath = Paths.get(plugin.getDataFolder().toPath().toString().replace("GigaChat", "update"));
+                final Path savePath = Paths.get(this.plugin.getDataFolder().toPath().toString().replace("GigaChat", "update"));
                 try (final InputStream inputStream = response.body();
                         final FileOutputStream outputStream = new FileOutputStream(savePath.toFile())) {
                     inputStream.transferTo(outputStream);
