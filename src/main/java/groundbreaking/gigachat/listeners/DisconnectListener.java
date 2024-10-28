@@ -82,7 +82,7 @@ public final class DisconnectListener implements Listener {
         if (Ignore.playerIgnoresChatAnyOne(name)) {
             DatabaseQueries.addPlayerToIgnoreChat(name, Ignore.getAllIgnoredChat(name));
         }
-        if (Ignore.playerIgnoresPrivateAnyOne(name) ) {
+        if (Ignore.playerIgnoresPrivateAnyOne(name)) {
             DatabaseQueries.addPlayerToIgnorePrivate(name, Ignore.getAllIgnoredPrivate(name));
         }
         if (LocalSpy.contains(name)) {
