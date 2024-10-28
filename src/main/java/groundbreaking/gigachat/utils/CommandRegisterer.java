@@ -1,6 +1,7 @@
 package groundbreaking.gigachat.utils;
 
 import groundbreaking.gigachat.GigaChat;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
 import org.bukkit.plugin.Plugin;
@@ -12,12 +13,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 public class CommandRegisterer {
 
     private final GigaChat plugin;
 
     private final SimpleCommandMap commandMap = this.getCommandMap();
+    private final Set<String> registeredCommands = new ObjectOpenHashSet<>();
 
     public CommandRegisterer(final GigaChat plugin) {
         this.plugin = plugin;
@@ -28,6 +31,9 @@ public class CommandRegisterer {
         for (final String alias : aliases) {
             this.registerCommand(alias, commandExecutor, tabCompleter);
         }
+
+        this.registeredCommands.add(command);
+        this.registeredCommands.addAll(aliases);
 
         this.syncCommands();
     }
@@ -51,7 +57,13 @@ public class CommandRegisterer {
         }
     }
 
-    public void unregisterCustomCommand(final String command) {
+    public void unregisterCustomCommand() {
+        for (final String command : this.registeredCommands) {
+            this.unregisterCustomCommand(command);
+        }
+    }
+
+    private void unregisterCustomCommand(final String command) {
         try {
             final PluginCommand pluginCommand = this.getCustomCommand(command);
             final Field field = SimpleCommandMap.class.getDeclaredField("knownCommands");
@@ -83,7 +95,7 @@ public class CommandRegisterer {
 
     private SimpleCommandMap getCommandMap() {
         try {
-            Field field = SimplePluginManager.class.getDeclaredField("commandMap");
+            final Field field = SimplePluginManager.class.getDeclaredField("commandMap");
             field.setAccessible(true);
 
             return (SimpleCommandMap) field.get(Bukkit.getPluginManager());

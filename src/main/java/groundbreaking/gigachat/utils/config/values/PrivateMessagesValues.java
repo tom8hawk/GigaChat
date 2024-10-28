@@ -25,7 +25,7 @@ public final class PrivateMessagesValues {
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    private boolean printLogsToConsole, isSoundEnabled, commandsRegistered = false;
+    private boolean printLogsToConsole, isSoundEnabled;
 
     private int pmCooldown, ignoreCooldown, spyCooldown;
 
@@ -86,46 +86,36 @@ public final class PrivateMessagesValues {
         final ConfigurationSection pmCommand = config.getConfigurationSection("private-message-command");
         if (pmCommand != null) {
             this.pmCooldown = pmCommand.getInt("cooldown");
-            if (!this.commandsRegistered) {
-                final PrivateMessageCommandExecutor pmExecutor = new PrivateMessageCommandExecutor(plugin);
-                final String command = pmCommand.getString("command");
-                final List<String> aliases = pmCommand.getStringList("aliases");
+            final PrivateMessageCommandExecutor pmExecutor = new PrivateMessageCommandExecutor(plugin);
+            final String command = pmCommand.getString("command");
+            final List<String> aliases = pmCommand.getStringList("aliases");
 
-                this.plugin.getCommandRegisterer().unregisterCustomCommand(command);
-                this.plugin.getCommandRegisterer().register(command, aliases, pmExecutor, pmExecutor);
-            }
+            this.plugin.getCommandRegisterer().register(command, aliases, pmExecutor, pmExecutor);
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"private-message-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
 
-        if (!this.commandsRegistered) {
-            final ConfigurationSection replyCommand = config.getConfigurationSection("reply-command");
-            if (replyCommand != null) {
-                final ReplyCommandExecutor replyExecutor = new ReplyCommandExecutor(plugin);
-                final String command = replyCommand.getString("command");
-                final List<String> aliases = replyCommand.getStringList("aliases");
+        final ConfigurationSection replyCommand = config.getConfigurationSection("reply-command");
+        if (replyCommand != null) {
+            final ReplyCommandExecutor replyExecutor = new ReplyCommandExecutor(plugin);
+            final String command = replyCommand.getString("command");
+            final List<String> aliases = replyCommand.getStringList("aliases");
 
-                this.plugin.getCommandRegisterer().unregisterCustomCommand(command);
-                this.plugin.getCommandRegisterer().register(command, aliases, replyExecutor, replyExecutor);
-            } else {
-                this.plugin.getMyLogger().warning("Failed to load section \"reply-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
-                this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-            }
+            this.plugin.getCommandRegisterer().register(command, aliases, replyExecutor, replyExecutor);
+        } else {
+            this.plugin.getMyLogger().warning("Failed to load section \"reply-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
 
         final ConfigurationSection ignoreCommand = config.getConfigurationSection("ignore-command");
         if (ignoreCommand != null) {
             this.ignoreCooldown = ignoreCommand.getInt("cooldown");
-            if (!this.commandsRegistered) {
-                final IgnoreCommandExecutor ignoreExecutor = new IgnoreCommandExecutor(plugin);
-                final String command = ignoreCommand.getString("command");
-                final List<String> aliases = ignoreCommand.getStringList("aliases");
+            final IgnoreCommandExecutor ignoreExecutor = new IgnoreCommandExecutor(plugin);
+            final String command = ignoreCommand.getString("command");
+            final List<String> aliases = ignoreCommand.getStringList("aliases");
 
-                this.plugin.getCommandRegisterer().unregisterCustomCommand(command);
-                this.plugin.getCommandRegisterer().register(command, aliases, ignoreExecutor, ignoreExecutor);
-
-            }
+            this.plugin.getCommandRegisterer().register(command, aliases, ignoreExecutor, ignoreExecutor);
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"ignore-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
@@ -134,20 +124,15 @@ public final class PrivateMessagesValues {
         final ConfigurationSection spyCommand = config.getConfigurationSection("socialspy-command");
         if (spyCommand != null) {
             this.spyCooldown = spyCommand.getInt("cooldown");
-            if (!this.commandsRegistered) {
-                final SocialSpyCommandExecutor socialspyExecutor = new SocialSpyCommandExecutor(plugin);
-                final String command = spyCommand.getString("command");
-                final List<String> aliases = spyCommand.getStringList("aliases");
+            final SocialSpyCommandExecutor socialspyExecutor = new SocialSpyCommandExecutor(plugin);
+            final String command = spyCommand.getString("command");
+            final List<String> aliases = spyCommand.getStringList("aliases");
 
-                this.plugin.getCommandRegisterer().unregisterCustomCommand(command);
-                this.plugin.getCommandRegisterer().register(command, aliases, socialspyExecutor, socialspyExecutor);
-            }
+            this.plugin.getCommandRegisterer().register(command, aliases, socialspyExecutor, socialspyExecutor);
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"socialspy-command\" from file \"private-messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
-
-        this.commandsRegistered = true;
     }
 
     private void setupFormats(final FileConfiguration config) {
