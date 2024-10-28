@@ -12,6 +12,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.Map;
+
 public final class DisconnectListener implements Listener {
 
     private final ChatValues chatValues;
@@ -96,8 +98,8 @@ public final class DisconnectListener implements Listener {
 
     private void removeCooldown(final String name) {
         final Object2ObjectOpenHashMap<Character, Chat> chats = this.chatValues.getChats();
-        for (final Character character : chats.keySet()) {
-            chats.get(character).getCooldowns().remove(name);
+        for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
+            entry.getValue().getCooldowns().remove(name);
         }
         this.cooldowns.removePlayerPrivateCooldown(name);
         this.cooldowns.removePlayerIgnoreCooldown(name);
