@@ -16,6 +16,7 @@ import groundbreaking.gigachat.listeners.ChatListener;
 import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
 import groundbreaking.gigachat.listeners.NewbieChatListener;
+import groundbreaking.gigachat.utils.CommandRegisterer;
 import groundbreaking.gigachat.utils.ServerInfo;
 import groundbreaking.gigachat.utils.colorizer.basic.*;
 import groundbreaking.gigachat.utils.config.values.*;
@@ -28,10 +29,7 @@ import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandMap;
-import org.bukkit.command.PluginCommand;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventPriority;
@@ -41,7 +39,6 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Locale;
 import java.util.logging.Logger;
@@ -76,6 +73,8 @@ public final class GigaChat extends JavaPlugin {
     private CommandListener commandListener;
     private NewbieChatListener newbieChatListener;
 
+    private final CommandRegisterer commandRegisterer = new CommandRegisterer(this);
+
     @Override
     public void onEnable() {
         final long startTime = System.currentTimeMillis();
@@ -107,6 +106,7 @@ public final class GigaChat extends JavaPlugin {
 
         this.registerEvents();
         this.registerMainPluginCommand();
+        this.registerPluginCommands();
 
         super.getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new UpdatesChecker(this).check(), 300L);
 
@@ -272,7 +272,8 @@ public final class GigaChat extends JavaPlugin {
             final List<String> aliases = broadcast.getStringList("aliases");
             final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
 
-            this.registerCommand(command, aliases, broadcastCommand, broadcastCommand);
+            this.commandRegisterer.unregisterCustomCommand(command);
+            this.commandRegisterer.register(command, aliases, broadcastCommand, broadcastCommand);
         }
     }
 
@@ -287,7 +288,8 @@ public final class GigaChat extends JavaPlugin {
             final List<String> aliases = disableOwnChat.getStringList("aliases");
             final DisableOwnChatExecutor disableOwnChatCommand = new DisableOwnChatExecutor(this);
 
-            this.registerCommand(command, aliases, disableOwnChatCommand, disableOwnChatCommand);
+            this.commandRegisterer.unregisterCustomCommand(command);
+            this.commandRegisterer.register(command, aliases, disableOwnChatCommand, disableOwnChatCommand);
         }
     }
 
@@ -302,23 +304,8 @@ public final class GigaChat extends JavaPlugin {
             final List<String> aliases = disableAutoMessages.getStringList("aliases");
             final DisableAutoMessagesCommand disableAutoMessagesCommand = new DisableAutoMessagesCommand(this);
 
-            this.registerCommand(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
-        }
-    }
-
-    public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
-        try {
-            final CommandMap commandMap = super.getServer().getCommandMap();
-            final Constructor<PluginCommand> constructor = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
-            constructor.setAccessible(true);
-            final PluginCommand pluginCommand = constructor.newInstance(command, this);
-            pluginCommand.setAliases(aliases);
-            pluginCommand.setExecutor(commandExecutor);
-            pluginCommand.setTabCompleter(tabCompleter);
-            commandMap.register(super.getDescription().getName(), pluginCommand);
-        } catch (final Exception ex) {
-            this.myLogger.warning("Unable to register" + command + " command! " + ex);
-            super.getServer().getPluginManager().disablePlugin(this);
+            this.commandRegisterer.unregisterCustomCommand(command);
+            this.commandRegisterer.register(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
         }
     }
 
