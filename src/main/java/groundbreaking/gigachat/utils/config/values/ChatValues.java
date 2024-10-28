@@ -15,7 +15,10 @@ import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 
-import java.util.*;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 @Getter
 public final class ChatValues {
@@ -23,52 +26,45 @@ public final class ChatValues {
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    private String localFormat, localSpyFormat, globalFormat;
-
-    private int localDistance;
-
-    private int localCooldown, globalCooldown;
-
-    private char globalSymbol;
-
-    private boolean
-            noOneHearEnabled,
-            noOneHearHideHidden,
-            noOneHearHideVanished,
-            noOneHearHideSpectators;
-
-    private boolean isGlobalForce;
-
-    private final Map<String, String>
-            localGroupsColors = new HashMap<>(),
-            globalGroupsColors = new HashMap<>();
-
     private String priority;
+
+    private boolean isHoverEnabled;
+    private boolean isAdminHoverEnabled;
+
+    private String hoverAction;
+    private String adminHoverAction;
+
+    private String hoverValue;
+    private String adminHoverValue;
+
+    private String hoverText;
+    private String adminHoverText;
 
     private IColorizer formatsColorizer;
 
     private final AbstractColorizer chatsColorizer;
 
-    private boolean isHoverEnabled, isAdminHoverEnabled;
+    private boolean isCharsValidatorBlockMessage;
+    private boolean isCharsValidatorDenySoundEnabled;
 
-    private String
-            hoverText, hoverAction, hoverValue,
-            adminHoverText, adminHoverAction, adminHoverValue;
+    private boolean capsValidatorBlockMessageSend;
+    private boolean isCapsValidatorDenySoundEnabled;
 
-    private boolean
-            isCharsValidatorBlockMessage, isCharsValidatorDenySoundEnabled,
-            capsValidatorBlockMessageSend, isCapsValidatorDenySoundEnabled,
-            wordsValidatorBlockMessageSend, isWordsValidatorDenySoundEnabled;
+    private boolean wordsValidatorBlockMessageSend;
+    private boolean isWordsValidatorDenySoundEnabled;
 
-    private Sound
-            textValidatorDenySound,
-            capsValidatorDenySound,
-            wordsValidatorDenySound;
+    private Sound textValidatorDenySound;
+    private Sound capsValidatorDenySound;
+    private Sound wordsValidatorDenySound;
 
-    private float
-            textValidatorDenySoundVolume, textValidatorDenySoundPitch,
-            capsValidatorDenySoundVolume, capsValidatorDenySoundPitch,
-            wordsValidatorDenySoundVolume, wordsValidatorDenySoundPitch;
+    private float textValidatorDenySoundVolume;
+    private float textValidatorDenySoundPitch;
+
+    private float capsValidatorDenySoundVolume;
+    private float capsValidatorDenySoundPitch;
+
+    private float wordsValidatorDenySoundVolume;
+    private float wordsValidatorDenySoundPitch;
 
     private final StringUtil stringUtil = new StringUtil();
 
@@ -108,14 +104,19 @@ public final class ChatValues {
 
             for (final String key : chatsKeys) {
                 final ConfigurationSection keySection = chats.getConfigurationSection(key);
+                if (keySection == null) {
+                    this.plugin.getMyLogger().warning("Failed to load section \"chats." + key + "\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+                    this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                    continue;
+                }
                 final String format = keySection.getString("format");
                 if (format == null) {
                     throw new FormatNullException("Chat format cannot be null! Path: \"chats." + key + ".format\"");
                 }
                 final String symbolString = keySection.getString("symbol");
-                final String spyFormat = keySection.getString("spy-format");
+                final String spyFormat = keySection.getString("spy-format", null);
                 final int distance = keySection.getInt("distance");
-                final int cooldown = keySection.getInt("cooldown", 1500);
+                final int cooldown = keySection.getInt("cooldown");
 
                 final ConfigurationSection noOneHeardYou = keySection.getConfigurationSection("no-one-heard-you");
                 boolean isNoOneHeardEnabled = false;
@@ -129,7 +130,7 @@ public final class ChatValues {
                     isNoOneHeardHideSpectators = keySection.getBoolean("no-one-heard-you.hide-spectators");
                 }
 
-                final HashMap<String, String> groupsColors = new HashMap<>();
+                final Map<String, String> groupsColors = new Object2ObjectOpenHashMap<>();
 
                 final ConfigurationSection groupsColorsSection = keySection.getConfigurationSection("groups-colors");
                 if (groupsColorsSection != null) {
@@ -138,7 +139,19 @@ public final class ChatValues {
                     }
                 }
 
-                final Chat chat = new Chat(key, format, spyFormat, distance, cooldown, isNoOneHeardEnabled, isNoOneHeardHideHidden, isNoOneHeardHideVanished, isNoOneHeardHideSpectators, groupsColors);
+                final Chat chat = Chat.builder()
+                        .setName(key)
+                        .setFormat(format)
+                        .setSpyFormat(spyFormat)
+                        .setDistance(distance)
+                        .setCooldown(cooldown)
+                        .setIsNoOneHeardEnabled(isNoOneHeardEnabled)
+                        .setIsNoOneHeardHideHidden(isNoOneHeardHideHidden)
+                        .setIsNoOneHeardHideVanished(isNoOneHeardHideVanished)
+                        .setIsNoOneHeardHideSpectators(isNoOneHeardHideSpectators)
+                        .setGroupsColors(groupsColors)
+                        .build();
+
                 if (symbolString.equalsIgnoreCase("default")) {
                     defaultChat = chat;
                 } else {

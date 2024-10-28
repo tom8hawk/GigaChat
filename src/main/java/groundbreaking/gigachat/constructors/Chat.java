@@ -13,8 +13,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,9 +38,9 @@ public final class Chat {
     private final List<Player> spyListeners;
 
     public Chat(
-            final @NotNull String name,
-            final @NotNull String format,
-            final @Nullable String spyFormat,
+            final String name,
+            final String format,
+            final String spyFormat,
             final int distance,
             final int cooldown,
             final boolean isNoOneHeardEnabled,
@@ -64,6 +62,10 @@ public final class Chat {
         this.groupsColors = groupsColors;
         this.cooldowns = new ExpiringMap<>(cooldown, TimeUnit.MILLISECONDS);
         this.spyListeners = new ArrayList<>();
+    }
+
+    public static ChatBuilder builder() {
+        return new ChatBuilder();
     }
 
     public boolean hasCooldown(final Player sender, final Messages messages, final AsyncPlayerChatEvent event) {
@@ -184,5 +186,75 @@ public final class Chat {
 
     private boolean isRecipientNotSpectator(final Player recipient) {
         return !this.isNoOneHeardHideSpectators || recipient.getGameMode() != GameMode.SPECTATOR;
+    }
+
+    public static class ChatBuilder {
+        private String name;
+        private String format;
+        private String spyFormat = null;
+        private int distance;
+        private int cooldown = 1500;
+        private boolean isNoOneHeardEnabled;
+        private boolean isNoOneHeardHideHidden;
+        private boolean isNoOneHeardHideVanished;
+        private boolean isNoOneHeardHideSpectators;
+        private Map<String, String> groupsColors;
+
+        ChatBuilder() {
+        }
+
+        public ChatBuilder setName(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public ChatBuilder setFormat(String format) {
+            this.format = format;
+            return this;
+        }
+
+        public ChatBuilder setSpyFormat(String spyFormat) {
+            this.spyFormat = spyFormat;
+            return this;
+        }
+
+        public ChatBuilder setDistance(int distance) {
+            this.distance = distance;
+            return this;
+        }
+
+        public ChatBuilder setCooldown(int cooldown) {
+            this.cooldown = cooldown;
+            return this;
+        }
+
+        public ChatBuilder setIsNoOneHeardEnabled(boolean isNoOneHeardEnabled) {
+            this.isNoOneHeardEnabled = isNoOneHeardEnabled;
+            return this;
+        }
+
+        public ChatBuilder setIsNoOneHeardHideHidden(boolean isNoOneHeardHideHidden) {
+            this.isNoOneHeardHideHidden = isNoOneHeardHideHidden;
+            return this;
+        }
+
+        public ChatBuilder setIsNoOneHeardHideVanished(boolean isNoOneHeardHideVanished) {
+            this.isNoOneHeardHideVanished = isNoOneHeardHideVanished;
+            return this;
+        }
+
+        public ChatBuilder setIsNoOneHeardHideSpectators(boolean isNoOneHeardHideSpectators) {
+            this.isNoOneHeardHideSpectators = isNoOneHeardHideSpectators;
+            return this;
+        }
+
+        public ChatBuilder setGroupsColors(Map<String, String> groupsColors) {
+            this.groupsColors = groupsColors;
+            return this;
+        }
+
+        public Chat build() {
+            return new Chat(name, format, spyFormat, distance, cooldown, isNoOneHeardEnabled, isNoOneHeardHideHidden, isNoOneHeardHideVanished, isNoOneHeardHideSpectators, groupsColors);
+        }
     }
 }
