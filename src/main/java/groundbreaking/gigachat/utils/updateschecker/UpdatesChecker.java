@@ -14,7 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
 
-public class UpdatesChecker {
+public final class UpdatesChecker {
 
     private final GigaChat plugin;
 
