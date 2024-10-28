@@ -2,26 +2,24 @@ package groundbreaking.gigachat.collections;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.map.ExpiringMap;
+import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.TimeUnit;
 
+@Getter
 public final class Cooldowns {
 
+    @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    @Getter
-    private ExpiringMap<String, Long> localCooldowns;
-    @Getter
-    private ExpiringMap<String, Long> globalCooldowns;
-    @Getter
     private ExpiringMap<String, Long> privateCooldowns;
-    @Getter
+
     private ExpiringMap<String, Long> ignoreCooldowns;
-    @Getter
+
     private ExpiringMap<String, Long> spyCooldowns;
-    @Getter
+
     private ExpiringMap<String, Long> broadcastCooldowns;
 
     public Cooldowns(final GigaChat plugin) {
@@ -29,20 +27,10 @@ public final class Cooldowns {
     }
     
     public void setCooldowns() {
-        this.localCooldowns = new ExpiringMap<>(this.plugin.getChatValues().getLocalCooldown(), TimeUnit.MILLISECONDS);
-        this.globalCooldowns = new ExpiringMap<>(this.plugin.getChatValues().getGlobalCooldown(), TimeUnit.MILLISECONDS);
         this.privateCooldowns = new ExpiringMap<>(this.plugin.getPmValues().getPmCooldown(), TimeUnit.MILLISECONDS);
         this.ignoreCooldowns = new ExpiringMap<>(this.plugin.getPmValues().getIgnoreCooldown(), TimeUnit.MILLISECONDS);
         this.spyCooldowns = new ExpiringMap<>(this.plugin.getPmValues().getSpyCooldown(), TimeUnit.MILLISECONDS);
         this.broadcastCooldowns = new ExpiringMap<>(this.plugin.getBroadcastValues().getCooldown(), TimeUnit.MILLISECONDS);
-    }
-
-    public void removePlayerLocalCooldown(final String playerName) {
-        this.localCooldowns.remove(playerName);
-    }
-
-    public void removePlayerGlobalCooldown(final String playerName) {
-        this.globalCooldowns.remove(playerName);
     }
 
     public void removePlayerPrivateCooldown(final String playerName) {
