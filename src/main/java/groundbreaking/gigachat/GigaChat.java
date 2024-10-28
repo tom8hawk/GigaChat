@@ -106,9 +106,7 @@ public final class GigaChat extends JavaPlugin {
         this.setupPerms(servicesManager);
 
         this.registerEvents();
-        this.registerCommands();
-        this.registerBroadcastCommand();
-        this.registerDisableAutoMessagesCommand();
+        this.registerMainPluginCommand();
 
         super.getServer().getScheduler().runTaskLaterAsynchronously(this, () -> new UpdatesChecker(this).check(), 300L);
 
@@ -238,15 +236,9 @@ public final class GigaChat extends JavaPlugin {
         }
     }
 
-    private void registerCommands() {
+    private void registerMainPluginCommand() {
         final MainCommandHandler mainCommandHandler = new MainCommandHandler(this);
         super.getCommand("gigachat").setExecutor(mainCommandHandler);
-
-        final String disableOwnChatCommand = super.getConfig().getString("disable-own-chat.command");
-        final List<String> disableOwnChatAliases = super.getConfig().getStringList("disable-own-chat.aliases");
-        final DisableOwnChatExecutor disableOwnChat = new DisableOwnChatExecutor(this);
-
-        this.registerCommand(disableOwnChatCommand, disableOwnChatAliases, disableOwnChat, disableOwnChat);
 
         final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
         final DisableAutoMessagesArgument disableAutoMessagesArgument = new DisableAutoMessagesArgument(this, "disableam", "gigachat.command.disableautomessages.other");
@@ -263,6 +255,12 @@ public final class GigaChat extends JavaPlugin {
         mainCommandHandler.registerArgument(pmSoundSetter);
     }
 
+    public void registerPluginCommands() {
+        this.registerBroadcastCommand();
+        this.registerDisableOwnChat();
+        this.registerDisableAutoMessagesCommand();
+    }
+
     private void registerBroadcastCommand() {
         final ConfigurationSection broadcast = super.getConfig().getConfigurationSection("broadcast");
         if (broadcast != null) {
@@ -271,6 +269,17 @@ public final class GigaChat extends JavaPlugin {
             final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
 
             this.registerCommand(command, aliases, broadcastCommand, broadcastCommand);
+        }
+    }
+
+    private void registerDisableOwnChat() {
+        final ConfigurationSection disableOwnChat = super.getConfig().getConfigurationSection("disable-own-chat");
+        if (disableOwnChat != null) {
+            final String command = disableOwnChat.getString("command");
+            final List<String> aliases = disableOwnChat.getStringList("aliases");
+            final DisableOwnChatExecutor disableOwnChatCommand = new DisableOwnChatExecutor(this);
+
+            this.registerCommand(command, aliases, disableOwnChatCommand, disableOwnChatCommand);
         }
     }
 
@@ -283,6 +292,10 @@ public final class GigaChat extends JavaPlugin {
 
             this.registerCommand(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
         }
+    }
+
+    public void unregisterCommands() {
+        super.getServer().getCommandMap().clearCommands();
     }
 
     public void registerCommand(final String command, final List<String> aliases, final CommandExecutor commandExecutor, final TabCompleter tabCompleter) {
