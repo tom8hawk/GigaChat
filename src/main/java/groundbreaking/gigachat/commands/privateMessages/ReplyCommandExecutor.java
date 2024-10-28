@@ -24,8 +24,8 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     private final Messages messages;
     private final IVanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
-    private final Cooldowns cooldowns;
-    private final PmSounds pmSounds;
+    private final CooldownsMap cooldownsMap;
+    private final PmSoundsMap pmSoundsMap;
 
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
 
@@ -35,8 +35,8 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         this.messages = plugin.getMessages();
         this.vanishChecker = plugin.getVanishChecker();
         this.consoleSender = plugin.getServer().getConsoleSender();
-        this.cooldowns = plugin.getCooldowns();
-        this.pmSounds = plugin.getPmSounds();
+        this.cooldownsMap = plugin.getCooldownsMap();
+        this.pmSoundsMap = plugin.getPmSoundsMap();
     }
 
     @Override
@@ -63,7 +63,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
             return true;
         }
 
-        final String recipientName = Reply.getRecipientName(senderName);
+        final String recipientName = ReplyMap.getRecipientName(senderName);
 
         if (recipientName == null) {
             sender.sendMessage(this.messages.getNobodyToAnswer());
@@ -108,9 +108,9 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         formattedMessageForConsole = this.getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
         formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
 
-        Reply.add(recipientName, senderName);
+        ReplyMap.add(recipientName, senderName);
         this.processLogs(formattedMessageForConsole);
-        SocialSpy.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
+        SocialSpyMap.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
 
         sender.sendMessage(formattedMessageForSender);
         recipient.sendMessage(formattedMessageForRecipient);
@@ -121,11 +121,11 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldowns.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldowns.getPrivateCooldowns());
+        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsMap.getPrivateCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldowns.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMap.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -133,7 +133,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private boolean isIgnored(final String ignoredName, final String ignoringName) {
-        return Ignore.isIgnoredPrivate(ignoringName, ignoredName);
+        return IgnoreMap.isIgnoredPrivate(ignoringName, ignoredName);
     }
 
     private String getPrefix(final Player player) {
@@ -171,7 +171,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private void playSound(final Player recipient) {
-        final Sound sound = this.pmSounds.getSound(recipient.getName());
+        final Sound sound = this.pmSoundsMap.getSound(recipient.getName());
         if (this.pmValues.isSoundEnabled()) {
             final Location recipientLocation = recipient.getLocation();
             final float volume = this.pmValues.getSoundVolume();

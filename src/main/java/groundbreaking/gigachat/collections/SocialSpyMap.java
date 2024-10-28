@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 import java.util.Set;
 
-public final class SocialSpy {
+public final class SocialSpyMap {
 
     private static final Set<String> listening = new HashSet<>();
 

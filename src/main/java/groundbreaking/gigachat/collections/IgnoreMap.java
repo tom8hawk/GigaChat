@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public final class Ignore {
+public final class IgnoreMap {
 
     private static final HashMap<String, List<String>> ignoredChat = new HashMap<>();
     private static final HashMap<String, List<String>> ignoredPrivate = new HashMap<>();

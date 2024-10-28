@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.constructors;
 
-import groundbreaking.gigachat.collections.DisabledChat;
-import groundbreaking.gigachat.collections.Ignore;
+import groundbreaking.gigachat.collections.DisabledChatMap;
+import groundbreaking.gigachat.collections.IgnoreMap;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.map.ExpiringMap;
@@ -112,7 +112,7 @@ public final class Chat {
 
         for (final Player target : onlinePlayers) {
             final String targetName = target.getName();
-            if (Ignore.isIgnoredChat(targetName, senderName) || DisabledChat.contains(targetName)) {
+            if (IgnoreMap.isIgnoredChat(targetName, senderName) || DisabledChatMap.contains(targetName)) {
                 continue;
             }
 
@@ -135,7 +135,7 @@ public final class Chat {
         final String senderName = sender.getName();
         for (final Player target : onlinePlayers) {
             final String targetName = target.getName();
-            if (!Ignore.isIgnoredChat(targetName, senderName)) {
+            if (!IgnoreMap.isIgnoredChat(targetName, senderName)) {
                 playerList.add(target);
             }
         }

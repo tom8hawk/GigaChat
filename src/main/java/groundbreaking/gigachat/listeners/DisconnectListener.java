@@ -17,15 +17,15 @@ import java.util.Map;
 public final class DisconnectListener implements Listener {
 
     private final ChatValues chatValues;
-    private final Cooldowns cooldowns;
-    private final PmSounds pmSounds;
-    private final DisabledPrivateMessages disabledPrivateMessages;
+    private final CooldownsMap cooldownsMap;
+    private final PmSoundsMap pmSoundsMap;
+    private final DisabledPrivateMessagesMap disabledPrivateMessagesMap;
 
     public DisconnectListener(final GigaChat plugin) {
         this.chatValues = plugin.getChatValues();
-        this.cooldowns = plugin.getCooldowns();
-        this.pmSounds = plugin.getPmSounds();
-        this.disabledPrivateMessages = plugin.getDisabled();
+        this.cooldownsMap = plugin.getCooldownsMap();
+        this.pmSoundsMap = plugin.getPmSoundsMap();
+        this.disabledPrivateMessagesMap = plugin.getDisabled();
     }
 
     @EventHandler
@@ -50,48 +50,48 @@ public final class DisconnectListener implements Listener {
 
     private void loadData(final String name) {
         if (DatabaseQueries.disabledChatContainsPlayer(name)) {
-            DisabledChat.add(name);
+            DisabledChatMap.add(name);
         }
         if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(name)) {
-            this.disabledPrivateMessages.add(name);
+            this.disabledPrivateMessagesMap.add(name);
         }
         if (DatabaseQueries.ignoreChatContains(name)) {
-            Ignore.addToIgnoredChat(name, DatabaseQueries.getIgnoredChat(name));
+            IgnoreMap.addToIgnoredChat(name, DatabaseQueries.getIgnoredChat(name));
         }
         if (DatabaseQueries.ignorePrivateContainsPlayer(name)) {
-            Ignore.addToIgnoredPrivate(name, DatabaseQueries.getIgnoredPrivate(name));
+            IgnoreMap.addToIgnoredPrivate(name, DatabaseQueries.getIgnoredPrivate(name));
         }
         if (DatabaseQueries.localSpyContainsPlayer(name)) {
-            LocalSpy.add(name);
+            LocalSpyMap.add(name);
         }
         if (DatabaseQueries.privateMessagesSoundsContainsPlayer(name)) {
-            this.pmSounds.setSound(name, DatabaseQueries.getSound(name));
+            this.pmSoundsMap.setSound(name, DatabaseQueries.getSound(name));
         }
         if (DatabaseQueries.socialSpyContainsPlayer(name)) {
-            SocialSpy.add(name);
+            SocialSpyMap.add(name);
         }
     }
 
     private void saveData(final String name) {
-        if (DisabledChat.contains(name)) {
+        if (DisabledChatMap.contains(name)) {
             DatabaseQueries.addPlayerToDisabledChat(name);
         }
-        if (this.disabledPrivateMessages.contains(name)) {
+        if (this.disabledPrivateMessagesMap.contains(name)) {
             DatabaseQueries.addPlayerToDisabledPrivateMessages(name);
         }
-        if (Ignore.playerIgnoresChatAnyOne(name)) {
-            DatabaseQueries.addPlayerToIgnoreChat(name, Ignore.getAllIgnoredChat(name));
+        if (IgnoreMap.playerIgnoresChatAnyOne(name)) {
+            DatabaseQueries.addPlayerToIgnoreChat(name, IgnoreMap.getAllIgnoredChat(name));
         }
-        if (Ignore.playerIgnoresPrivateAnyOne(name)) {
-            DatabaseQueries.addPlayerToIgnorePrivate(name, Ignore.getAllIgnoredPrivate(name));
+        if (IgnoreMap.playerIgnoresPrivateAnyOne(name)) {
+            DatabaseQueries.addPlayerToIgnorePrivate(name, IgnoreMap.getAllIgnoredPrivate(name));
         }
-        if (LocalSpy.contains(name)) {
+        if (LocalSpyMap.contains(name)) {
             DatabaseQueries.addPlayerToLocalSpy(name);
         }
-        if (this.pmSounds.contains(name)) {
-            DatabaseQueries.addPlayerPmSoundToPmSounds(name, this.pmSounds.getSound(name).toString());
+        if (this.pmSoundsMap.contains(name)) {
+            DatabaseQueries.addPlayerPmSoundToPmSounds(name, this.pmSoundsMap.getSound(name).toString());
         }
-        if (SocialSpy.contains(name)) {
+        if (SocialSpyMap.contains(name)) {
             DatabaseQueries.addPlayerToSocialSpy(name);
         }
     }
@@ -101,17 +101,17 @@ public final class DisconnectListener implements Listener {
         for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
             entry.getValue().getCooldowns().remove(name);
         }
-        this.cooldowns.removePlayerPrivateCooldown(name);
-        this.cooldowns.removePlayerIgnoreCooldown(name);
-        this.cooldowns.removePlayerSpyCooldown(name);
-        this.cooldowns.removeBroadcastCooldown(name);
-        DisabledChat.remove(name);
-        this.disabledPrivateMessages.remove(name);
-        Ignore.removeFromIgnoredChat(name);
-        Ignore.removeFromIgnoredPrivate(name);
-        LocalSpy.remove(name);
-        this.pmSounds.remove(name);
-        Reply.removeFromAll(name);
-        SocialSpy.remove(name);
+        this.cooldownsMap.removePlayerPrivateCooldown(name);
+        this.cooldownsMap.removePlayerIgnoreCooldown(name);
+        this.cooldownsMap.removePlayerSpyCooldown(name);
+        this.cooldownsMap.removeBroadcastCooldown(name);
+        DisabledChatMap.remove(name);
+        this.disabledPrivateMessagesMap.remove(name);
+        IgnoreMap.removeFromIgnoredChat(name);
+        IgnoreMap.removeFromIgnoredPrivate(name);
+        LocalSpyMap.remove(name);
+        this.pmSoundsMap.remove(name);
+        ReplyMap.removeFromAll(name);
+        SocialSpyMap.remove(name);
     }
 }

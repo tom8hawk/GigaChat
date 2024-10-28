@@ -3,7 +3,7 @@ package groundbreaking.gigachat.collections;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DisabledPrivateMessages {
+public final class DisabledPrivateMessagesMap {
 
     private final List<String> players = new ArrayList<>();
 

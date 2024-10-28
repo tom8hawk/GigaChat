@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.args;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.LocalSpy;
+import groundbreaking.gigachat.collections.LocalSpyMap;
 import groundbreaking.gigachat.constructors.ArgsConstructor;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -28,12 +28,12 @@ public final class LocalSpyArgument extends ArgsConstructor {
 
         final String senderName = playerSender.getName();
 
-        if (LocalSpy.contains(senderName)) {
-            LocalSpy.remove(senderName);
+        if (LocalSpyMap.contains(senderName)) {
+            LocalSpyMap.remove(senderName);
             DatabaseQueries.removePlayerFromLocalSpy(senderName);
             sender.sendMessage(this.messages.getLocalSpyDisabled());
         } else {
-            LocalSpy.add(senderName);
+            LocalSpyMap.add(senderName);
             sender.sendMessage(this.messages.getLocalSpyEnabled());
         }
 

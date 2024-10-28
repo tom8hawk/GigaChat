@@ -2,7 +2,7 @@ package groundbreaking.gigachat.collections;
 
 import java.util.HashMap;
 
-public final class Reply {
+public final class ReplyMap {
 
     private static final HashMap<String, String> reply = new HashMap<>();
 

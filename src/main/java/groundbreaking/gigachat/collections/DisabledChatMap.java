@@ -3,7 +3,7 @@ package groundbreaking.gigachat.collections;
 import java.util.ArrayList;
 import java.util.List;
 
-public final class DisabledChat {
+public final class DisabledChatMap {
 
     private static final List<String> disabled = new ArrayList<>();
 

@@ -57,6 +57,7 @@ public final class AutoMessages {
         final float soundPitch = params.length == 3 && params[2] != null ? Float.parseFloat(params[2]) : 1.0f;
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
+            // todo Настроить отключение через команду
             if (player.hasPermission("gigachat.automessages")) {
                 continue;
             }

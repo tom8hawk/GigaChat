@@ -93,6 +93,7 @@ public final class ChatListener implements Listener {
 
         final String[] replacementList = this.getReplacements(sender, chat);
 
+        // todo добавить команду для включения/отключения
         final String spyFormat = chat.getSpyFormat();
         if (spyFormat != null && !spyFormat.isEmpty()) {
             final List<Player> spyListeners = chat.getSpyListeners();

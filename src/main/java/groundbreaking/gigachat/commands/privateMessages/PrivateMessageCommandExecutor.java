@@ -28,9 +28,9 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
     private final IColorizer hexColorizer;
-    private final Cooldowns cooldowns;
-    private final PmSounds pmSounds;
-    private final DisabledPrivateMessages disabled;
+    private final CooldownsMap cooldownsMap;
+    private final PmSoundsMap pmSoundsMap;
+    private final DisabledPrivateMessagesMap disabled;
     private final IVanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
 
@@ -42,8 +42,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
         this.hexColorizer = plugin.getColorizerByVersion();
-        this.cooldowns = plugin.getCooldowns();
-        this.pmSounds = plugin.getPmSounds();
+        this.cooldownsMap = plugin.getCooldownsMap();
+        this.pmSoundsMap = plugin.getPmSoundsMap();
         this.disabled = plugin.getDisabled();
         this.vanishChecker = plugin.getVanishChecker();
         this.consoleSender = plugin.getServer().getConsoleSender();
@@ -89,12 +89,12 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         final String recipientName = recipient.getName();
 
         if (isPlayerSender && !sender.hasPermission("gigachat.bypass.ignore")) {
-            if (Ignore.isIgnoredPrivate(recipientName, senderName)) {
+            if (IgnoreMap.isIgnoredPrivate(recipientName, senderName)) {
                 sender.sendMessage(this.messages.getRecipientIgnoresSender());
                 return true;
             }
 
-            if (Ignore.isIgnoredPrivate(senderName, recipientName)) {
+            if (IgnoreMap.isIgnoredPrivate(senderName, recipientName)) {
                 sender.sendMessage(this.messages.getSenderIgnoresRecipient());
                 return true;
             }
@@ -123,11 +123,11 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldowns.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.pm", this.cooldowns.getPrivateCooldowns());
+        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.pm", this.cooldownsMap.getPrivateCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldowns.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMap.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -247,9 +247,9 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             formattedMessageForConsole = getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
             formattedMessageForSocialSpy = getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
 
-            Reply.add(recipientName, senderName);
+            ReplyMap.add(recipientName, senderName);
             processLogs(formattedMessageForConsole);
-            SocialSpy.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
+            SocialSpyMap.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
         } else {
             formattedMessageForSender = getFormattedMessage(message, this.pmValues.getSenderFormat(), replacementList);
             formattedMessageForRecipient = getFormattedMessage(message, this.pmValues.getRecipientFormat(), replacementList);
@@ -290,7 +290,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
     private void playSound(final Player recipient) {
         if (pmValues.isSoundEnabled()) {
-            final Sound sound = this.pmSounds.getSound(recipient.getName());
+            final Sound sound = this.pmSoundsMap.getSound(recipient.getName());
             if (sound != null) {
                 final Location recipientLocation = recipient.getLocation();
                 final float volume = this.pmValues.getSoundVolume();
@@ -315,7 +315,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             if (sender instanceof Player playerSender) {
                 for (final Player player : Bukkit.getOnlinePlayers()) {
                     final String playerName = player.getName();
-                    if (Ignore.isIgnoredChat(playerSender.getName(), playerName) || Ignore.isIgnoredChat(playerName, playerSender.getName())) {
+                    if (IgnoreMap.isIgnoredChat(playerSender.getName(), playerName) || IgnoreMap.isIgnoredChat(playerName, playerSender.getName())) {
                         continue;
                     }
 

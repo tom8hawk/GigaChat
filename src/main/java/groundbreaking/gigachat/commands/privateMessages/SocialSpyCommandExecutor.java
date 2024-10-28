@@ -1,8 +1,8 @@
 package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.Cooldowns;
-import groundbreaking.gigachat.collections.SocialSpy;
+import groundbreaking.gigachat.collections.CooldownsMap;
+import groundbreaking.gigachat.collections.SocialSpyMap;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -21,12 +21,12 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
 
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
-    private final Cooldowns cooldowns;
+    private final CooldownsMap cooldownsMap;
 
     public SocialSpyCommandExecutor(final GigaChat plugin) {
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
-        this.cooldowns = plugin.getCooldowns();
+        this.cooldownsMap = plugin.getCooldownsMap();
     }
 
     @Override
@@ -48,26 +48,26 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
             return true;
         }
 
-        if (SocialSpy.contains(senderName)) {
-            SocialSpy.remove(senderName);
+        if (SocialSpyMap.contains(senderName)) {
+            SocialSpyMap.remove(senderName);
             DatabaseQueries.removePlayerFromSocialSpy(senderName);
             sender.sendMessage(this.messages.getSpyDisabled());
         } else {
-            SocialSpy.add(senderName);
+            SocialSpyMap.add(senderName);
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 
-        this.cooldowns.addCooldown(senderName, this.cooldowns.getSpyCooldowns());
+        this.cooldownsMap.addCooldown(senderName, this.cooldownsMap.getSpyCooldowns());
 
         return true;
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldowns.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldowns.getSpyCooldowns());
+        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsMap.getSpyCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldowns.getSpyCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMap.getSpyCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getSpyCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);

@@ -6,7 +6,7 @@ import org.bukkit.Sound;
 
 import java.util.Map;
 
-public final class PmSounds {
+public final class PmSoundsMap {
 
     private final Map<String, String> sounds = new Object2ObjectOpenHashMap<>();
     private String defaultSound; public void setDefaultSound(final String defaultSound) {
@@ -18,7 +18,7 @@ public final class PmSounds {
 
     private final GigaChat plugin;
 
-    public PmSounds(final GigaChat plugin) {
+    public PmSoundsMap(final GigaChat plugin) {
         this.plugin = plugin;
     }
 

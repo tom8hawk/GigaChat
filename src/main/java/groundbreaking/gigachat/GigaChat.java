@@ -1,9 +1,9 @@
 package groundbreaking.gigachat;
 
 import groundbreaking.gigachat.automessages.AutoMessages;
-import groundbreaking.gigachat.collections.Cooldowns;
-import groundbreaking.gigachat.collections.DisabledPrivateMessages;
-import groundbreaking.gigachat.collections.PmSounds;
+import groundbreaking.gigachat.collections.CooldownsMap;
+import groundbreaking.gigachat.collections.DisabledPrivateMessagesMap;
+import groundbreaking.gigachat.collections.PmSoundsMap;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.commands.args.*;
 import groundbreaking.gigachat.commands.other.BroadcastCommand;
@@ -61,10 +61,10 @@ public final class GigaChat extends JavaPlugin {
     private NewbieCommandsValues newbieCommandsValues;
     private PrivateMessagesValues pmValues;
 
-    private Cooldowns cooldowns;
-    private PmSounds pmSounds;
+    private CooldownsMap cooldownsMap;
+    private PmSoundsMap pmSoundsMap;
 
-    private DisabledPrivateMessages disabled;
+    private DisabledPrivateMessagesMap disabled;
 
     private IVanishChecker vanishChecker;
 
@@ -163,13 +163,13 @@ public final class GigaChat extends JavaPlugin {
         this.newbieChatValues = new NewbieChatValues(this);
         this.pmValues = new PrivateMessagesValues(this);
         this.newbieCommandsValues = new NewbieCommandsValues(this);
-        this.cooldowns = new Cooldowns(this);
-        this.disabled = new DisabledPrivateMessages();
+        this.cooldownsMap = new CooldownsMap(this);
+        this.disabled = new DisabledPrivateMessagesMap();
         this.chatListener = new ChatListener(this);
         this.commandListener = new CommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
         this.autoMessages = new AutoMessages(this);
-        this.pmSounds = new PmSounds(this);
+        this.pmSoundsMap = new PmSoundsMap(this);
     }
 
     public void setupAll() {
@@ -183,7 +183,7 @@ public final class GigaChat extends JavaPlugin {
             this.newbieCommandsValues.setValues();
         }
         this.pmValues.setValues();
-        this.cooldowns.setCooldowns();
+        this.cooldownsMap.setCooldowns();
     }
 
     public void setupVanishChecker() {

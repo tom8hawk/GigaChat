@@ -1,8 +1,8 @@
 package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.Cooldowns;
-import groundbreaking.gigachat.collections.Ignore;
+import groundbreaking.gigachat.collections.CooldownsMap;
+import groundbreaking.gigachat.collections.IgnoreMap;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -25,13 +25,13 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
-    private final Cooldowns cooldowns;
+    private final CooldownsMap cooldownsMap;
     private final IVanishChecker vanishChecker;
 
     public IgnoreCommandExecutor(final GigaChat plugin) {
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
-        this.cooldowns = plugin.getCooldowns();
+        this.cooldownsMap = plugin.getCooldownsMap();
         this.vanishChecker = plugin.getVanishChecker();
     }
 
@@ -98,11 +98,11 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldowns.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.ignore", this.cooldowns.getIgnoreCooldowns());
+        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.ignore", this.cooldownsMap.getIgnoreCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldowns.getIgnoreCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMap.getIgnoreCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -110,41 +110,41 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     }
 
     private void processChat(final Player sender, final String senderName, final String targetName) {
-        if (!Ignore.ignoredChatContains(senderName)) {
-            Ignore.addToIgnoredChat(senderName, new ArrayList<>(List.of(targetName)));
+        if (!IgnoreMap.ignoredChatContains(senderName)) {
+            IgnoreMap.addToIgnoredChat(senderName, new ArrayList<>(List.of(targetName)));
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
             return;
         }
 
-        if (Ignore.ignoredChatContains(senderName, targetName)) {
-            Ignore.removeFromIgnoredChat(senderName, targetName);
+        if (IgnoreMap.ignoredChatContains(senderName, targetName)) {
+            IgnoreMap.removeFromIgnoredChat(senderName, targetName);
             DatabaseQueries.removePlayerFromIgnoreChat(senderName);
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
         } else {
-            Ignore.addToIgnoredChat(senderName, targetName);
+            IgnoreMap.addToIgnoredChat(senderName, targetName);
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
 
-        this.cooldowns.addCooldown(senderName, this.cooldowns.getIgnoreCooldowns());
+        this.cooldownsMap.addCooldown(senderName, this.cooldownsMap.getIgnoreCooldowns());
     }
 
     private void processPrivate(final Player sender, final String senderName, final String targetName) {
-        if (!Ignore.ignoredPrivateContains(senderName)) {
-            Ignore.addToIgnoredPrivate(senderName, new ArrayList<>(List.of(targetName)));
+        if (!IgnoreMap.ignoredPrivateContains(senderName)) {
+            IgnoreMap.addToIgnoredPrivate(senderName, new ArrayList<>(List.of(targetName)));
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
             return;
         }
 
-        if (Ignore.ignoredPrivateContains(senderName, targetName)) {
-            Ignore.removeFromIgnoredPrivate(senderName, targetName);
+        if (IgnoreMap.ignoredPrivateContains(senderName, targetName)) {
+            IgnoreMap.removeFromIgnoredPrivate(senderName, targetName);
             DatabaseQueries.removePlayerFromIgnorePrivate(senderName);
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
         } else {
-            Ignore.addToIgnoredPrivate(senderName, targetName);
+            IgnoreMap.addToIgnoredPrivate(senderName, targetName);
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
 
-        this.cooldowns.addCooldown(senderName, this.cooldowns.getIgnoreCooldowns());
+        this.cooldownsMap.addCooldown(senderName, this.cooldownsMap.getIgnoreCooldowns());
     }
 
     @Override
@@ -185,7 +185,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             }
 
             final String playerName = target.getName();
-            if (Ignore.isIgnoredChat(senderName, playerName) || Ignore.isIgnoredChat(playerName, senderName)) {
+            if (IgnoreMap.isIgnoredChat(senderName, playerName) || IgnoreMap.isIgnoredChat(playerName, senderName)) {
                 continue;
             }
 
