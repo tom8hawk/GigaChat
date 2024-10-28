@@ -37,7 +37,7 @@ public class CommandRegisterer {
         custom.setExecutor(commandExecutor);
         custom.setTabCompleter(tabCompleter);
 
-        commandMap.register(plugin.getDescription().getName(), custom);
+        this.commandMap.register(this.plugin.getDescription().getName(), custom);
     }
 
     public PluginCommand getCustomCommand(final String name) {
@@ -45,7 +45,7 @@ public class CommandRegisterer {
             final Constructor<PluginCommand> c = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
             c.setAccessible(true);
 
-            return c.newInstance(name, plugin);
+            return c.newInstance(name, this.plugin);
         } catch (final SecurityException | IllegalArgumentException | IllegalAccessException | InstantiationException | InvocationTargetException | NoSuchMethodException ex) {
             throw new RuntimeException(ex);
         }
@@ -56,13 +56,13 @@ public class CommandRegisterer {
             final PluginCommand pluginCommand = this.getCustomCommand(command);
             final Field field = SimpleCommandMap.class.getDeclaredField("knownCommands");
             field.setAccessible(true);
-            final Object map = field.get(commandMap);
+            final Object map = field.get(this.commandMap);
 
             final HashMap<String, Command> knownCommands = (HashMap<String, Command>) map;
             knownCommands.remove(pluginCommand.getName());
 
             for (final String alias : pluginCommand.getAliases()) {
-                if (knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(plugin.getName())) {
+                if (knownCommands.containsKey(alias) && knownCommands.get(alias).toString().contains(this.plugin.getName())) {
                     knownCommands.remove(alias);
                 }
             }
