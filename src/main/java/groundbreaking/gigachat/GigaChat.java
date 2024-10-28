@@ -116,6 +116,7 @@ public final class GigaChat extends JavaPlugin {
     @Override
     public void onDisable() {
         new DatabaseHandler(this).closeConnection();
+        super.getServer().getScheduler().cancelTasks(this);
     }
 
     private void logPaperWarning() {
