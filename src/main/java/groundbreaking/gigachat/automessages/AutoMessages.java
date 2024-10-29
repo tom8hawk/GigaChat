@@ -84,9 +84,9 @@ public final class AutoMessages {
         }
 
         final AutoMessageConstructor autoMessage;
-        final int autoMessagesSize = this.autoMessagesClone.size() <= 1 ? 1 : this.autoMessagesClone.size() - 1;
+        final int autoMessagesSize = this.autoMessagesClone.size() - 1;
         if (this.autoMessagesValues.isRandom()) {
-            final int randomNumb = this.random.nextInt(autoMessagesSize);
+            final int randomNumb = autoMessagesSize <= 1 ? 1 : this.random.nextInt(autoMessagesSize);
             this.lastIndex = randomNumb;
             autoMessage = this.autoMessagesClone.get(randomNumb);
             this.autoMessagesClone.remove(randomNumb);
