@@ -118,6 +118,7 @@ public final class ChatListener implements Listener {
             final String hoverValue = this.chatValues.getHoverValue();
 
             this.sendHover(sender, formattedMessage, hoverText, hoverAction, hoverValue, recipients, replacementList);
+            this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
 
             event.setCancelled(true);
         } else {
@@ -253,8 +254,6 @@ public final class ChatListener implements Listener {
         for (int i = 0; i < recipients.size(); i++) {
             recipients.get(i).spigot().sendMessage(comp);
         }
-
-        this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
     }
 
     private void sendSpy(final Player sender, final String message, final String spyFormat, final List<Player> recipients, final String[] replacementList) {
