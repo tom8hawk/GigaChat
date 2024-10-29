@@ -96,6 +96,7 @@ public final class AutoMessages {
             }
             this.lastIndex++;
             autoMessage = this.autoMessagesClone.get(this.lastIndex);
+            this.autoMessagesClone.remove(this.lastIndex);
         }
 
         return autoMessage;
