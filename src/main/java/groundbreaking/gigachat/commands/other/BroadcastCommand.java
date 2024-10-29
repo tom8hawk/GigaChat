@@ -11,6 +11,8 @@ import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +31,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
     private final CooldownsMaps cooldownsMaps;
     private final ConsoleCommandSender consoleCommandSender;
 
-    private final String[] placeholders = { "{player}", "{prefix}", "{suffix}", "{message}" };
+    private final String[] placeholders = {"{player}", "{prefix}", "{suffix}", "{message}"};
 
     public BroadcastCommand(final GigaChat plugin) {
         this.plugin = plugin;
@@ -66,10 +68,12 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         final String message = this.getMessage(sender, args, isPlayerSender);
 
         if (isPlayerSender && this.broadcastValues.isHoverEnabled()) {
-            sendHover((Player) sender, message, recipients);
+            this.sendHover((Player) sender, message, recipients);
         } else {
             for (int i = 0; i < recipients.size(); i++) {
-                recipients.get(i).sendMessage(message);
+                final Player recipient = recipients.get(i);
+                recipient.get(i).sendMessage(message);
+                this.playerSound(recipient);
             }
         }
 
@@ -108,7 +112,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
             message = this.broadcastValues.getColorizer().colorize(String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
         }
 
-        final String[] replacementList = { name, prefix, suffix, message };
+        final String[] replacementList = {name, prefix, suffix, message};
 
         return Utils.replaceEach(this.broadcastValues.getFormat(), replacementList, this.placeholders);
     }
@@ -129,8 +133,19 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
             comp[i].setClickEvent(clickEvent);
         }
         for (int i = 0; i < recipients.size(); i++) {
-            recipients.get(i).spigot().sendMessage(comp);
+            final Player recipient = recipients.get(i);
+            recipient.spigot().sendMessage(comp);
+            this.playerSound(recipient);
         }
+    }
+
+    private void playerSound(final Player recipient) {
+        final Location location = recipient.getLocation();
+        final Sound sound = this.broadcastValues.getSound();
+        final float soundVolume = this.broadcastValues.getSoundVolume();
+        final float soundPitch = this.broadcastValues.getSoundPitch();
+
+        recipient.playSound(location, sound, soundVolume, soundPitch);
     }
 
     @Override
