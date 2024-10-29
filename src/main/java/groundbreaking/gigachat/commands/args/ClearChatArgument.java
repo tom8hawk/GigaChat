@@ -19,7 +19,6 @@ public final class ClearChatArgument extends ArgsConstructor {
         this.clearMessage = "\n ".repeat(100);
     }
 
-    // todo проверить player != sender если отправитель игрок, ибо не факт, что жаба сама умеет кастовать
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
 
