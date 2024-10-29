@@ -30,7 +30,8 @@ public final class NewbieCommandsValues {
 
     private boolean isGiveBypassPermissionEnabled;
 
-    private int requiredTime, requiredTimeToGetBypassPerm;
+    private int requiredTime;
+    private int requiredTimeToGetBypassPerm;
 
     private String denyMessage;
 
@@ -38,7 +39,8 @@ public final class NewbieCommandsValues {
 
     private Sound denySound;
 
-    private float denySoundVolume, denySoundPitch;
+    private float denySoundVolume;
+    private float denySoundPitch;
 
     private final List<String> blockedCommands = new ArrayList<>();
 

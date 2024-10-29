@@ -28,7 +28,8 @@ public final class NewbieChatValues {
 
     private boolean isGiveBypassPermissionEnabled;
 
-    private int requiredTime, requiredTimeToGetBypassPerm;
+    private int requiredTime;
+    private int requiredTimeToGetBypassPerm;
 
     private String denyMessage;
 
@@ -36,7 +37,8 @@ public final class NewbieChatValues {
 
     private Sound denySound;
 
-    private float denySoundVolume, denySoundPitch;
+    private float denySoundVolume;
+    private float denySoundPitch;
 
     public NewbieChatValues(final GigaChat plugin) {
         this.plugin = plugin;
@@ -61,8 +63,7 @@ public final class NewbieChatValues {
             this.denyMessage = colorizer.colorize(settings.getString("deny-message"));
 
             this.setupSound(settings);
-        }
-        else {
+        } else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"newbie-chat.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
@@ -74,11 +75,9 @@ public final class NewbieChatValues {
             this.plugin.getMyLogger().warning("Failed to load sound on path \"settings.deny-sound\" from file \"newbie-chat.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             this.isDenySoundEnabled = false;
-        }
-        else if (soundString.equalsIgnoreCase("disabled")) {
+        } else if (soundString.equalsIgnoreCase("disabled")) {
             this.isDenySoundEnabled = false;
-        }
-        else {
+        } else {
             this.isDenySoundEnabled = true;
             final String[] params = soundString.split(";");
             this.denySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;

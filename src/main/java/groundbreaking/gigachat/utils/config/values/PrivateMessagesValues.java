@@ -25,28 +25,38 @@ public final class PrivateMessagesValues {
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    private boolean printLogsToConsole, isSoundEnabled;
+    private boolean printLogsToConsole;
+    private boolean isSoundEnabled;
 
-    private int pmCooldown, ignoreCooldown, spyCooldown;
+    private int pmCooldown;
+    private int ignoreCooldown;
+    private int spyCooldown;
 
-    private float soundVolume, soundPitch;
+    private float soundVolume;
+    private float soundPitch;
 
-    private Sound
-            textValidatorDenySound,
-            capsValidatorDenySound,
-            wordsValidatorDenySound;
+    private Sound textValidatorDenySound;
+    private Sound capsValidatorDenySound;
+    private Sound wordsValidatorDenySound;
 
-    private float
-            textValidatorDenySoundVolume, textValidatorDenySoundPitch,
-            capsValidatorDenySoundVolume, capsValidatorDenySoundPitch,
-            wordsValidatorDenySoundVolume, wordsValidatorDenySoundPitch;
+    private float textValidatorDenySoundVolume;
+    private float textValidatorDenySoundPitch;
+    private float capsValidatorDenySoundVolume;
+    private float capsValidatorDenySoundPitch;
+    private float wordsValidatorDenySoundVolume;
+    private float wordsValidatorDenySoundPitch;
 
-    private String senderFormat, recipientFormat, socialSpyFormat, consoleFormat;
+    private String senderFormat;
+    private String recipientFormat;
+    private String socialSpyFormat;
+    private String consoleFormat;
 
-    private boolean
-            isCharsValidatorBlockMessage, isCharsValidatorDenySoundEnabled,
-            capsValidatorBlockMessageSend, isCapsValidatorDenySoundEnabled,
-            wordsValidatorBlockMessageSend, isWordsValidatorDenySoundEnabled;
+    private boolean isCharsValidatorBlockMessage;
+    private boolean isCharsValidatorDenySoundEnabled;
+    private boolean capsValidatorBlockMessageSend;
+    private boolean isCapsValidatorDenySoundEnabled;
+    private boolean wordsValidatorBlockMessageSend;
+    private boolean isWordsValidatorDenySoundEnabled;
 
     public IColorizer formatsColorizer;
 
