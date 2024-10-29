@@ -72,7 +72,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         } else {
             for (int i = 0; i < recipients.size(); i++) {
                 final Player recipient = recipients.get(i);
-                recipient.get(i).sendMessage(message);
+                recipient.sendMessage(message);
                 this.playerSound(recipient);
             }
         }
