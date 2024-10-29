@@ -1,10 +1,9 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
+import groundbreaking.gigachat.constructors.AutoMessageConstructor;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -26,8 +25,7 @@ public final class AutoMessagesValues {
 
     private String defaultSound;
 
-    private final Int2ObjectMap<List<String>> autoMessages = new Int2ObjectOpenHashMap<>();
-    private final Int2ObjectMap<String> autoMessagesSounds = new Int2ObjectOpenHashMap<>();
+    private final List<AutoMessageConstructor> autoMessages = new ObjectArrayList<>();
 
     public AutoMessagesValues(final GigaChat plugin) {
         this.plugin = plugin;
@@ -57,20 +55,21 @@ public final class AutoMessagesValues {
     private void setupAutoMessages(final FileConfiguration config, final IColorizer colorizer) {
         final ConfigurationSection autoMessagesSection = config.getConfigurationSection("auto-messages");
         if (autoMessagesSection != null) {
-            this.autoMessagesSounds.clear();
             this.autoMessages.clear();
 
             final List<String> autoMessagesKeys = new ObjectArrayList<>(autoMessagesSection.getKeys(false));
             for (int i = 0; i < autoMessagesKeys.size(); i++) {
                 final String key = autoMessagesKeys.get(i);
-                this.autoMessagesSounds.put(i, autoMessagesSection.getString(key + ".sound", this.defaultSound));
 
                 final List<String> messages = new ObjectArrayList<>(autoMessagesSection.getStringList(key + ".messages"));
                 for (int r = 0; r < messages.size(); r++) {
                     messages.set(r, colorizer.colorize(messages.get(r)));
                 }
 
-                this.autoMessages.put(i, messages);
+                final String sound = autoMessagesSection.getString(key + ".sound", this.defaultSound);
+
+                final AutoMessageConstructor autoMessageConstructor = new AutoMessageConstructor(messages, sound);
+                this.autoMessages.add(autoMessageConstructor);
             }
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"auto-messages\" from file \"auto-messages.yml\". Please check your configuration file, or delete it and restart your server!");

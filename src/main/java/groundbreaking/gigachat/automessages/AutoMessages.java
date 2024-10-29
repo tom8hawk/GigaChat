@@ -2,9 +2,9 @@ package groundbreaking.gigachat.automessages;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.AutoMessagesMap;
+import groundbreaking.gigachat.constructors.AutoMessageConstructor;
 import groundbreaking.gigachat.utils.config.values.AutoMessagesValues;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -22,7 +22,7 @@ public final class AutoMessages {
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
 
-    private final Int2ObjectMap<List<String>> autoMessagesClone = new Int2ObjectOpenHashMap<>();
+    private final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
 
     public AutoMessages(final GigaChat plugin) {
         this.plugin = plugin;
@@ -38,14 +38,14 @@ public final class AutoMessages {
     }
 
     private void process() {
-        final List<String> autoMessage = this.getAutoMessage();
-        if (!this.sendWithSound(autoMessage)) {
+        final List<String> autoMessage = this.getAutoMessage().autoMessage();
+        final String sound = this.getAutoMessage().sound();
+        if (!this.sendWithSound(autoMessage, sound)) {
             this.sendSimple(autoMessage);
         }
     }
 
-    private boolean sendWithSound(final List<String> autoMessages) {
-        final String soundString = this.autoMessagesValues.getAutoMessagesSounds().get(this.lastIndex);
+    private boolean sendWithSound(final List<String> autoMessages, final String soundString) {
         if (soundString == null || soundString.equalsIgnoreCase("disabled")) {
             return false;
         }
@@ -77,13 +77,13 @@ public final class AutoMessages {
         }
     }
 
-    private List<String> getAutoMessage() {
+    private AutoMessageConstructor getAutoMessage() {
         if (this.autoMessagesClone.isEmpty()) {
-            final Int2ObjectMap<List<String>> autoMessages = this.autoMessagesValues.getAutoMessages();
-            this.autoMessagesClone.putAll(autoMessages);
+            final List<AutoMessageConstructor> autoMessages = this.autoMessagesValues.getAutoMessages();
+            this.autoMessagesClone.addAll(autoMessages);
         }
 
-        final List<String> autoMessage;
+        final AutoMessageConstructor autoMessage;
         final int autoMessagesSize = this.autoMessagesClone.size() - 1;
         if (this.autoMessagesValues.isRandom()) {
             final int randomNumb = this.random.nextInt(autoMessagesSize);
@@ -92,11 +92,11 @@ public final class AutoMessages {
             this.autoMessagesClone.remove(randomNumb);
         } else {
             if (this.lastIndex >= autoMessagesSize) {
-                this.lastIndex = -1;
+                this.lastIndex = 0;
             }
-            this.lastIndex++;
             autoMessage = this.autoMessagesClone.get(this.lastIndex);
             this.autoMessagesClone.remove(this.lastIndex);
+            this.lastIndex++;
         }
 
         return autoMessage;
