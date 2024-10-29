@@ -71,6 +71,9 @@ permissions:
   gigachat.command.setpmsound:
     default: op
 
+  gigachat.command.disableam:
+    default: op
+
   gigachat.command.disablechat:
     default: op
 
@@ -80,13 +83,10 @@ permissions:
   gigachat.command.clearchat:
     default: op
 
-  gigachat.command.localspy:
+  gigachat.command.spy.other:
     default: op
 
   gigachat.command.broadcast:
-    default: op
-
-  gigachat.automessages:
     default: op
 
   gigachat.color.private.hex:

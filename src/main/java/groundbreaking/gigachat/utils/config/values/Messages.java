@@ -3,10 +3,13 @@ package groundbreaking.gigachat.utils.config.values;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+
+import java.util.Map;
 
 @Getter
 public final class Messages {
@@ -28,6 +31,7 @@ public final class Messages {
     private String setpmsoundUsageError;
     private String broadcastUsageError;
     private String disableAutoMessagesUsageError;
+    private String spyUsageError;
     private String nonExistArgument;
     private String argumentUsageError;
     private String soundAdditionalArgs;
@@ -68,6 +72,14 @@ public final class Messages {
     private String autoMessagesDisabledByOther;
     private String autoMessagesEnabled;
     private String autoMessagesDisabled;
+    private String chatsSpyEnabled;
+    private String chatsSpyDisabled;
+    private String chatsSpyEnabledOther;
+    private String chatsSpyDisabledOther;
+    private String chatsSpyEnabledByOther;
+    private String chatsSpyDisabledByOther;
+    private String chatNotFound;
+    private Map<String, String> chatsNames = new Object2ObjectOpenHashMap<>();
 
     @Getter private static String hours;
     @Getter private static String minutes;
@@ -100,6 +112,7 @@ public final class Messages {
         this.setpmsoundUsageError = this.getMessage(config, "setpmsound-usage-error", colorizer);
         this.broadcastUsageError = this.getMessage(config, "broadcast-usage-error", colorizer);
         this.disableAutoMessagesUsageError = this.getMessage(config, "disable-auto-messages-usage-error", colorizer);
+        this.spyUsageError = this.getMessage(config, "spy-usage-error", colorizer);
         this.nonExistArgument = this.getMessage(config, "non-exist-arg", colorizer);
         this.argumentUsageError = this.getMessage(config, "arg-usage-error", colorizer);
         this.soundAdditionalArgs = this.getMessage(config, "sound-additional-args", colorizer);
@@ -140,10 +153,39 @@ public final class Messages {
         this.autoMessagesDisabledByOther = this.getMessage(config, "auto-messages-disabled-by-other", colorizer);
         this.autoMessagesEnabled = this.getMessage(config, "auto-messages-enabled", colorizer);
         this.autoMessagesDisabled = this.getMessage(config, "auto-messages-disabled", colorizer);
+
+        final ConfigurationSection chatsSpyMode = config.getConfigurationSection("chats-spy-mode");
+        if (chatsSpyMode != null) {
+            this.chatsSpyEnabled = this.getMessage(chatsSpyMode, "enabled", "chats-spy-mode.enabled", colorizer);
+            this.chatsSpyDisabled = this.getMessage(chatsSpyMode, "disabled", "chats-spy-mode.disabled", colorizer);
+            this.chatsSpyEnabledOther = this.getMessage(chatsSpyMode, "enabled-other", "chats-spy-mode.enabled-other", colorizer);
+            this.chatsSpyDisabledOther = this.getMessage(chatsSpyMode, "disabled-other", "chats-spy-mode.disabled-other", colorizer);
+            this.chatsSpyEnabledByOther = this.getMessage(chatsSpyMode, "enabled-by-other", "chats-spy-mode.enabled-by-other", colorizer);
+            this.chatsSpyDisabledByOther = this.getMessage(chatsSpyMode, "disabled-by-other", "chats-spy-mode.disabled-by-other", colorizer);
+            this.chatNotFound = this.getMessage(chatsSpyMode, "chat-not-found", "chats-spy-mode.chat-not-found", colorizer);
+
+            final ConfigurationSection chats = chatsSpyMode.getConfigurationSection("chats");
+            if (chats != null) {
+                for (final String key : chats.getKeys(false)) {
+                    this.chatsNames.put(key, chats.getString(key, key));
+                }
+            } else{
+                this.plugin.getMyLogger().warning("Failed to load section \"chats-spy-mode.chats\" from file \"messages.yml\". Please check your configuration file, or delete it and restart your server!");
+                this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            }
+        } else{
+            this.plugin.getMyLogger().warning("Failed to load section \"chats-spy-mode\" from file \"messages.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+        }
     }
 
     public String getMessage(final FileConfiguration config, final String path, final IColorizer colorizer) {
         final String message = config.getString(path, "&4(!) &cFailed to get message from: " + path);
+        return colorizer.colorize(message);
+    }
+
+    public String getMessage(final ConfigurationSection section, final String path, final String fullPath, final IColorizer colorizer) {
+        final String message = section.getString(path, "&4(!) &cFailed to get message from: " + fullPath);
         return colorizer.colorize(message);
     }
 

@@ -1,6 +1,7 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
+import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.exceptions.FormatNullException;
 import groundbreaking.gigachat.utils.StringUtil;
@@ -101,6 +102,8 @@ public final class ChatValues {
         final ConfigurationSection chats = config.getConfigurationSection("chats");
         if (chats != null) {
             final Set<String> chatsKeys = chats.getKeys(false);
+            MainCommandHandler.CHATS.clear();
+            MainCommandHandler.CHATS.addAll(chatsKeys);
 
             for (final String key : chatsKeys) {
                 final ConfigurationSection keySection = chats.getConfigurationSection(key);
@@ -115,8 +118,10 @@ public final class ChatValues {
                 }
                 final String symbolString = keySection.getString("symbol");
                 final String spyFormat = keySection.getString("spy-format", null);
+                final String spyCommand = keySection.getString("spy-command", null);
                 final int distance = keySection.getInt("distance");
-                final int cooldown = keySection.getInt("cooldown");
+                final int chatCooldown = keySection.getInt("chat-cooldown");
+                final int spyCooldown = keySection.getInt("spy-cooldown");
 
                 final ConfigurationSection noOneHeardYou = keySection.getConfigurationSection("no-one-heard-you");
                 boolean isNoOneHeardEnabled = false;
@@ -140,11 +145,14 @@ public final class ChatValues {
                 }
 
                 final Chat chat = Chat.builder()
+                        .setPlugin(this.plugin)
                         .setName(key)
                         .setFormat(format)
                         .setSpyFormat(spyFormat)
+                        .setSpyCommand(spyCommand)
                         .setDistance(distance)
-                        .setCooldown(cooldown)
+                        .setChatCooldown(chatCooldown)
+                        .setSpyCooldown(spyCooldown)
                         .setIsNoOneHeardEnabled(isNoOneHeardEnabled)
                         .setIsNoOneHeardHideHidden(isNoOneHeardHideHidden)
                         .setIsNoOneHeardHideVanished(isNoOneHeardHideVanished)
@@ -153,7 +161,7 @@ public final class ChatValues {
                         .build();
 
                 if (symbolString.equalsIgnoreCase("default")) {
-                    defaultChat = chat;
+                    this.defaultChat = chat;
                 } else {
                     final char symbol = symbolString.charAt(0);
                     this.chats.put(symbol, chat);

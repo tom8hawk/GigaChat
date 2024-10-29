@@ -3,6 +3,7 @@ package groundbreaking.gigachat.commands;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.constructors.ArgsConstructor;
 import groundbreaking.gigachat.utils.config.values.Messages;
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.command.*;
@@ -18,6 +19,7 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
     private final Messages messages;
 
     private final HashMap<String, ArgsConstructor> arguments = new HashMap<>();
+    public static final List<String> CHATS = new ObjectArrayList<>();
 
     public MainCommandHandler(final GigaChat plugin) {
         this.messages = plugin.getMessages();
@@ -58,11 +60,12 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        return sender.hasPermission("gigachat.command.reload")
+        return sender.hasPermission("gigachat.command.clearchat")
+                || sender.hasPermission("gigachat.command.disableam")
                 || sender.hasPermission("gigachat.command.disablechat")
+                || sender.hasPermission("gigachat.command.reload")
                 || sender.hasPermission("gigachat.command.setpmsound")
-                || sender.hasPermission("gigachat.command.localspy")
-                || sender.hasPermission("gigachat.command.clearchat");
+                || sender.hasPermission("gigachat.command.spy.other");
     }
 
     @Override
@@ -71,15 +74,14 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
         final String input = args[args.length - 1].toUpperCase();
 
         if (args.length == 1) {
-
             if (sender.hasPermission("gigachat.command.clearchat") && "clearchat".startsWith(input)) {
                 list.add("clearchat");
             }
+            if (sender.hasPermission("gigachat.command.disableam") && "disableam".startsWith(input)) {
+                list.add("disableam");
+            }
             if (sender.hasPermission("gigachat.command.disablechat") && "disablechat".startsWith(input)) {
                 list.add("disablechat");
-            }
-            if (sender.hasPermission("gigachat.command.localspy") && "localspy".startsWith(input)) {
-                list.add("localspy");
             }
             if (sender.hasPermission("gigachat.command.reload") && "reload".startsWith(input)) {
                 list.add("reload");
@@ -87,17 +89,26 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("gigachat.command.setpmsound") && "setpmsound".startsWith(input)) {
                 list.add("setpmsound");
             }
+            if (sender.hasPermission("gigachat.command.spy.other") && "spy".startsWith(input)) {
+                list.add("spy");
+            }
 
             return list;
         }
 
-        final boolean isSetpmsoundArg = args[0].equalsIgnoreCase("setpmsound");
-        if (isSetpmsoundArg) {
-            final boolean hasSetpmsoundPerm = sender.hasPermission("gigachat.command.setpmsound");
-            if (args.length == 2 && hasSetpmsoundPerm) {
+        if (args.length == 2) {
+            final boolean hasAnyPerm = sender.hasPermission("gigachat.command.disableam")
+                    || sender.hasPermission("gigachat.command.setpmsound")
+                    || sender.hasPermission("gigachat.command.spy.other");
+            if (hasAnyPerm) {
                 final List<String> playerNames = this.getPlayers(input);
                 list.addAll(playerNames);
-            } else if (args.length == 3 && hasSetpmsoundPerm) {
+            }
+        }
+
+        if (args[0].equalsIgnoreCase("setpmsound")) {
+            final boolean hasPerm = sender.hasPermission("gigachat.command.setpmsound");
+            if (args.length == 3 && hasPerm) {
                 if ("none".startsWith(input.toLowerCase())) {
                     list.add("none");
                 }
@@ -109,6 +120,8 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
                     }
                 }
             }
+        } else if (args[0].equalsIgnoreCase("spy.other")) {
+            return CHATS;
         }
 
         return list;

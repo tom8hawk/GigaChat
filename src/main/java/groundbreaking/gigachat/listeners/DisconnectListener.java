@@ -105,7 +105,7 @@ public final class DisconnectListener implements Listener {
     private void removeCooldown(final String name) {
         final Object2ObjectOpenHashMap<Character, Chat> chats = this.chatValues.getChats();
         for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
-            entry.getValue().getCooldowns().remove(name);
+            entry.getValue().getChatCooldowns().remove(name);
         }
         this.cooldownsMap.removePlayerPrivateCooldown(name);
         this.cooldownsMap.removePlayerIgnoreCooldown(name);

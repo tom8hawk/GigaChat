@@ -243,16 +243,16 @@ public final class GigaChat extends JavaPlugin {
         final ClearChatArgument clearChat = new ClearChatArgument(this, "clearchat", "gigachat.command.clearchat");
         final DisableAutoMessagesArgument disableAutoMessagesArgument = new DisableAutoMessagesArgument(this, "disableam", "gigachat.command.disableautomessages.other");
         final DisableServerChatArgument disableServerChat = new DisableServerChatArgument(this, "disablechat", "gigachat.command.disablechat");
-        final LocalSpyArgument localSpy = new LocalSpyArgument(this, "localspy", "gigachat.command.localspy");
         final ReloadArgument reload = new ReloadArgument(this, "reload", "gigachat.command.reload");
         final SetPmSoundArgument pmSoundSetter = new SetPmSoundArgument(this, "setpmsound", "gigachat.command.setpmsound");
+        final SpyArgument spyArgument = new SpyArgument(this, "spy", "gigachat.command.spy.other");
 
         mainCommandHandler.registerArgument(clearChat);
         mainCommandHandler.registerArgument(disableAutoMessagesArgument);
         mainCommandHandler.registerArgument(disableServerChat);
-        mainCommandHandler.registerArgument(localSpy);
         mainCommandHandler.registerArgument(reload);
         mainCommandHandler.registerArgument(pmSoundSetter);
+        mainCommandHandler.registerArgument(spyArgument);
     }
 
     public void registerPluginCommands() {
