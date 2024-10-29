@@ -66,6 +66,6 @@ disable-own-chat:
 # Настройка команды для отключения авто-сообщений
 disable-auto-messages:
   # Оставьте пустым, чтобы отключить
-  command: "disableautomessages"
+  command: "disableam"
   # Альясы для команды
-  aliases: [ "disableam" ]
+  aliases: [ "disableautomessages" ]
