@@ -45,7 +45,7 @@ public final class AutoMessages {
     }
 
     private boolean sendWithSound(final List<String> autoMessages) {
-        final String soundString = this.autoMessagesValues.getAutoMessagesSounds().get(this.lastIndex - 1);
+        final String soundString = this.autoMessagesValues.getAutoMessagesSounds().get(this.lastIndex);
         if (soundString == null || soundString.equalsIgnoreCase("disabled")) {
             return false;
         }
@@ -92,10 +92,10 @@ public final class AutoMessages {
             this.autoMessagesClone.remove(randomNumb);
         } else {
             if (this.lastIndex >= autoMessagesSize) {
-                this.lastIndex = 0;
+                this.lastIndex = -1;
             }
-            autoMessage = this.autoMessagesClone.get(this.lastIndex);
             this.lastIndex++;
+            autoMessage = this.autoMessagesClone.get(this.lastIndex);
         }
 
         return autoMessage;
