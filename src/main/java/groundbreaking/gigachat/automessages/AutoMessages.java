@@ -38,8 +38,9 @@ public final class AutoMessages {
     }
 
     private void process() {
-        final List<String> autoMessage = this.getAutoMessage().autoMessage();
-        final String sound = this.getAutoMessage().sound();
+        final AutoMessageConstructor autoMessageConstructor = this.getAutoMessage();
+        final List<String> autoMessage = autoMessageConstructor.autoMessage();
+        final String sound = autoMessageConstructor.sound();
         if (!this.sendWithSound(autoMessage, sound)) {
             this.sendSimple(autoMessage);
         }
