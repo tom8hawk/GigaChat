@@ -19,7 +19,7 @@ public final class AutoMessages {
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
 
-    private final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
+    public final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
 
     public AutoMessages(final GigaChat plugin) {
         this.plugin = plugin;

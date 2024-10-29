@@ -24,6 +24,7 @@ public final class ReloadArgument extends ArgsConstructor {
         final long startTime = System.currentTimeMillis();
 
         this.plugin.getCommandRegisterer().unregisterCustomCommand();
+        this.plugin.getAutoMessages().autoMessagesClone.clear();
         this.plugin.reloadConfig();
         this.plugin.setupVanishChecker();
         this.plugin.setupAll();
