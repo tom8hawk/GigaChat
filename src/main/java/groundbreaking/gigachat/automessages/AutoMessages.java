@@ -10,14 +10,11 @@ import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 public final class AutoMessages {
-
-    private final Random random = new Random();
-    private int lastIndex = 0;
 
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
@@ -82,23 +79,13 @@ public final class AutoMessages {
         if (this.autoMessagesClone.isEmpty()) {
             final List<AutoMessageConstructor> autoMessages = this.autoMessagesValues.getAutoMessages();
             this.autoMessagesClone.addAll(autoMessages);
+            if (this.autoMessagesValues.isRandom()) {
+                Collections.shuffle(autoMessages);
+            }
         }
 
-        final AutoMessageConstructor autoMessage;
-        final int autoMessagesSize = this.autoMessagesClone.size() - 1;
-        if (this.autoMessagesValues.isRandom()) {
-            final int randomNumb = autoMessagesSize < 1 ? 0 : this.random.nextInt(autoMessagesSize);
-            this.lastIndex = randomNumb;
-            autoMessage = this.autoMessagesClone.get(randomNumb);
-            this.autoMessagesClone.remove(randomNumb);
-        } else {
-            if (this.lastIndex >= autoMessagesSize) {
-                this.lastIndex = 0;
-            }
-            autoMessage = this.autoMessagesClone.get(this.lastIndex);
-            this.autoMessagesClone.remove(this.lastIndex);
-            this.lastIndex++;
-        }
+        final AutoMessageConstructor autoMessage = this.autoMessagesClone.get(0);
+        this.autoMessagesClone.remove(0);
 
         return autoMessage;
     }
