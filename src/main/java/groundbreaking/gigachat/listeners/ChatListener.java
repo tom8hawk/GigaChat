@@ -93,10 +93,10 @@ public final class ChatListener implements Listener {
 
         final String[] replacementList = this.getReplacements(sender, chat);
 
-        // todo добавить команду для включения/отключения
         final String spyFormat = chat.getSpyFormat();
         if (spyFormat != null && !spyFormat.isEmpty()) {
-            final List<Player> spyListeners = chat.getSpyListeners();
+            final List<Player> spyListeners = new ArrayList<>(chat.getSpyListeners());
+            spyListeners.remove(sender);
             this.sendSpy(sender, message, spyFormat, spyListeners, replacementList);
         }
 
