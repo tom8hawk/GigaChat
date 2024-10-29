@@ -265,10 +265,12 @@ public final class GigaChat extends JavaPlugin {
         final ConfigurationSection broadcast = super.getConfig().getConfigurationSection("broadcast");
         if (broadcast != null) {
             final String command = broadcast.getString("command");
-            final List<String> aliases = broadcast.getStringList("aliases");
-            final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
+            if (!command.isEmpty()) {
+                final List<String> aliases = broadcast.getStringList("aliases");
+                final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
 
-            this.commandRegisterer.register(command, aliases, broadcastCommand, broadcastCommand);
+                this.commandRegisterer.register(command, aliases, broadcastCommand, broadcastCommand);
+            }
         }
     }
 
@@ -276,10 +278,12 @@ public final class GigaChat extends JavaPlugin {
         final ConfigurationSection disableOwnChat = super.getConfig().getConfigurationSection("disable-own-chat");
         if (disableOwnChat != null) {
             final String command = disableOwnChat.getString("command");
-            final List<String> aliases = disableOwnChat.getStringList("aliases");
-            final DisableOwnChatExecutor disableOwnChatCommand = new DisableOwnChatExecutor(this);
+            if (!command.isEmpty()) {
+                final List<String> aliases = disableOwnChat.getStringList("aliases");
+                final DisableOwnChatExecutor disableOwnChatCommand = new DisableOwnChatExecutor(this);
 
-            this.commandRegisterer.register(command, aliases, disableOwnChatCommand, disableOwnChatCommand);
+                this.commandRegisterer.register(command, aliases, disableOwnChatCommand, disableOwnChatCommand);
+            }
         }
     }
 
@@ -287,10 +291,12 @@ public final class GigaChat extends JavaPlugin {
         final ConfigurationSection disableAutoMessages = super.getConfig().getConfigurationSection("disable-auto-messages");
         if (disableAutoMessages != null) {
             final String command = disableAutoMessages.getString("command");
-            final List<String> aliases = disableAutoMessages.getStringList("aliases");
-            final DisableAutoMessagesCommand disableAutoMessagesCommand = new DisableAutoMessagesCommand(this);
+            if (!command.isEmpty()) {
+                final List<String> aliases = disableAutoMessages.getStringList("aliases");
+                final DisableAutoMessagesCommand disableAutoMessagesCommand = new DisableAutoMessagesCommand(this);
 
-            this.commandRegisterer.register(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
+                this.commandRegisterer.register(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
+            }
         }
     }
 
