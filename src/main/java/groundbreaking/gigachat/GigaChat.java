@@ -1,7 +1,7 @@
 package groundbreaking.gigachat;
 
 import groundbreaking.gigachat.automessages.AutoMessages;
-import groundbreaking.gigachat.collections.CooldownsMap;
+import groundbreaking.gigachat.collections.CooldownsMaps;
 import groundbreaking.gigachat.collections.DisabledPrivateMessagesMap;
 import groundbreaking.gigachat.collections.PmSoundsMap;
 import groundbreaking.gigachat.commands.MainCommandHandler;
@@ -59,7 +59,7 @@ public final class GigaChat extends JavaPlugin {
     private NewbieCommandsValues newbieCommandsValues;
     private PrivateMessagesValues pmValues;
 
-    private CooldownsMap cooldownsMap;
+    private CooldownsMaps cooldownsMaps;
     private PmSoundsMap pmSoundsMap;
 
     private DisabledPrivateMessagesMap disabled;
@@ -164,7 +164,7 @@ public final class GigaChat extends JavaPlugin {
         this.newbieChatValues = new NewbieChatValues(this);
         this.pmValues = new PrivateMessagesValues(this);
         this.newbieCommandsValues = new NewbieCommandsValues(this);
-        this.cooldownsMap = new CooldownsMap(this);
+        this.cooldownsMaps = new CooldownsMaps(this);
         this.disabled = new DisabledPrivateMessagesMap();
         this.chatListener = new ChatListener(this);
         this.commandListener = new CommandListener(this);
@@ -184,7 +184,7 @@ public final class GigaChat extends JavaPlugin {
             this.newbieCommandsValues.setValues();
         }
         this.pmValues.setValues();
-        this.cooldownsMap.setCooldowns();
+        this.cooldownsMaps.setCooldowns();
     }
 
     public void setupVanishChecker() {

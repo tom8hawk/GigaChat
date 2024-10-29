@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.CooldownsMap;
+import groundbreaking.gigachat.collections.CooldownsMaps;
 import groundbreaking.gigachat.collections.SocialSpyMap;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
@@ -21,12 +21,12 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
 
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
-    private final CooldownsMap cooldownsMap;
+    private final CooldownsMaps cooldownsMaps;
 
     public SocialSpyCommandExecutor(final GigaChat plugin) {
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
-        this.cooldownsMap = plugin.getCooldownsMap();
+        this.cooldownsMaps = plugin.getCooldownsMaps();
     }
 
     @Override
@@ -57,17 +57,17 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 
-        this.cooldownsMap.addCooldown(senderName, this.cooldownsMap.getSpyCooldowns());
+        this.cooldownsMaps.addCooldown(senderName, this.cooldownsMaps.getSpyCooldowns());
 
         return true;
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsMap.getSpyCooldowns());
+        return this.cooldownsMaps.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsMaps.getSpyCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsMap.getSpyCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMaps.getSpyCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getSpyCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);

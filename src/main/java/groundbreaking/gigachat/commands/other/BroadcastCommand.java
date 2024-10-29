@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.CooldownsMap;
+import groundbreaking.gigachat.collections.CooldownsMaps;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.BroadcastValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -26,7 +26,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
     private final GigaChat plugin;
     private final BroadcastValues broadcastValues;
     private final Messages messages;
-    private final CooldownsMap cooldownsMap;
+    private final CooldownsMaps cooldownsMaps;
     private final ConsoleCommandSender consoleCommandSender;
 
     private final String[] placeholders = { "{player}", "{prefix}", "{suffix}", "{message}" };
@@ -35,7 +35,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
         this.broadcastValues = plugin.getBroadcastValues();
         this.messages = plugin.getMessages();
-        this.cooldownsMap = plugin.getCooldownsMap();
+        this.cooldownsMaps = plugin.getCooldownsMaps();
         this.consoleCommandSender = plugin.getServer().getConsoleSender();
     }
 
@@ -74,7 +74,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         }
 
         if (isPlayerSender) {
-            this.cooldownsMap.addCooldown(sender.getName(), this.cooldownsMap.getBroadcastCooldowns());
+            this.cooldownsMaps.addCooldown(sender.getName(), this.cooldownsMaps.getBroadcastCooldowns());
         }
 
         this.consoleCommandSender.sendMessage(message);
@@ -83,11 +83,11 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.broadcast", cooldownsMap.getBroadcastCooldowns());
+        return this.cooldownsMaps.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.broadcast", cooldownsMaps.getBroadcastCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsMap.getBroadcastCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMaps.getBroadcastCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.broadcastValues.getCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);

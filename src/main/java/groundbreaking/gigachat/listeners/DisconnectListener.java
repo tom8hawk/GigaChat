@@ -17,13 +17,13 @@ import java.util.Map;
 public final class DisconnectListener implements Listener {
 
     private final ChatValues chatValues;
-    private final CooldownsMap cooldownsMap;
+    private final CooldownsMaps cooldownsMaps;
     private final PmSoundsMap pmSoundsMap;
     private final DisabledPrivateMessagesMap disabledPrivateMessagesMap;
 
     public DisconnectListener(final GigaChat plugin) {
         this.chatValues = plugin.getChatValues();
-        this.cooldownsMap = plugin.getCooldownsMap();
+        this.cooldownsMaps = plugin.getCooldownsMaps();
         this.pmSoundsMap = plugin.getPmSoundsMap();
         this.disabledPrivateMessagesMap = plugin.getDisabled();
     }
@@ -107,10 +107,10 @@ public final class DisconnectListener implements Listener {
         for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
             entry.getValue().getChatCooldowns().remove(name);
         }
-        this.cooldownsMap.removePlayerPrivateCooldown(name);
-        this.cooldownsMap.removePlayerIgnoreCooldown(name);
-        this.cooldownsMap.removePlayerSpyCooldown(name);
-        this.cooldownsMap.removeBroadcastCooldown(name);
+        this.cooldownsMaps.removePlayerPrivateCooldown(name);
+        this.cooldownsMaps.removePlayerIgnoreCooldown(name);
+        this.cooldownsMaps.removePlayerSpyCooldown(name);
+        this.cooldownsMaps.removeBroadcastCooldown(name);
         DisabledChatMap.remove(name);
         this.disabledPrivateMessagesMap.remove(name);
         IgnoreMap.removeFromIgnoredChat(name);

@@ -24,7 +24,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     private final Messages messages;
     private final IVanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
-    private final CooldownsMap cooldownsMap;
+    private final CooldownsMaps cooldownsMaps;
     private final PmSoundsMap pmSoundsMap;
 
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
@@ -35,7 +35,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         this.messages = plugin.getMessages();
         this.vanishChecker = plugin.getVanishChecker();
         this.consoleSender = plugin.getServer().getConsoleSender();
-        this.cooldownsMap = plugin.getCooldownsMap();
+        this.cooldownsMaps = plugin.getCooldownsMaps();
         this.pmSoundsMap = plugin.getPmSoundsMap();
     }
 
@@ -121,11 +121,11 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsMap.getPrivateCooldowns());
+        return this.cooldownsMaps.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsMaps.getPrivateCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsMap.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMaps.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);

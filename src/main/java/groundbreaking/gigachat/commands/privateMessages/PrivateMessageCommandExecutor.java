@@ -28,7 +28,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
     private final IColorizer hexColorizer;
-    private final CooldownsMap cooldownsMap;
+    private final CooldownsMaps cooldownsMaps;
     private final PmSoundsMap pmSoundsMap;
     private final DisabledPrivateMessagesMap disabled;
     private final IVanishChecker vanishChecker;
@@ -42,7 +42,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
         this.hexColorizer = plugin.getColorizerByVersion();
-        this.cooldownsMap = plugin.getCooldownsMap();
+        this.cooldownsMaps = plugin.getCooldownsMaps();
         this.pmSoundsMap = plugin.getPmSoundsMap();
         this.disabled = plugin.getDisabled();
         this.vanishChecker = plugin.getVanishChecker();
@@ -123,11 +123,11 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsMap.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.pm", this.cooldownsMap.getPrivateCooldowns());
+        return this.cooldownsMaps.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.pm", this.cooldownsMaps.getPrivateCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsMap.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownsMaps.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
