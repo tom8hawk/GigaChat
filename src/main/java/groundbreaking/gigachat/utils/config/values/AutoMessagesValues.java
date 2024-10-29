@@ -60,16 +60,18 @@ public final class AutoMessagesValues {
             final List<String> autoMessagesKeys = new ObjectArrayList<>(autoMessagesSection.getKeys(false));
             for (int i = 0; i < autoMessagesKeys.size(); i++) {
                 final String key = autoMessagesKeys.get(i);
+                final ConfigurationSection keySection = autoMessagesSection.getConfigurationSection(key);
+                if (keySection != null) {
+                    final List<String> messages = new ObjectArrayList<>(keySection.getStringList("messages"));
+                    final String sound = keySection.getString("sound", this.defaultSound);
 
-                final List<String> messages = new ObjectArrayList<>(autoMessagesSection.getStringList(key + ".messages"));
-                for (int r = 0; r < messages.size(); r++) {
-                    messages.set(r, colorizer.colorize(messages.get(r)));
+                    for (int r = 0; r < messages.size(); r++) {
+                        messages.set(r, colorizer.colorize(messages.get(r)));
+                    }
+
+                    final AutoMessageConstructor autoMessageConstructor = new AutoMessageConstructor(messages, sound);
+                    this.autoMessages.add(autoMessageConstructor);
                 }
-
-                final String sound = autoMessagesSection.getString(key + ".sound", this.defaultSound);
-
-                final AutoMessageConstructor autoMessageConstructor = new AutoMessageConstructor(messages, sound);
-                this.autoMessages.add(autoMessageConstructor);
             }
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"auto-messages\" from file \"auto-messages.yml\". Please check your configuration file, or delete it and restart your server!");
