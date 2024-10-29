@@ -30,7 +30,7 @@ public final class DisableAutoMessagesCommand implements CommandExecutor, TabCom
             return true;
         }
 
-        if (!sender.hasPermission("gigachat.command.disableautomessages.self")) {
+        if (!sender.hasPermission("gigachat.command.disableam.own")) {
             sender.sendMessage(this.messages.getNoPermission());
             return true;
         }

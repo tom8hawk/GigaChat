@@ -71,7 +71,10 @@ permissions:
   gigachat.command.setpmsound:
     default: op
 
-  gigachat.command.disableam:
+  gigachat.command.disableam.own:
+    default: op
+
+  gigachat.command.disableam.other:
     default: op
 
   gigachat.command.disablechat:

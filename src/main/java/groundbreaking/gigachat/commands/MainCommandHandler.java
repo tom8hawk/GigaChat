@@ -61,7 +61,7 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
         }
 
         return sender.hasPermission("gigachat.command.clearchat")
-                || sender.hasPermission("gigachat.command.disableam")
+                || sender.hasPermission("gigachat.command.disableam.other")
                 || sender.hasPermission("gigachat.command.disablechat")
                 || sender.hasPermission("gigachat.command.reload")
                 || sender.hasPermission("gigachat.command.setpmsound")
@@ -77,7 +77,7 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("gigachat.command.clearchat") && "clearchat".startsWith(input)) {
                 list.add("clearchat");
             }
-            if (sender.hasPermission("gigachat.command.disableam") && "disableam".startsWith(input)) {
+            if (sender.hasPermission("gigachat.command.disableam.other") && "disableam".startsWith(input)) {
                 list.add("disableam");
             }
             if (sender.hasPermission("gigachat.command.disablechat") && "disablechat".startsWith(input)) {
