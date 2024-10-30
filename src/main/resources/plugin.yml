@@ -20,12 +20,6 @@ permissions:
   gigachat.hex:
     default: op
 
-  gigachat.bypass.cooldown.local:
-    default: op
-
-  gigachat.bypass.cooldown.global:
-    default: op
-
   gigachat.bypass.cooldown.socialspy:
     default: op
 
