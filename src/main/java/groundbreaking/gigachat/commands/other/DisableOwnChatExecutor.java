@@ -53,7 +53,7 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
     }
 
     @Override
-    public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
+    public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         return Collections.emptyList();
     }
 }
