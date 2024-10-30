@@ -114,7 +114,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
 
         final String[] replacementList = {name, prefix, suffix, message};
 
-        return Utils.replaceEach(this.broadcastValues.getFormat(), replacementList, this.placeholders);
+        return Utils.replaceEach(this.broadcastValues.getFormat(), this.placeholders, replacementList);
     }
 
     private void sendHover(final Player sender, final String formattedMessage, final List<Player> recipients) {
