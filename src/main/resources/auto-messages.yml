@@ -42,6 +42,6 @@ auto-messages:
     messages:
       - "[GigaChat] This plugin was mady by OverwriteMC and edited by Groundbreaking"
   monkey:
-    sound: player_level_up;1.0;1.0
+    sound: entity_player_levelup;1.0;1.0
     messages:
       - "[GigaChat] Overwrite is monkey"
