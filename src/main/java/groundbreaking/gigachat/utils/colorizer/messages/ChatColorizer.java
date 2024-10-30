@@ -16,15 +16,12 @@ public final class ChatColorizer extends AbstractColorizer {
         }
 
         final char[] letters = message.toCharArray();
-        for (int i = 0; i < letters.length; i++) {
+        for (int i = 0; i < letters.length - 1; i++) {
             if (letters[i] == COLOR_CHAR) {
                 final char code = letters[i + 1];
-                if (COLOR_CODES.contains(code) && player.hasPermission("gigachat.color.chat." + code)) {
-                    letters[i++] = '§';
-                    letters[i] = Character.toLowerCase(letters[i]);
-                }
-                else if (STYLE_CODES.contains(code) && player.hasPermission("gigachat.style.chat." + code)) {
-                    letters[i++] = '§';
+                if ((COLOR_CODES.contains(code) && player.hasPermission("gigachat.color.chat." + code)) ||
+                        (STYLE_CODES.contains(code) && player.hasPermission("gigachat.style.chat." + code))) {
+                    letters[i++] = MINECRAFT_COLOR_CHAR;
                     letters[i] = Character.toLowerCase(letters[i]);
                 }
             }

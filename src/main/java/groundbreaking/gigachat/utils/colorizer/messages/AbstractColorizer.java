@@ -21,6 +21,7 @@ public abstract class AbstractColorizer {
 
     protected final IColorizer messagesColorizer;
     protected static final char COLOR_CHAR = '&';
+    protected static final char MINECRAFT_COLOR_CHAR = '§';
 
     public AbstractColorizer(final GigaChat plugin) {
         this.messagesColorizer = plugin.getColorizerByVersion();

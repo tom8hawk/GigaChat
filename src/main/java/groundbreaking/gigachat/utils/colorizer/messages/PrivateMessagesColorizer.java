@@ -19,12 +19,9 @@ public final class PrivateMessagesColorizer extends AbstractColorizer {
         for (int i = 0; i < letters.length; i++) {
             if (letters[i] == COLOR_CHAR) {
                 final char code = letters[i + 1];
-                if (COLOR_CODES.contains(code) && player.hasPermission("gigachat.color.private." + code)) {
-                    letters[i++] = '§';
-                    letters[i] = Character.toLowerCase(letters[i]);
-                }
-                else if (STYLE_CODES.contains(code) && player.hasPermission("gigachat.style.private." + code)) {
-                    letters[i++] = '§';
+                if ((COLOR_CODES.contains(code) && player.hasPermission("gigachat.color.private." + code))
+                        || (STYLE_CODES.contains(code) && player.hasPermission("gigachat.style.private." + code))) {
+                    letters[i++] = MINECRAFT_COLOR_CHAR;
                     letters[i] = Character.toLowerCase(letters[i]);
                 }
             }
