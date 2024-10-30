@@ -63,7 +63,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
     ) {
         this.plugin = plugin;
         this.name = name;
-        this.bypassCooldownPermission = "gigachat.bypass.cooldown." + name;
+        this.bypassCooldownPermission = "gigachat.bypass.cooldown.chat" + name;
         this.format = format;
         this.spyFormat = spyFormat;
         this.spyCommand = spyCommand;
