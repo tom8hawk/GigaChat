@@ -117,9 +117,9 @@ help-message: |-
   &8- &6/gigachat reload &f- перезагрузить плагин 
   &8- &6/gigachat disablechat &f- отключить чат всему серверу 
   &8- &6/gigachat clearchat &f- очистить чат 
-  &8- &6/gigachat localspy &f- ключить отображение локал чата
   &8- &6/gigachat setpmsound <ник> <звук> &f- перезагрузить плагин 
   &8- &6/gigachat disableam <ник> &f- отключить авто-сообщения игроку 
+  &8- &6/gigachat spy <игрок> <чат> &f- переключить режим слежки за указанным чатом игроку
 
 time:
   hours: "ч. "

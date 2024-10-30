@@ -1,8 +1,12 @@
 package groundbreaking.gigachat.utils.updateschecker;
 
 import groundbreaking.gigachat.GigaChat;
+import lombok.Getter;
+import lombok.experimental.Accessors;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,13 +14,16 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
 
 public final class UpdatesChecker {
 
     private final GigaChat plugin;
+
+    @Getter @Accessors(fluent = true)
+    private static boolean hasUpdate = false;
+    private static String downloadLink = null;
 
     public UpdatesChecker(final GigaChat plugin) {
         this.plugin = plugin;
@@ -31,7 +38,7 @@ public final class UpdatesChecker {
         }
 
         if (!updates.getBoolean("check")) {
-            this.plugin.getMyLogger().warning("Updates checker wes disabled, but it's not recommend by the author to do it!");
+            this.plugin.getMyLogger().warning("Updates checker was disabled, but it's not recommend by the author to do it!");
             return;
         }
 
@@ -47,9 +54,11 @@ public final class UpdatesChecker {
                 final String[] body = response.body().split("\n", 2);
                 final String[] versionInfo = body[0].split("->");
                 if (this.isHigher(versionInfo[0])) {
+                    hasUpdate = true;
                     this.plugin.getMyLogger().info(body[1]);
+                    downloadLink = versionInfo[1];
                     if (!updates.getBoolean("auto-download")) {
-                        this.downloadJar(versionInfo[1]);
+                        this.downloadJar();
                     }
                     return;
                 }
@@ -74,26 +83,60 @@ public final class UpdatesChecker {
         return currentVersionNum < newVersionNum;
     }
 
-    private void downloadJar(final String downloadLink) {
+    public void downloadJar() {
+        if (downloadLink == null) {
+            this.plugin.getMyLogger().warning("No link to download update were found!");
+            this.plugin.getMyLogger().warning("Enable \"updates.check\" in \"config.yml\" and restart your server!");
+            return;
+        } else if (downloadLink.isEmpty()) {
+            this.plugin.getMyLogger().warning("\u001b[31mDownload link for new version of the plugin is empty!.\u001b[0m");
+            this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
+            return;
+        }
+
         try {
-            final HttpClient client = HttpClient.newHttpClient();
+            final File updateFolder = Bukkit.getUpdateFolderFile();
+            final String jarFileName = new File(plugin.getClass().getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
+            final File outputFile = new File(updateFolder, jarFileName);
+
+            final HttpClient client = HttpClient.newBuilder()
+                    .connectTimeout(Duration.ofSeconds(30))
+                    .followRedirects(HttpClient.Redirect.ALWAYS)
+                    .build();
+
             final HttpRequest request = HttpRequest.newBuilder()
                     .uri(URI.create(downloadLink))
+                    .timeout(Duration.ofMinutes(2))
                     .build();
 
             final HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
 
             if (response.statusCode() == 200) {
-                final Path savePath = Paths.get(this.plugin.getDataFolder().toPath().toString().replace("GigaChat", "update"));
-                try (final InputStream inputStream = response.body();
-                        final FileOutputStream outputStream = new FileOutputStream(savePath.toFile())) {
-                    inputStream.transferTo(outputStream);
+                final long totalSize = response.headers().firstValueAsLong("Content-Length").orElse(-1);
+                try (final InputStream in = response.body();
+                        final FileOutputStream fileOutputStream = new FileOutputStream(outputFile)) {
+                    final byte[] dataBuffer = new byte[1024];
+                    int bytesRead;
+                    int downloaded = 0;
+
+                    while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+                        fileOutputStream.write(dataBuffer, 0, bytesRead);
+                        downloaded += bytesRead;
+                        if (totalSize > 0) {
+                            int progress = (int) ((downloaded / (double) totalSize) * 100);
+                            if (progress % 10 == 0) {
+                                this.plugin.getMyLogger().info("Downloaded: " + (downloaded / 1024) + " / " + (totalSize / 1024) + " KB (" + progress + "%)");
+                            }
+                        }
+                    }
+
+                    this.plugin.getMyLogger().info("Update downloaded successfully.");
                 }
             } else {
                 this.plugin.getMyLogger().warning("\u001b[31mJar downloading was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
-                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
+                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
             }
-        } catch (final InterruptedException | IOException ex) {
+        } catch (final IOException | InterruptedException ex) {
             ex.printStackTrace();
         }
     }

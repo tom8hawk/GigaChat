@@ -92,6 +92,9 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
             if (sender.hasPermission("gigachat.command.spy.other") && "spy".startsWith(input)) {
                 list.add("spy");
             }
+            if (sender instanceof ConsoleCommandSender && "update".startsWith(input)) {
+                list.add("update");
+            }
 
             return list;
         }
