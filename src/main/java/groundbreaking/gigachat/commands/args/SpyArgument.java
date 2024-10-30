@@ -61,20 +61,21 @@ public class SpyArgument  extends ArgsConstructor {
 
     private boolean process(final CommandSender sender, final Player target, final Chat chat) {
         final List<Player> players = chat.getSpyListeners();
-        final String chatName = this.messages.getChatsNames().get(chat.getName());
+        final String chatName = chat.getName();
+        final String replacement = this.messages.getChatsNames().getOrDefault(chatName, chatName);
         final String targetName = target.getName();
         if (players.contains(target)) {
-            sender.sendMessage(this.messages.getChatsSpyDisabledOther().replace("{player}", targetName).replace("{chat}", chatName));
+            sender.sendMessage(this.messages.getChatsSpyDisabledOther().replace("{player}", targetName).replace("{chat}", replacement));
             final String message = this.messages.getChatsSpyDisabledByOther();
             if (!message.isEmpty()){
-                target.sendMessage(message.replace("{chat}", chatName));
+                target.sendMessage(message.replace("{chat}", replacement));
             }
             players.remove(target);
         } else {
-            sender.sendMessage(this.messages.getChatsSpyEnabledOther().replace("{player}", targetName).replace("{chat}", chatName));
+            sender.sendMessage(this.messages.getChatsSpyEnabledOther().replace("{player}", targetName).replace("{chat}", replacement));
             final String message = this.messages.getChatsSpyEnabledByOther();
             if (!message.isEmpty()){
-                target.sendMessage(message.replace("{chat}", chatName));
+                target.sendMessage(message.replace("{chat}", replacement));
             }
             players.add(target);
         }
