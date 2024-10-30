@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class SpyArgument  extends ArgsConstructor {
+public class SpyArgument extends ArgsConstructor {
 
     private final Messages messages;
     private final ChatValues chatValues;
