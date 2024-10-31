@@ -4,10 +4,12 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.BroadcastColorizer;
+import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import java.util.Locale;
 
@@ -44,16 +46,18 @@ public final class BroadcastValues {
     }
 
     public void setValues() {
-        final ConfigurationSection broadcast = this.plugin.getConfig().getConfigurationSection("broadcast");
+        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("broadcast", 1.0);
+
+        final ConfigurationSection broadcast = config.getConfigurationSection("settings");
         if (broadcast != null) {
-            this.colorizer = this.plugin.getColorizer(this.plugin.getConfig(), "broadcast.serializer");
+            this.colorizer = this.plugin.getColorizer(config, "settings.serializer");
             this.format = this.colorizer.colorize(broadcast.getString("format"));
             this.cooldown = broadcast.getInt("cooldown");
 
             this.setupHover(broadcast);
             this.setupSound(broadcast);
         } else {
-            this.plugin.getMyLogger().warning("Failed to load section \"broadcast\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"broadcast.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
@@ -66,7 +70,7 @@ public final class BroadcastValues {
             this.hoverValue = hover.getString("click-value");
             this.hoverText = hover.getString("text");
         } else {
-            this.plugin.getMyLogger().warning("Failed to load section \"broadcast.hover\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("Failed to load section \"settings.hover\" from file \"broadcast.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
@@ -74,7 +78,7 @@ public final class BroadcastValues {
     private void setupSound(final ConfigurationSection settings) {
         final String soundString = settings.getString("sound");
         if (soundString == null) {
-            this.plugin.getMyLogger().warning("Failed to load sound on path \"broadcast.sound\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getMyLogger().warning("Failed to load sound on path \"settings.sound\" from file \"broadcast.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             this.isSoundEnabled = false;
         } else if (soundString.equalsIgnoreCase("disabled")) {
