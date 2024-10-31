@@ -3,6 +3,7 @@ package groundbreaking.gigachat.commands.other;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.CooldownsMaps;
 import groundbreaking.gigachat.utils.Utils;
+import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.config.values.BroadcastValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -102,13 +103,14 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         String prefix = "", suffix = "";
         final String message;
 
+        final AbstractColorizer colorizer = this.broadcastValues.getMessageColorizer();
         if (isPlayerSender) {
             final Player playerSender = (Player) sender;
-            prefix = this.plugin.getChat().getPlayerPrefix(playerSender);
-            suffix = this.plugin.getChat().getPlayerSuffix(playerSender);
-            message = this.broadcastValues.getMessageColorizer().colorize((Player) sender, String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
+            prefix = colorizer.colorize(this.plugin.getChat().getPlayerPrefix(playerSender));
+            suffix = colorizer.colorize(this.plugin.getChat().getPlayerSuffix(playerSender));
+            message = colorizer.colorize((Player) sender, String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
         } else {
-            message = this.broadcastValues.getColorizer().colorize(String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
+            message = colorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
         }
 
         final String[] replacementList = {name, prefix, suffix, message};
