@@ -44,10 +44,10 @@ public final class BroadcastValues {
     }
 
     public void setValues() {
-        final ConfigurationSection broadcast = plugin.getConfig().getConfigurationSection("broadcast");
+        final ConfigurationSection broadcast = this.plugin.getConfig().getConfigurationSection("broadcast");
         if (broadcast != null) {
-            this.colorizer = plugin.getColorizer(plugin.getConfig(), "broadcast.serializer");
-            this.format = colorizer.colorize(broadcast.getString("format"));
+            this.colorizer = this.plugin.getColorizer(this.plugin.getConfig(), "broadcast.serializer");
+            this.format = this.colorizer.colorize(broadcast.getString("format"));
             this.cooldown = broadcast.getInt("cooldown");
 
             this.setupHover(broadcast);
