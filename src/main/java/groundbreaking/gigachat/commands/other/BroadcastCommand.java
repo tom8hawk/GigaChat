@@ -65,10 +65,11 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         }
 
         final List<Player> recipients = new ArrayList<>(Bukkit.getOnlinePlayers());
-        final String message = this.getMessage(sender, args, isPlayerSender);
+        final String[] replacementList = this.getPlaceholders(sender, args, isPlayerSender);
+        final String message = this.getMessage(replacementList);
 
         if (isPlayerSender && this.broadcastValues.isHoverEnabled()) {
-            this.sendHover((Player) sender, message, recipients);
+            this.sendHover((Player) sender, message, recipients, replacementList);
         } else {
             for (int i = 0; i < recipients.size(); i++) {
                 final Player recipient = recipients.get(i);
@@ -98,7 +99,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         playerSender.sendMessage(message);
     }
 
-    private String getMessage(final CommandSender sender, final String[] args, final boolean isPlayerSender) {
+    private String[] getPlaceholders(final CommandSender sender, final String[] args, final boolean isPlayerSender) {
         final String name = sender.getName();
         String prefix = "", suffix = "";
         final String message;
@@ -113,14 +114,19 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
             message = colorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
         }
 
-        final String[] replacementList = {name, prefix, suffix, message};
+        return new String[]{name, prefix, suffix, message};
+    }
 
+    private String getMessage(final String[] replacementList) {
         return Utils.replaceEach(this.broadcastValues.getFormat(), this.placeholders, replacementList);
     }
 
-    private void sendHover(final Player sender, final String formattedMessage, final List<Player> recipients) {
+    private void sendHover(final Player sender, final String formattedMessage, final List<Player> recipients, final String[] replacementList) {
         final String hoverString = this.broadcastValues.getColorizer().colorize(
-                Utils.replacePlaceholders(sender, this.broadcastValues.getHoverText())
+                Utils.replacePlaceholders(
+                        sender,
+                        Utils.replaceEach(this.broadcastValues.getHoverText(), this.placeholders, replacementList)
+                )
         );
         final ClickEvent.Action hoverAction = ClickEvent.Action.valueOf(this.broadcastValues.getHoverAction());
         final String hoverValue = this.broadcastValues.getHoverValue().replace("{player}", sender.getName());
