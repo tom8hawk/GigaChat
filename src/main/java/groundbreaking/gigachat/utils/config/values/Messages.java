@@ -192,9 +192,9 @@ public final class Messages {
     private void setupTimes(final FileConfiguration config) {
         final ConfigurationSection time = config.getConfigurationSection("time");
         if (time != null) {
-            hours = time.getString("time.hours");
-            minutes = time.getString("time.minutes");
-            seconds = time.getString("time.seconds");
+            hours = time.getString("hours");
+            minutes = time.getString("minutes");
+            seconds = time.getString("seconds");
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"time\" from file \"messages.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
