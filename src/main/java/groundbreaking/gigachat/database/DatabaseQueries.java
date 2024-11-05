@@ -75,7 +75,7 @@ public final class DatabaseQueries {
             statement.execute(privateMessagesSoundsQuery);
             statement.execute(socialSpyQuery);
             statement.execute(autoMessagesQuery);
-        } catch(SQLException ex) {
+        } catch (SQLException ex) {
             ex.printStackTrace();
         }
     }
@@ -136,7 +136,11 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToIgnoreChat(final String username, final List<String> ignored) {
-        final String query = "INSERT OR IGNORE INTO ignoreChat(username, ignored) VALUES(?, ?)";
+        final String query = """
+                    INSERT INTO ignoreChat(username, ignored)
+                    VALUES(?, ?)
+                    ON CONFLICT(username) DO UPDATE SET sound = excluded.ignored;
+                """;
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.setString(2, String.join(";", ignored));
@@ -260,7 +264,11 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToIgnorePrivate(final String username, final List<String> ignored) {
-        final String query = "INSERT OR IGNORE INTO ignorePrivate(username, ignored) VALUES(?, ?)";
+        final String query = """
+                    INSERT INTO ignorePrivate(username, ignored)
+                    VALUES(?, ?)
+                    ON CONFLICT(username) DO UPDATE SET sound = excluded.ignored;
+                """;
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.setString(2, String.join(";", ignored));
@@ -385,7 +393,11 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerPmSoundToPmSounds(final String username, final String sound) {
-        final String query = "INSERT OR IGNORE INTO privateMessagesSounds(username, sound) VALUES(?, ?)";
+        final String query = """
+                    INSERT INTO privateMessagesSounds(username, sound)
+                    VALUES(?, ?)
+                    ON CONFLICT(username) DO UPDATE SET sound = excluded.sound;
+                """;
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.setString(2, sound);
