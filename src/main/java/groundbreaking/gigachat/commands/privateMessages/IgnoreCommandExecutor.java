@@ -45,7 +45,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
         final String senderName = playerSender.getName();
         if (this.hasCooldown(playerSender, senderName)) {
-            sendMessageHasCooldown(playerSender, senderName);
+            this.sendMessageHasCooldown(playerSender, senderName);
             return true;
         }
 
