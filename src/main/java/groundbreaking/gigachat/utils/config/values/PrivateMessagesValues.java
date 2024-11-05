@@ -5,7 +5,7 @@ import groundbreaking.gigachat.commands.privateMessages.IgnoreCommandExecutor;
 import groundbreaking.gigachat.commands.privateMessages.PrivateMessageCommandExecutor;
 import groundbreaking.gigachat.commands.privateMessages.ReplyCommandExecutor;
 import groundbreaking.gigachat.commands.privateMessages.SocialSpyCommandExecutor;
-import groundbreaking.gigachat.utils.StringUtil;
+import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.PrivateMessagesColorizer;
@@ -62,7 +62,7 @@ public final class PrivateMessagesValues {
 
     public final AbstractColorizer messagesColorizer;
 
-    private final StringUtil stringUtil = new StringUtil();
+    private final StringValidator stringValidator = new StringValidator();
 
     public PrivateMessagesValues(final GigaChat plugin) {
         this.plugin = plugin;
@@ -196,7 +196,7 @@ public final class PrivateMessagesValues {
             final char textValidatorCensorshipChar = charsValidator.getString("censorship-char").charAt(0);
             final char[] textValidatorAllowedChars = charsValidator.getString("allowed").toCharArray();
 
-            this.stringUtil.setupCharsValidator(isCharsValidatorEnabled, textValidatorAllowedChars, textValidatorCensorshipChar);
+            this.stringValidator.setupCharsValidator(isCharsValidatorEnabled, textValidatorAllowedChars, textValidatorCensorshipChar);
 
             this.setupCharsValidatorDenySound(charsValidator);
         } else {
@@ -212,7 +212,7 @@ public final class PrivateMessagesValues {
             final int capsValidatorMaxPercentage = caseValidator.getInt("max-percent");
             this.capsValidatorBlockMessageSend = caseValidator.getBoolean("block-message-send");
 
-            this.stringUtil.setupCapsValidator(isCapsValidatorEnabled, capsValidatorMaxPercentage);
+            this.stringValidator.setupCapsValidator(isCapsValidatorEnabled, capsValidatorMaxPercentage);
 
             this.setupCapsValidatorDenySound(caseValidator);
         } else {
@@ -229,7 +229,7 @@ public final class PrivateMessagesValues {
             final List<String> wordsValidatorBlockedWords = wordsValidator.getStringList("blocked");
             this.wordsValidatorBlockMessageSend = wordsValidator.getBoolean("block-message-send");
 
-            this.stringUtil.setupWordsValidator(isWordsValidatorEnabled, wordsValidatorBlockedWords, wordsValidatorCensorshipChar);
+            this.stringValidator.setupWordsValidator(isWordsValidatorEnabled, wordsValidatorBlockedWords, wordsValidatorCensorshipChar);
 
             this.setupWordsValidatorDenySound(wordsValidator);
         } else {

@@ -3,7 +3,7 @@ package groundbreaking.gigachat.listeners;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.commands.args.DisableServerChatArgument;
 import groundbreaking.gigachat.constructors.Chat;
-import groundbreaking.gigachat.utils.StringUtil;
+import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -154,8 +154,8 @@ public final class ChatListener implements Listener {
     }
 
     private String getValidMessage(final Player sender, String message, final AsyncPlayerChatEvent event) {
-        final StringUtil stringUtil = this.chatValues.getStringUtil();
-        if (stringUtil.hasBlockedChars(message)) {
+        final StringValidator stringValidator = this.chatValues.getStringValidator();
+        if (stringValidator.hasBlockedChars(message)) {
             if (this.chatValues.isCharsValidatorBlockMessage()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -166,10 +166,10 @@ public final class ChatListener implements Listener {
                 return null;
             }
 
-            message = stringUtil.getFormattedCharsMessage(message);
+            message = stringValidator.getFormattedCharsMessage(message);
         }
 
-        if (stringUtil.isUpperCasePercentageExceeded(message)) {
+        if (stringValidator.isUpperCasePercentageExceeded(message)) {
             if (this.chatValues.isCapsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -183,7 +183,7 @@ public final class ChatListener implements Listener {
             message = message.toLowerCase();
         }
 
-        if (stringUtil.hasBlockedWords(message)) {
+        if (stringValidator.hasBlockedWords(message)) {
             if (this.chatValues.isWordsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getWordsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -194,7 +194,7 @@ public final class ChatListener implements Listener {
                 return null;
             }
 
-            message = stringUtil.getFormattedWordsMessage(message);
+            message = stringValidator.getFormattedWordsMessage(message);
         }
 
         return message;

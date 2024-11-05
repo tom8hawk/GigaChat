@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class StringUtil {
+public final class StringValidator {
 
     private boolean isCharsValidatorEnabled;
     private final Set<Character> allowedCharsHashSet = new ObjectOpenHashSet<>();

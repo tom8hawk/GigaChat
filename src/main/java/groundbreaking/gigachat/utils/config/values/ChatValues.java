@@ -4,7 +4,7 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.exceptions.FormatNullException;
-import groundbreaking.gigachat.utils.StringUtil;
+import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.ChatColorizer;
@@ -67,7 +67,7 @@ public final class ChatValues {
     private float wordsValidatorDenySoundVolume;
     private float wordsValidatorDenySoundPitch;
 
-    private final StringUtil stringUtil = new StringUtil();
+    private final StringValidator stringValidator = new StringValidator();
 
     private final Object2ObjectOpenHashMap<Character, Chat> chats = new Object2ObjectOpenHashMap<>();
     private Chat defaultChat;
@@ -219,7 +219,7 @@ public final class ChatValues {
             final char textValidatorCensorshipChar = charsValidator.getString("censorship-char").charAt(0);
             final char[] textValidatorAllowedChars = charsValidator.getString("allowed").toCharArray();
 
-            this.stringUtil.setupCharsValidator(isCharsValidatorEnabled, textValidatorAllowedChars, textValidatorCensorshipChar);
+            this.stringValidator.setupCharsValidator(isCharsValidatorEnabled, textValidatorAllowedChars, textValidatorCensorshipChar);
 
             this.setupCharsValidatorDenySound(charsValidator);
         } else {
@@ -235,7 +235,7 @@ public final class ChatValues {
             final int capsValidatorMaxPercentage = caseValidator.getInt("max-percent");
             this.capsValidatorBlockMessageSend = caseValidator.getBoolean("block-message-send");
 
-            this.stringUtil.setupCapsValidator(isCapsValidatorEnabled, capsValidatorMaxPercentage);
+            this.stringValidator.setupCapsValidator(isCapsValidatorEnabled, capsValidatorMaxPercentage);
 
             this.setupCapsValidatorDenySound(caseValidator);
         } else {
@@ -252,7 +252,7 @@ public final class ChatValues {
             final List<String> wordsValidatorBlockedWords = wordsValidator.getStringList("blocked");
             this.wordsValidatorBlockMessageSend = wordsValidator.getBoolean("block-message-send");
 
-            this.stringUtil.setupWordsValidator(isWordsValidatorEnabled, wordsValidatorBlockedWords, wordsValidatorCensorshipChar);
+            this.stringValidator.setupWordsValidator(isWordsValidatorEnabled, wordsValidatorBlockedWords, wordsValidatorCensorshipChar);
 
             this.setupWordsValidatorDenySound(wordsValidator);
         } else {

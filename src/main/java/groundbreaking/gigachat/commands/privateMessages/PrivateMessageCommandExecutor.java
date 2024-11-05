@@ -3,7 +3,7 @@ package groundbreaking.gigachat.commands.privateMessages;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.*;
 import groundbreaking.gigachat.database.DatabaseQueries;
-import groundbreaking.gigachat.utils.StringUtil;
+import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -161,8 +161,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private String getValidMessage(final Player sender, String message) {
-        final StringUtil stringUtil = this.pmValues.getStringUtil();
-        if (stringUtil.hasBlockedChars(message)) {
+        final StringValidator stringValidator = this.pmValues.getStringValidator();
+        if (stringValidator.hasBlockedChars(message)) {
             if (this.pmValues.isCharsValidatorBlockMessage()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -172,10 +172,10 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
                 return null;
             }
 
-            message = stringUtil.getFormattedCharsMessage(message);
+            message = stringValidator.getFormattedCharsMessage(message);
         }
 
-        if (stringUtil.isUpperCasePercentageExceeded(message)) {
+        if (stringValidator.isUpperCasePercentageExceeded(message)) {
             if (this.pmValues.isCapsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -188,7 +188,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             message = message.toLowerCase();
         }
 
-        if (stringUtil.hasBlockedWords(message)) {
+        if (stringValidator.hasBlockedWords(message)) {
             if (this.pmValues.isWordsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getWordsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -198,7 +198,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
                 return null;
             }
 
-            message = stringUtil.getFormattedWordsMessage(message);
+            message = stringValidator.getFormattedWordsMessage(message);
         }
 
         return message;
