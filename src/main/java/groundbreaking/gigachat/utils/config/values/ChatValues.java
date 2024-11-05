@@ -5,9 +5,9 @@ import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.exceptions.FormatNullException;
 import groundbreaking.gigachat.utils.StringValidator;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
-import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.ChatColorizer;
+import groundbreaking.gigachat.utils.colorizer.messages.PermissionsColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AccessLevel;
@@ -41,9 +41,9 @@ public final class ChatValues {
     private String hoverText;
     private String adminHoverText;
 
-    private IColorizer formatsColorizer;
+    private Colorizer formatsColorizer;
 
-    private final AbstractColorizer chatsColorizer;
+    private final PermissionsColorizer chatsColorizer;
 
     private boolean isCharsValidatorBlockMessage;
     private boolean isCharsValidatorDenySoundEnabled;

@@ -1,12 +1,12 @@
 package groundbreaking.gigachat.utils.colorizer.messages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import org.bukkit.entity.Player;
 
-public abstract class AbstractColorizer {
+public abstract class PermissionsColorizer {
 
     protected static final CharSet COLOR_CODES = new CharOpenHashSet(new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -19,11 +19,11 @@ public abstract class AbstractColorizer {
             'K', 'L', 'M', 'N', 'O', 'R', 'X'
     });
 
-    protected final IColorizer messagesColorizer;
+    protected final Colorizer messagesColorizer;
     protected static final char COLOR_CHAR = '&';
     protected static final char MINECRAFT_COLOR_CHAR = '§';
 
-    public AbstractColorizer(final GigaChat plugin) {
+    public PermissionsColorizer(final GigaChat plugin) {
         this.messagesColorizer = plugin.getColorizerByVersion();
     }
 

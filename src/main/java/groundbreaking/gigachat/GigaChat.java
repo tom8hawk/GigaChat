@@ -21,7 +21,7 @@ import groundbreaking.gigachat.utils.ServerInfo;
 import groundbreaking.gigachat.utils.colorizer.basic.*;
 import groundbreaking.gigachat.utils.config.values.*;
 import groundbreaking.gigachat.utils.logging.BukkitLogger;
-import groundbreaking.gigachat.utils.logging.ILogger;
+import groundbreaking.gigachat.utils.logging.Logger;
 import groundbreaking.gigachat.utils.logging.PaperLogger;
 import groundbreaking.gigachat.utils.updateschecker.UpdatesChecker;
 import groundbreaking.gigachat.utils.vanish.*;
@@ -42,7 +42,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.logging.Logger;
 
 @Getter
 public final class GigaChat extends JavaPlugin {
@@ -66,9 +65,9 @@ public final class GigaChat extends JavaPlugin {
 
     private DisabledPrivateMessagesMap disabled;
 
-    private IVanishChecker vanishChecker;
+    private VanishChecker vanishChecker;
 
-    private ILogger myLogger;
+    private Logger myLogger;
 
     private ChatListener chatListener;
     private CommandListener commandListener;
@@ -122,7 +121,7 @@ public final class GigaChat extends JavaPlugin {
     }
 
     private void logPaperWarning() {
-        final Logger logger = super.getLogger();
+        final java.util.logging.Logger logger = super.getLogger();
         logger.warning("\u001b[91m=============== \u001b[31mWARNING \u001b[91m===============\u001b[0m");
         logger.warning("\u001b[91mThe plugin dev is against using Bukkit, Spigot etc.!\u001b[0m");
         logger.warning("\u001b[91mSwitch to Paper or its fork. To download Paper visit:\u001b[0m");
@@ -282,7 +281,7 @@ public final class GigaChat extends JavaPlugin {
         }
     }
 
-    public IColorizer getColorizer(final FileConfiguration config, final String configPath) {
+    public Colorizer getColorizer(final FileConfiguration config, final String configPath) {
         final String colorizerMode = config.getString(configPath).toUpperCase();
 
         return switch (colorizerMode) {
@@ -293,7 +292,7 @@ public final class GigaChat extends JavaPlugin {
         };
     }
 
-    public IColorizer getColorizerByVersion() {
+    public Colorizer getColorizerByVersion() {
         final ServerInfo serverInfo = new ServerInfo();
         final boolean is16OrAbove = serverInfo.getSubVersion(this) >= 16;
         return is16OrAbove

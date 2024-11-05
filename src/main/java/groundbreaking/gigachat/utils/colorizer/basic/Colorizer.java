@@ -1,6 +1,6 @@
 package groundbreaking.gigachat.utils.colorizer.basic;
 
-public interface IColorizer {
+public interface Colorizer {
 
     String colorize(String message);
 }

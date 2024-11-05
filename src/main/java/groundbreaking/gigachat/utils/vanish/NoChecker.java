@@ -2,7 +2,7 @@ package groundbreaking.gigachat.utils.vanish;
 
 import org.bukkit.entity.Player;
 
-public final class NoChecker implements IVanishChecker {
+public final class NoChecker implements VanishChecker {
 
     @Override
     public boolean isVanished(final Player player) {

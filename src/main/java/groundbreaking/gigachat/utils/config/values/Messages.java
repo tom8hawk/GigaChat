@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AccessLevel;
@@ -91,13 +91,13 @@ public final class Messages {
 
     public void setupMessages() {
         final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("messages", 1.0);
-        final IColorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
+        final Colorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
 
         this.setupMessages(config, colorizer);
         this.setupTimes(config);
     }
 
-    private void setupMessages(final FileConfiguration config, final IColorizer colorizer) {
+    private void setupMessages(final FileConfiguration config, final Colorizer colorizer) {
         this.playerOnly = getMessage(config,"player-only", colorizer);
         this.noPermission = this.getMessage(config, "no-perm", colorizer);
         this.reloadMessage = this.getMessage(config, "reload", colorizer);
@@ -179,12 +179,12 @@ public final class Messages {
         }
     }
 
-    public String getMessage(final FileConfiguration config, final String path, final IColorizer colorizer) {
+    public String getMessage(final FileConfiguration config, final String path, final Colorizer colorizer) {
         final String message = config.getString(path, "&4(!) &cFailed to get message from: " + path);
         return colorizer.colorize(message);
     }
 
-    public String getMessage(final ConfigurationSection section, final String path, final String fullPath, final IColorizer colorizer) {
+    public String getMessage(final ConfigurationSection section, final String path, final String fullPath, final Colorizer colorizer) {
         final String message = section.getString(path, "&4(!) &cFailed to get message from: " + fullPath);
         return colorizer.colorize(message);
     }

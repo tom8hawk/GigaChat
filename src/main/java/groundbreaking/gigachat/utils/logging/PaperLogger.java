@@ -4,7 +4,7 @@ import groundbreaking.gigachat.GigaChat;
 import net.kyori.adventure.text.logger.slf4j.ComponentLogger;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-public final class PaperLogger implements ILogger {
+public final class PaperLogger implements Logger {
 
     private final ComponentLogger logger;
     private final LegacyComponentSerializer legacySection;

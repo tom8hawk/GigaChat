@@ -5,10 +5,10 @@ import groundbreaking.gigachat.collections.*;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.Utils;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.config.values.PrivateMessagesValues;
-import groundbreaking.gigachat.utils.vanish.IVanishChecker;
+import groundbreaking.gigachat.utils.vanish.VanishChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -27,11 +27,11 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     private final GigaChat plugin;
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
-    private final IColorizer hexColorizer;
+    private final Colorizer hexColorizer;
     private final CooldownsMaps cooldownsMaps;
     private final PmSoundsMap pmSoundsMap;
     private final DisabledPrivateMessagesMap disabled;
-    private final IVanishChecker vanishChecker;
+    private final VanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
 
     @Getter

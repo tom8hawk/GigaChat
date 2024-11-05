@@ -7,7 +7,7 @@ import groundbreaking.gigachat.commands.other.SpyModeCommand;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.map.ExpiringMap;
-import groundbreaking.gigachat.utils.vanish.IVanishChecker;
+import groundbreaking.gigachat.utils.vanish.VanishChecker;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -186,7 +186,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return playerList;
     }
 
-    public boolean isNoOneHeard(final Player sender, final List<Player> recipients, final IVanishChecker vanishChecker) {
+    public boolean isNoOneHeard(final Player sender, final List<Player> recipients, final VanishChecker vanishChecker) {
         if (this.isNoOneHeardEnabled) {
             final List<Player> validRecipients = new ArrayList<>(recipients);
             validRecipients.removeIf(recipient ->
@@ -199,7 +199,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return false;
     }
 
-    private boolean isRecipientValid(final Player sender, final Player recipient, final IVanishChecker vanishChecker) {
+    private boolean isRecipientValid(final Player sender, final Player recipient, final VanishChecker vanishChecker) {
         return this.isRecipientVisible(sender, recipient)
                 && this.isRecipientNotVanished(recipient, vanishChecker)
                 && this.isRecipientNotSpectator(recipient);
@@ -209,7 +209,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return !this.isNoOneHeardHideHidden || sender.canSee(recipient);
     }
 
-    private boolean isRecipientNotVanished(final Player recipient, final IVanishChecker vanishChecker) {
+    private boolean isRecipientNotVanished(final Player recipient, final VanishChecker vanishChecker) {
         return !this.isNoOneHeardHideVanished || !vanishChecker.isVanished(recipient);
     }
 

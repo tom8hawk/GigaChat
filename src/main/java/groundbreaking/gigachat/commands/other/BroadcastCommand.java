@@ -3,7 +3,7 @@ package groundbreaking.gigachat.commands.other;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.CooldownsMaps;
 import groundbreaking.gigachat.utils.Utils;
-import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
+import groundbreaking.gigachat.utils.colorizer.messages.PermissionsColorizer;
 import groundbreaking.gigachat.utils.config.values.BroadcastValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -104,7 +104,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         String prefix = "", suffix = "";
         final String message;
 
-        final AbstractColorizer colorizer = this.broadcastValues.getMessageColorizer();
+        final PermissionsColorizer colorizer = this.broadcastValues.getMessageColorizer();
         if (isPlayerSender) {
             final Player playerSender = (Player) sender;
             prefix = colorizer.colorize(this.plugin.getChat().getPlayerPrefix(playerSender));

@@ -1,9 +1,9 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
-import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.BroadcastColorizer;
+import groundbreaking.gigachat.utils.colorizer.messages.PermissionsColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,9 +36,9 @@ public final class BroadcastValues {
     private float soundVolume;
     private float soundPitch;
 
-    private IColorizer colorizer;
+    private Colorizer colorizer;
 
-    private final AbstractColorizer messageColorizer;
+    private final PermissionsColorizer messageColorizer;
 
     public BroadcastValues(final GigaChat plugin) {
         this.plugin = plugin;

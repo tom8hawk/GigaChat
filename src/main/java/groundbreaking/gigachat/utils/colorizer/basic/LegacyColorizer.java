@@ -3,7 +3,7 @@ package groundbreaking.gigachat.utils.colorizer.basic;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class LegacyColorizer implements IColorizer {
+public final class LegacyColorizer implements Colorizer {
 
     private static final Pattern HEX_PATTERN = Pattern.compile("&#([a-fA-F\\d]{6})");
     private static final char COLOR_CHAR = '§';

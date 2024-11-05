@@ -6,8 +6,8 @@ import groundbreaking.gigachat.commands.privateMessages.PrivateMessageCommandExe
 import groundbreaking.gigachat.commands.privateMessages.ReplyCommandExecutor;
 import groundbreaking.gigachat.commands.privateMessages.SocialSpyCommandExecutor;
 import groundbreaking.gigachat.utils.StringValidator;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
-import groundbreaking.gigachat.utils.colorizer.messages.AbstractColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
+import groundbreaking.gigachat.utils.colorizer.messages.PermissionsColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.PrivateMessagesColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
@@ -58,9 +58,9 @@ public final class PrivateMessagesValues {
     private boolean wordsValidatorBlockMessageSend;
     private boolean isWordsValidatorDenySoundEnabled;
 
-    public IColorizer formatsColorizer;
+    public Colorizer formatsColorizer;
 
-    public final AbstractColorizer messagesColorizer;
+    public final PermissionsColorizer messagesColorizer;
 
     private final StringValidator stringValidator = new StringValidator();
 

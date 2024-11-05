@@ -5,7 +5,7 @@ import org.bukkit.metadata.MetadataValue;
 
 import java.util.List;
 
-public final class SuperVanishChecker implements IVanishChecker {
+public final class SuperVanishChecker implements VanishChecker {
 
     @Override
     public boolean isVanished(final Player player) {

@@ -3,11 +3,10 @@ package groundbreaking.gigachat.utils.logging;
 import groundbreaking.gigachat.GigaChat;
 
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-public final class BukkitLogger implements ILogger {
+public final class BukkitLogger implements Logger {
 
-    private final Logger logger;
+    private final java.util.logging.Logger logger;
 
     public BukkitLogger(final GigaChat plugin) {
         this.logger = plugin.getLogger();

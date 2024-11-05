@@ -1,6 +1,6 @@
 package groundbreaking.gigachat.utils.colorizer.basic;
 
-public final class LegacyAdvancedColorizer implements IColorizer {
+public final class LegacyAdvancedColorizer implements Colorizer {
 
     private static final char COLOR_CHAR = '§';
 

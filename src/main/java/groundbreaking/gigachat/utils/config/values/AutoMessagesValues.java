@@ -2,7 +2,7 @@ package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.constructors.AutoMessageConstructor;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AccessLevel;
@@ -33,7 +33,7 @@ public final class AutoMessagesValues {
 
     public void setValues() {
         final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("auto-messages", 1.0);
-        final IColorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
+        final Colorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
 
         this.setupSettings(config);
         this.setupAutoMessages(config, colorizer);
@@ -52,7 +52,7 @@ public final class AutoMessagesValues {
         }
     }
 
-    private void setupAutoMessages(final FileConfiguration config, final IColorizer colorizer) {
+    private void setupAutoMessages(final FileConfiguration config, final Colorizer colorizer) {
         final ConfigurationSection autoMessagesSection = config.getConfigurationSection("auto-messages");
         if (autoMessagesSection != null) {
             this.autoMessages.clear();

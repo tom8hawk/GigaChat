@@ -7,7 +7,7 @@ import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.config.values.PrivateMessagesValues;
-import groundbreaking.gigachat.utils.vanish.IVanishChecker;
+import groundbreaking.gigachat.utils.vanish.VanishChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -26,7 +26,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
     private final CooldownsMaps cooldownsMaps;
-    private final IVanishChecker vanishChecker;
+    private final VanishChecker vanishChecker;
 
     public IgnoreCommandExecutor(final GigaChat plugin) {
         this.pmValues = plugin.getPmValues();

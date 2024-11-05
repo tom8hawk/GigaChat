@@ -4,7 +4,7 @@ import com.earth2me.essentials.Essentials;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-public final class EssentialsChecker implements IVanishChecker {
+public final class EssentialsChecker implements VanishChecker {
 
     private final Essentials essentials;
 

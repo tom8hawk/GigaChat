@@ -2,7 +2,7 @@ package groundbreaking.gigachat.utils.counter;
 
 import org.bukkit.entity.Player;
 
-public final class FirstEntryCounter implements ICounter {
+public final class FirstEntryCounter implements Counter {
 
     @Override
     public long count(final Player player) {

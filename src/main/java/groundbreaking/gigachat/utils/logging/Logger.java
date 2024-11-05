@@ -1,6 +1,6 @@
 package groundbreaking.gigachat.utils.logging;
 
-public interface ILogger {
+public interface Logger {
 
     void info(String msg);
 

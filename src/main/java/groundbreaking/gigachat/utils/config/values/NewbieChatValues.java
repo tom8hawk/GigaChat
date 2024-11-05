@@ -1,10 +1,10 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.utils.colorizer.basic.IColorizer;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
+import groundbreaking.gigachat.utils.counter.Counter;
 import groundbreaking.gigachat.utils.counter.FirstEntryCounter;
-import groundbreaking.gigachat.utils.counter.ICounter;
 import groundbreaking.gigachat.utils.counter.OnlineTimeCounter;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public final class NewbieChatValues {
 
     private String priority;
 
-    private ICounter counter;
+    private Counter counter;
 
     private boolean isGiveBypassPermissionEnabled;
 
@@ -46,12 +46,12 @@ public final class NewbieChatValues {
 
     public void setValues() {
         final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("newbie-chat", 1.0);
-        final IColorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
+        final Colorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
 
         this.setupSettings(config, colorizer);
     }
 
-    private void setupSettings(final FileConfiguration config, final IColorizer colorizer) {
+    private void setupSettings(final FileConfiguration config, final Colorizer colorizer) {
         final ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings != null) {
             this.isEnabled = settings.getBoolean("enable");

@@ -4,7 +4,7 @@ import com.Zrips.CMI.CMI;
 import com.Zrips.CMI.Containers.CMIUser;
 import org.bukkit.entity.Player;
 
-public final class CMIChecker implements IVanishChecker {
+public final class CMIChecker implements VanishChecker {
 
     private final CMI instance;
 
