@@ -19,8 +19,8 @@ public final class DatabaseHandler {
     public static void createConnection(final GigaChat plugin) {
         final HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDriverUrl(plugin));
-        hikariConfig.setMaximumPoolSize(15);
-        hikariConfig.setMinimumIdle(2);
+        hikariConfig.setMaximumPoolSize(16);
+        hikariConfig.setMinimumIdle(4);
         hikariConfig.setConnectionTimeout(30000);
         hikariConfig.setIdleTimeout(600000);
         hikariConfig.setMaxLifetime(1800000);
