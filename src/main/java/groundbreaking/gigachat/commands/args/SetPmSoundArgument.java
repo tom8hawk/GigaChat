@@ -62,12 +62,13 @@ public final class SetPmSoundArgument extends ArgsConstructor {
             return true;
         }
 
-        this.pmSoundsCollection.setSound(target.getName(), sound.name());
+        final String targetName = target.getName();
+        this.pmSoundsCollection.setSound(targetName, sound.name());
 
         final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
         if (sender != target || messageForTargetIsEmpty) {
             sender.sendMessage(this.messages.getTargetPmSoundSet()
-                    .replace("{player}", target.getName())
+                    .replace("{player}", targetName)
                     .replace("{sound}", sound.name())
             );
         }
@@ -77,6 +78,8 @@ public final class SetPmSoundArgument extends ArgsConstructor {
                     .replace("{sound}", sound.name())
             );
         }
+
+        DatabaseQueries.addPlayerPmSoundToPmSounds(targetName, sound.name());
 
         return true;
     }

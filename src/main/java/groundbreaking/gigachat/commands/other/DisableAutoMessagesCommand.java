@@ -47,6 +47,7 @@ public final class DisableAutoMessagesCommand implements CommandExecutor, TabCom
         } else {
             sender.sendMessage(this.messages.getAutoMessagesDisabled());
             AutoMessagesCollection.add(name);
+            DatabaseQueries.addPlayerToAutoMessages(name);
         }
 
         return true;

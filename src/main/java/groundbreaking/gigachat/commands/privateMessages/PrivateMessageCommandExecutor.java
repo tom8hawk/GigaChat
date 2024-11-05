@@ -142,6 +142,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             sender.sendMessage(this.messages.getPmDisabled());
         } else {
             this.disabled.add(name);
+            DatabaseQueries.addPlayerToDisabledPrivateMessages(name);
             sender.sendMessage(this.messages.getPmEnabled());
         }
     }

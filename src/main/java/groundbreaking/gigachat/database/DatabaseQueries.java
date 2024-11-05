@@ -41,11 +41,11 @@ public final class DatabaseQueries {
                     );
                 """;
 
-        final String localSpyQuery = """
-                    CREATE TABLE IF NOT EXISTS localSpy (
-                        username TEXT NOT NULL UNIQUE
-                    );
-                """;
+//        final String localSpyQuery = """
+//                    CREATE TABLE IF NOT EXISTS localSpy (
+//                        username TEXT NOT NULL UNIQUE
+//                    );
+//                """;
 
         final String privateMessagesSoundsQuery = """
                     CREATE TABLE IF NOT EXISTS privateMessagesSounds (
@@ -71,7 +71,7 @@ public final class DatabaseQueries {
             statement.execute(disabledPrivateMessagesQuery);
             statement.execute(ignoreChatQuery);
             statement.execute(ignorePrivateQuery);
-            statement.execute(localSpyQuery);
+//            statement.execute(localSpyQuery);
             statement.execute(privateMessagesSoundsQuery);
             statement.execute(socialSpyQuery);
             statement.execute(autoMessagesQuery);
@@ -337,55 +337,57 @@ public final class DatabaseQueries {
         return Collections.emptyList();
     }
 
-    /**
-     * Adds the player name to the "localSpy" table, to save the player's choice
-     *
-     * @param username of the player
-     */
-    public static void addPlayerToLocalSpy(final String username) {
-        final String query = "INSERT OR IGNORE INTO localSpy(username) VALUES(?)";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Removes the player's name from the "localSpy" table
-     *
-     * @param username of the player
-     */
-    public static void removePlayerFromLocalSpy(final String username) {
-        final String query = "DELETE FROM localSpy WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Checks the "localSpy" table for a player's name, to see if he is spying on the local chat.
-     *
-     * @param username of the player
-     * @return true if the table contains the player's name
-     */
-    public static boolean localSpyContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM localSpy WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-        }
-
-        return false;
-    }
+/////// Temporarily not functional.
+//
+//    /**
+//     * Adds the player name to the "localSpy" table, to save the player's choice
+//     *
+//     * @param username of the player
+//     */
+//    public static void addPlayerToLocalSpy(final String username) {
+//        final String query = "INSERT OR IGNORE INTO localSpy(username) VALUES(?)";
+//        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+//            statement.setString(1, username);
+//            statement.executeUpdate();
+//        } catch (final SQLException ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+//
+//    /**
+//     * Removes the player's name from the "localSpy" table
+//     *
+//     * @param username of the player
+//     */
+//    public static void removePlayerFromLocalSpy(final String username) {
+//        final String query = "DELETE FROM localSpy WHERE username = ? LIMIT 1";
+//        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+//            statement.setString(1, username);
+//            statement.executeUpdate();
+//        } catch (final SQLException ex) {
+//            ex.printStackTrace();
+//        }
+//    }
+//
+//    /**
+//     * Checks the "localSpy" table for a player's name, to see if he is spying on the local chat.
+//     *
+//     * @param username of the player
+//     * @return true if the table contains the player's name
+//     */
+//    public static boolean localSpyContainsPlayer(final String username) {
+//        final String query = "SELECT 1 FROM localSpy WHERE username = ? LIMIT 1";
+//        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+//            statement.setString(1, username);
+//
+//            final ResultSet result = statement.executeQuery();
+//            return result.next();
+//        } catch (final SQLException ex) {
+//            ex.printStackTrace();
+//        }
+//
+//        return false;
+//    }
 
     /**
      * Adds the player name to the "privateMessagesSounds" table, to save the player's choice

@@ -122,6 +122,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
         } else {
             IgnoreCollection.addToIgnoredChat(senderName, targetName);
+            DatabaseQueries.addPlayerToIgnoreChat(senderName, IgnoreCollection.getAllIgnoredChat(senderName));
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
 
@@ -141,6 +142,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
         } else {
             IgnoreCollection.addToIgnoredPrivate(senderName, targetName);
+            DatabaseQueries.addPlayerToIgnorePrivate(senderName, IgnoreCollection.getAllIgnoredChat(senderName));
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
 

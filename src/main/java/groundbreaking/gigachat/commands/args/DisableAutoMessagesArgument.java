@@ -48,6 +48,7 @@ public final class DisableAutoMessagesArgument extends ArgsConstructor {
             sender.sendMessage(this.messages.getAutoMessagesDisabledOther().replace("{player}", targetName));
             target.sendMessage(this.messages.getAutoMessagesDisabledByOther().replace("{player}", senderName));
             AutoMessagesCollection.add(targetName);
+            DatabaseQueries.addPlayerToAutoMessages(targetName);
         }
 
         return true;

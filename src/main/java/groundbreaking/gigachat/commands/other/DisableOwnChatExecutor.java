@@ -47,6 +47,7 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
         } else {
             sender.sendMessage(this.messages.getOwnChatEnabled());
             DisabledChatCollection.add(name);
+            DatabaseQueries.addPlayerToDisabledChat(name);
         }
 
         return true;

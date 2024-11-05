@@ -37,14 +37,12 @@ public final class DisconnectListener implements Listener {
     @EventHandler
     public void onQuit(final PlayerQuitEvent event) {
         final String name = event.getPlayer().getName();
-        this.saveData(name);
         this.removeCooldown(name);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onKick(final PlayerKickEvent event) {
         final String name = event.getPlayer().getName();
-        this.saveData(name);
         this.removeCooldown(name);
     }
 
@@ -61,9 +59,6 @@ public final class DisconnectListener implements Listener {
         if (DatabaseQueries.ignorePrivateContainsPlayer(name)) {
             IgnoreCollection.addToIgnoredPrivate(name, DatabaseQueries.getIgnoredPrivate(name));
         }
-        if (DatabaseQueries.localSpyContainsPlayer(name)) {
-            LocalSpyCollection.add(name);
-        }
         if (DatabaseQueries.privateMessagesSoundsContainsPlayer(name)) {
             this.pmSoundsCollection.setSound(name, DatabaseQueries.getSound(name));
         }
@@ -72,33 +67,6 @@ public final class DisconnectListener implements Listener {
         }
         if (DatabaseQueries.containsPlayerFromAutoMessages(name)) {
             AutoMessagesCollection.add(name);
-        }
-    }
-
-    private void saveData(final String name) {
-        if (DisabledChatCollection.contains(name)) {
-            DatabaseQueries.addPlayerToDisabledChat(name);
-        }
-        if (this.disabledPrivateMessagesCollection.contains(name)) {
-            DatabaseQueries.addPlayerToDisabledPrivateMessages(name);
-        }
-        if (IgnoreCollection.playerIgnoresChatAnyOne(name)) {
-            DatabaseQueries.addPlayerToIgnoreChat(name, IgnoreCollection.getAllIgnoredChat(name));
-        }
-        if (IgnoreCollection.playerIgnoresPrivateAnyOne(name)) {
-            DatabaseQueries.addPlayerToIgnorePrivate(name, IgnoreCollection.getAllIgnoredPrivate(name));
-        }
-        if (LocalSpyCollection.contains(name)) {
-            DatabaseQueries.addPlayerToLocalSpy(name);
-        }
-        if (this.pmSoundsCollection.contains(name)) {
-            DatabaseQueries.addPlayerPmSoundToPmSounds(name, this.pmSoundsCollection.getSound(name).toString());
-        }
-        if (SocialSpyCollection.contains(name)) {
-            DatabaseQueries.addPlayerToSocialSpy(name);
-        }
-        if (AutoMessagesCollection.contains(name)) {
-            DatabaseQueries.addPlayerToAutoMessages(name);
         }
     }
 

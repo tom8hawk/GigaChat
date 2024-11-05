@@ -54,6 +54,7 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
             sender.sendMessage(this.messages.getSpyDisabled());
         } else {
             SocialSpyCollection.add(senderName);
+            DatabaseQueries.addPlayerToSocialSpy(senderName);
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 
