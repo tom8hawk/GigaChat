@@ -32,7 +32,7 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!(sender instanceof Player playerSender)) {
+        if (!(sender instanceof final Player playerSender)) {
             sender.sendMessage(this.messages.getPlayerOnly());
             return true;
         }
