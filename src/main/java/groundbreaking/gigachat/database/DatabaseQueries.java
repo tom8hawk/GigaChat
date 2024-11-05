@@ -75,7 +75,7 @@ public final class DatabaseQueries {
             statement.execute(privateMessagesSoundsQuery);
             statement.execute(socialSpyQuery);
             statement.execute(autoMessagesQuery);
-        } catch (SQLException ex) {
+        } catch (final SQLException ex) {
             ex.printStackTrace();
         }
     }
