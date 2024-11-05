@@ -94,7 +94,7 @@ public final class GigaChat extends JavaPlugin {
         this.loadClasses();
         this.setupAll();
 
-        new DatabaseHandler(this).createConnection();
+        DatabaseHandler.createConnection(this);
         DatabaseQueries.createTables();
 
         this.autoMessages.run();
@@ -115,7 +115,7 @@ public final class GigaChat extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        new DatabaseHandler(this).closeConnection();
+        DatabaseHandler.closeConnection();
         super.getServer().getScheduler().cancelTasks(this);
     }
 

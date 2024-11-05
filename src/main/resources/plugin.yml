@@ -8,6 +8,7 @@ authors: [ Groundbreaking, OverwriteMC ]
 
 libraries:
   - com.github.ben-manes.caffeine:caffeine:3.1.8
+  - com.zaxxer:HikariCP:5.1.0
 
 commands:
   gigachat:

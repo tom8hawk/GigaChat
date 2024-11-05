@@ -1,54 +1,46 @@
 package groundbreaking.gigachat.database;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import groundbreaking.gigachat.GigaChat;
-import lombok.AccessLevel;
-import lombok.Getter;
 
 import java.io.File;
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public final class DatabaseHandler {
 
-    private final GigaChat plugin;
+    private static HikariDataSource dataSource;
 
-    @Getter(AccessLevel.PACKAGE)
-    private static Connection connection;
+    private DatabaseHandler() {
 
-    public DatabaseHandler(final GigaChat plugin) {
-        this.plugin = plugin;
     }
 
-    public void createConnection() {
-        final File dbFile = this.loadDatabaseFile();
-        final String url = "jdbc:sqlite:" + dbFile;
+    public static void createConnection(final GigaChat plugin) {
+        final HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setJdbcUrl(getDriverUrl(plugin));
+        hikariConfig.setMaximumPoolSize(15);
+        hikariConfig.setMinimumIdle(2);
+        hikariConfig.setConnectionTimeout(30000);
+        hikariConfig.setIdleTimeout(600000);
+        hikariConfig.setMaxLifetime(1800000);
 
+        dataSource = new HikariDataSource(hikariConfig);
+    }
+
+    private static String getDriverUrl(final GigaChat plugin) {
+        final File dbFile = new File(plugin.getDataFolder() + File.separator + "database.db");
+        return "jdbc:sqlite:" + dbFile;
+    }
+
+    static Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
+    public static void closeConnection() {
         try {
-            connection = DriverManager.getConnection(url);
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private File loadDatabaseFile() {
-        final File dbFile = new File(this.plugin.getDataFolder() + File.separator + "database.db");
-        if (!dbFile.exists()) {
-            try {
-                dbFile.createNewFile();
-            } catch (IOException ex) {
-                ex.printStackTrace();
-            }
-        }
-
-        return dbFile;
-    }
-
-    public void closeConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
+            if (dataSource != null && dataSource.getConnection() != null) {
+                dataSource.close();
             }
         } catch (final SQLException ex) {
             ex.printStackTrace();
