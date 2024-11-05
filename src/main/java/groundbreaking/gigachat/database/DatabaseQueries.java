@@ -82,7 +82,7 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "disabledChat" table, to save the player's choice
-     * 
+     *
      * @param username of the player
      */
     public static void addPlayerToDisabledChat(final String username) {
@@ -97,11 +97,11 @@ public final class DatabaseQueries {
 
     /**
      * Removes the player's name from the "disabledChat" table
-     * 
+     *
      * @param username of the player
      */
     public static void removePlayerFromDisabledChat(final String username) {
-        final String query = "DELETE FROM disabledChat WHERE username = ?";
+        final String query = "DELETE FROM disabledChat WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -111,13 +111,13 @@ public final class DatabaseQueries {
     }
 
     /**
-     * Checks the "disabledChat" table for a player's name, to see if he has chat disabled. 
-     * 
+     * Checks the "disabledChat" table for a player's name, to see if he has chat disabled.
+     *
      * @param username of the player
      * @return true if the table contains the player's name
      */
     public static boolean disabledChatContainsPlayer(final String username) {
-        final String query = "SELECT * FROM disabledChat WHERE username = ?";
+        final String query = "SELECT 1 FROM disabledChat WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -132,7 +132,7 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "ignoreChat" table, to save the player's choice
-     * 
+     *
      * @param username of the player
      */
     public static void addPlayerToIgnoreChat(final String username, final List<String> ignored) {
@@ -148,11 +148,11 @@ public final class DatabaseQueries {
 
     /**
      * Removes the player's name from the "ignoreChat" table
-     * 
+     *
      * @param username of the player
      */
     public static void removePlayerFromIgnoreChat(final String username) {
-        final String query = "DELETE FROM ignoreChat WHERE username = ?";
+        final String query = "DELETE FROM ignoreChat WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -168,7 +168,7 @@ public final class DatabaseQueries {
      * @return true if the table contains the player's name
      */
     public static boolean ignoreChatContains(final String username) {
-        final String query = "SELECT * FROM ignoreChat WHERE username = ?";
+        final String query = "SELECT 1 FROM ignoreChat WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -188,7 +188,7 @@ public final class DatabaseQueries {
      * @return a list of ignored players' names
      */
     public static List<String> getIgnoredChat(final String username) {
-        final String query = "SELECT ignored FROM ignoreChat WHERE username = ?";
+        final String query = "SELECT ignored FROM ignoreChat WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -206,7 +206,7 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "disabledPrivateMessages" table, to save the player's choice
-     * 
+     *
      * @param username of the player
      */
     public static void addPlayerToDisabledPrivateMessages(final String username) {
@@ -221,11 +221,11 @@ public final class DatabaseQueries {
 
     /**
      * Removes the player's name from the "disabledPrivateMessages" table
-     * 
+     *
      * @param username of the player
      */
     public static void removePlayerFromDisabledPrivateMessages(final String username) {
-        final String query = "DELETE FROM disabledPrivateMessages WHERE username = ?";
+        final String query = "DELETE FROM disabledPrivateMessages WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -241,7 +241,7 @@ public final class DatabaseQueries {
      * @return true if the player has disabled
      */
     public static boolean disabledPrivateMessagesContainsPlayer(final String username) {
-        final String query = "SELECT * FROM disabledPrivateMessages WHERE username = ?";
+        final String query = "SELECT 1 FROM disabledPrivateMessages WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -256,7 +256,7 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "ignorePrivate" table, to save the player's choice
-     * 
+     *
      * @param username of the player
      */
     public static void addPlayerToIgnorePrivate(final String username, final List<String> ignored) {
@@ -272,11 +272,11 @@ public final class DatabaseQueries {
 
     /**
      * Removes the player's name from the "ignorePrivate" table
-     * 
+     *
      * @param username of the player
      */
     public static void removePlayerFromIgnorePrivate(final String username) {
-        final String query = "DELETE FROM ignorePrivate WHERE username = ?";
+        final String query = "DELETE FROM ignorePrivate WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -292,7 +292,7 @@ public final class DatabaseQueries {
      * @return true if the player is ignoring someone
      */
     public static boolean ignorePrivateContainsPlayer(final String username) {
-        final String query = "SELECT * FROM ignorePrivate WHERE username = ?";
+        final String query = "SELECT 1 FROM ignorePrivate WHERE username = ? LIMIT 1";
 
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
@@ -313,7 +313,7 @@ public final class DatabaseQueries {
      * @return a list of ignored players' names
      */
     public static List<String> getIgnoredPrivate(final String username) {
-        final String query = "SELECT ignored FROM ignorePrivate WHERE username = ?";
+        final String query = "SELECT ignored FROM ignorePrivate WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -350,7 +350,7 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromLocalSpy(final String username) {
-        final String query = "DELETE FROM localSpy WHERE username = ?";
+        final String query = "DELETE FROM localSpy WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -366,7 +366,7 @@ public final class DatabaseQueries {
      * @return true if the table contains the player's name
      */
     public static boolean localSpyContainsPlayer(final String username) {
-        final String query = "SELECT * FROM localSpy WHERE username = ?";
+        final String query = "SELECT 1 FROM localSpy WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -381,7 +381,7 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "privateMessagesSounds" table, to save the player's choice
-     * 
+     *
      * @param username of the player
      */
     public static void addPlayerPmSoundToPmSounds(final String username, final String sound) {
@@ -397,11 +397,11 @@ public final class DatabaseQueries {
 
     /**
      * Removes the player's name from the "privateMessagesSounds" table
-     * 
+     *
      * @param username of the player
      */
     public static void removePlayerFromPmSounds(final String username) {
-        final String query = "DELETE FROM privateMessagesSounds WHERE username = ?";
+        final String query = "DELETE FROM privateMessagesSounds WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -417,7 +417,7 @@ public final class DatabaseQueries {
      * @return true if the table contains the player's name
      */
     public static boolean privateMessagesSoundsContainsPlayer(final String username) {
-        final String query = "SELECT * FROM privateMessagesSounds WHERE username = ?";
+        final String query = "SELECT 1 FROM privateMessagesSounds WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -437,7 +437,7 @@ public final class DatabaseQueries {
      * @return name of the sound player has chosen
      */
     public static String getSound(final String username) {
-        final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ?";
+        final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -454,7 +454,7 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "socialSpy" table, to save the player's choice
-     * 
+     *
      * @param username of the player
      */
     public static void addPlayerToSocialSpy(final String username) {
@@ -469,11 +469,11 @@ public final class DatabaseQueries {
 
     /**
      * Removes the player's name from the "socialSpy" table
-     * 
+     *
      * @param username of the player
      */
     public static void removePlayerFromSocialSpy(final String username) {
-        final String query = "DELETE FROM socialSpy WHERE username = ?";
+        final String query = "DELETE FROM socialSpy WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -489,7 +489,7 @@ public final class DatabaseQueries {
      * @return true if the table contains the player's name
      */
     public static boolean socialSpyContainsPlayer(final String username) {
-        final String query = "SELECT * FROM socialSpy WHERE username = ?";
+        final String query = "SELECT 1 FROM socialSpy WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, username);
 
@@ -513,7 +513,7 @@ public final class DatabaseQueries {
     }
 
     public static void removePlayerFromAutoMessages(final String name) {
-        final String query = "DELETE FROM autoMessages WHERE username = ?";
+        final String query = "DELETE FROM autoMessages WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, name);
             statement.executeUpdate();
@@ -523,7 +523,7 @@ public final class DatabaseQueries {
     }
 
     public static boolean containsPlayerFromAutoMessages(final String name) {
-        final String query = "SELECT * FROM autoMessages WHERE username = ?";
+        final String query = "SELECT 1 FROM autoMessages WHERE username = ? LIMIT 1";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, name);
 
