@@ -17,15 +17,15 @@ import java.util.Map;
 public final class DisconnectListener implements Listener {
 
     private final ChatValues chatValues;
-    private final CooldownsMaps cooldownsMaps;
-    private final PmSoundsMap pmSoundsMap;
-    private final DisabledPrivateMessagesMap disabledPrivateMessagesMap;
+    private final CooldownsCollection cooldownsCollection;
+    private final PmSoundsCollection pmSoundsCollection;
+    private final DisabledPrivateMessagesCollection disabledPrivateMessagesCollection;
 
     public DisconnectListener(final GigaChat plugin) {
         this.chatValues = plugin.getChatValues();
-        this.cooldownsMaps = plugin.getCooldownsMaps();
-        this.pmSoundsMap = plugin.getPmSoundsMap();
-        this.disabledPrivateMessagesMap = plugin.getDisabled();
+        this.cooldownsCollection = plugin.getCooldownsCollection();
+        this.pmSoundsCollection = plugin.getPmSoundsCollection();
+        this.disabledPrivateMessagesCollection = plugin.getDisabled();
     }
 
     @EventHandler
@@ -50,54 +50,54 @@ public final class DisconnectListener implements Listener {
 
     private void loadData(final String name) {
         if (DatabaseQueries.disabledChatContainsPlayer(name)) {
-            DisabledChatMap.add(name);
+            DisabledChatCollection.add(name);
         }
         if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(name)) {
-            this.disabledPrivateMessagesMap.add(name);
+            this.disabledPrivateMessagesCollection.add(name);
         }
         if (DatabaseQueries.ignoreChatContains(name)) {
-            IgnoreMap.addToIgnoredChat(name, DatabaseQueries.getIgnoredChat(name));
+            IgnoreCollection.addToIgnoredChat(name, DatabaseQueries.getIgnoredChat(name));
         }
         if (DatabaseQueries.ignorePrivateContainsPlayer(name)) {
-            IgnoreMap.addToIgnoredPrivate(name, DatabaseQueries.getIgnoredPrivate(name));
+            IgnoreCollection.addToIgnoredPrivate(name, DatabaseQueries.getIgnoredPrivate(name));
         }
         if (DatabaseQueries.localSpyContainsPlayer(name)) {
-            LocalSpyMap.add(name);
+            LocalSpyCollection.add(name);
         }
         if (DatabaseQueries.privateMessagesSoundsContainsPlayer(name)) {
-            this.pmSoundsMap.setSound(name, DatabaseQueries.getSound(name));
+            this.pmSoundsCollection.setSound(name, DatabaseQueries.getSound(name));
         }
         if (DatabaseQueries.socialSpyContainsPlayer(name)) {
-            SocialSpyMap.add(name);
+            SocialSpyCollection.add(name);
         }
         if (DatabaseQueries.containsPlayerFromAutoMessages(name)) {
-            AutoMessagesMap.add(name);
+            AutoMessagesCollection.add(name);
         }
     }
 
     private void saveData(final String name) {
-        if (DisabledChatMap.contains(name)) {
+        if (DisabledChatCollection.contains(name)) {
             DatabaseQueries.addPlayerToDisabledChat(name);
         }
-        if (this.disabledPrivateMessagesMap.contains(name)) {
+        if (this.disabledPrivateMessagesCollection.contains(name)) {
             DatabaseQueries.addPlayerToDisabledPrivateMessages(name);
         }
-        if (IgnoreMap.playerIgnoresChatAnyOne(name)) {
-            DatabaseQueries.addPlayerToIgnoreChat(name, IgnoreMap.getAllIgnoredChat(name));
+        if (IgnoreCollection.playerIgnoresChatAnyOne(name)) {
+            DatabaseQueries.addPlayerToIgnoreChat(name, IgnoreCollection.getAllIgnoredChat(name));
         }
-        if (IgnoreMap.playerIgnoresPrivateAnyOne(name)) {
-            DatabaseQueries.addPlayerToIgnorePrivate(name, IgnoreMap.getAllIgnoredPrivate(name));
+        if (IgnoreCollection.playerIgnoresPrivateAnyOne(name)) {
+            DatabaseQueries.addPlayerToIgnorePrivate(name, IgnoreCollection.getAllIgnoredPrivate(name));
         }
-        if (LocalSpyMap.contains(name)) {
+        if (LocalSpyCollection.contains(name)) {
             DatabaseQueries.addPlayerToLocalSpy(name);
         }
-        if (this.pmSoundsMap.contains(name)) {
-            DatabaseQueries.addPlayerPmSoundToPmSounds(name, this.pmSoundsMap.getSound(name).toString());
+        if (this.pmSoundsCollection.contains(name)) {
+            DatabaseQueries.addPlayerPmSoundToPmSounds(name, this.pmSoundsCollection.getSound(name).toString());
         }
-        if (SocialSpyMap.contains(name)) {
+        if (SocialSpyCollection.contains(name)) {
             DatabaseQueries.addPlayerToSocialSpy(name);
         }
-        if (AutoMessagesMap.contains(name)) {
+        if (AutoMessagesCollection.contains(name)) {
             DatabaseQueries.addPlayerToAutoMessages(name);
         }
     }
@@ -107,18 +107,18 @@ public final class DisconnectListener implements Listener {
         for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
             entry.getValue().getChatCooldowns().remove(name);
         }
-        this.cooldownsMaps.removePlayerPrivateCooldown(name);
-        this.cooldownsMaps.removePlayerIgnoreCooldown(name);
-        this.cooldownsMaps.removePlayerSpyCooldown(name);
-        this.cooldownsMaps.removeBroadcastCooldown(name);
-        DisabledChatMap.remove(name);
-        this.disabledPrivateMessagesMap.remove(name);
-        IgnoreMap.removeFromIgnoredChat(name);
-        IgnoreMap.removeFromIgnoredPrivate(name);
-        LocalSpyMap.remove(name);
-        this.pmSoundsMap.remove(name);
-        ReplyMap.removeFromAll(name);
-        SocialSpyMap.remove(name);
-        AutoMessagesMap.remove(name);
+        this.cooldownsCollection.removePlayerPrivateCooldown(name);
+        this.cooldownsCollection.removePlayerIgnoreCooldown(name);
+        this.cooldownsCollection.removePlayerSpyCooldown(name);
+        this.cooldownsCollection.removeBroadcastCooldown(name);
+        DisabledChatCollection.remove(name);
+        this.disabledPrivateMessagesCollection.remove(name);
+        IgnoreCollection.removeFromIgnoredChat(name);
+        IgnoreCollection.removeFromIgnoredPrivate(name);
+        LocalSpyCollection.remove(name);
+        this.pmSoundsCollection.remove(name);
+        ReplyCollection.removeFromAll(name);
+        SocialSpyCollection.remove(name);
+        AutoMessagesCollection.remove(name);
     }
 }

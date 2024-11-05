@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.args;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.AutoMessagesMap;
+import groundbreaking.gigachat.collections.AutoMessagesCollection;
 import groundbreaking.gigachat.constructors.ArgsConstructor;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -39,15 +39,15 @@ public final class DisableAutoMessagesArgument extends ArgsConstructor {
     private boolean process(final CommandSender sender, final Player target) {
         final String senderName = sender.getName();
         final String targetName = target.getName();
-        if (AutoMessagesMap.contains(targetName)) {
+        if (AutoMessagesCollection.contains(targetName)) {
             sender.sendMessage(this.messages.getAutoMessagesEnabledOther().replace("{player}", targetName));
             target.sendMessage(this.messages.getAutoMessagesEnabledByOther().replace("{player}", senderName));
-            AutoMessagesMap.remove(targetName);
+            AutoMessagesCollection.remove(targetName);
             DatabaseQueries.removePlayerFromAutoMessages(targetName);
         } else {
             sender.sendMessage(this.messages.getAutoMessagesDisabledOther().replace("{player}", targetName));
             target.sendMessage(this.messages.getAutoMessagesDisabledByOther().replace("{player}", senderName));
-            AutoMessagesMap.add(targetName);
+            AutoMessagesCollection.add(targetName);
         }
 
         return true;

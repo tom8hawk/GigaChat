@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.automessages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.AutoMessagesMap;
+import groundbreaking.gigachat.collections.AutoMessagesCollection;
 import groundbreaking.gigachat.constructors.AutoMessageConstructor;
 import groundbreaking.gigachat.utils.config.values.AutoMessagesValues;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -54,7 +54,7 @@ public final class AutoMessages {
         final float soundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
-            if (AutoMessagesMap.contains(player.getName())) {
+            if (AutoMessagesCollection.contains(player.getName())) {
                 continue;
             }
 

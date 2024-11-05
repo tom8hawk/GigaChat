@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-public final class LocalSpyMap {
+public final class LocalSpyCollection {
 
     private static final Set<String> PLAYERS = new ObjectOpenHashSet<>();
 

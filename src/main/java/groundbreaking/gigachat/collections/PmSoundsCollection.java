@@ -5,7 +5,7 @@ import org.bukkit.Sound;
 
 import java.util.Map;
 
-public final class PmSoundsMap {
+public final class PmSoundsCollection {
 
     private final Map<String, String> sounds = new Object2ObjectOpenHashMap<>();
     private String defaultSound; public void setDefaultSound(final String defaultSound) {

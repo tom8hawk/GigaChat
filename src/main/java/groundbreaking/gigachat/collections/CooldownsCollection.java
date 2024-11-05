@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public final class CooldownsMaps {
+public final class CooldownsCollection {
 
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
@@ -22,7 +22,7 @@ public final class CooldownsMaps {
 
     private ExpiringMap<String, Long> broadcastCooldowns;
 
-    public CooldownsMaps(final GigaChat plugin) {
+    public CooldownsCollection(final GigaChat plugin) {
         this.plugin = plugin;
     }
     

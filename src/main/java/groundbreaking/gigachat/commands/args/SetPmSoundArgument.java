@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.args;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.PmSoundsMap;
+import groundbreaking.gigachat.collections.PmSoundsCollection;
 import groundbreaking.gigachat.constructors.ArgsConstructor;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -14,12 +14,12 @@ import org.jetbrains.annotations.NotNull;
 public final class SetPmSoundArgument extends ArgsConstructor {
 
     private final Messages messages;
-    private final PmSoundsMap pmSoundsMap;
+    private final PmSoundsCollection pmSoundsCollection;
 
     public SetPmSoundArgument(final GigaChat plugin, final String name, final String permission) {
         super(name, permission);
         this.messages = plugin.getMessages();
-        this.pmSoundsMap = plugin.getPmSoundsMap();
+        this.pmSoundsCollection = plugin.getPmSoundsCollection();
     }
 
     @Override
@@ -37,7 +37,7 @@ public final class SetPmSoundArgument extends ArgsConstructor {
         }
 
         if (args[2].equalsIgnoreCase("none")) {
-            this.pmSoundsMap.remove(target.getName());
+            this.pmSoundsCollection.remove(target.getName());
             DatabaseQueries.removePlayerFromPmSounds(target.getName());
 
             final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
@@ -62,7 +62,7 @@ public final class SetPmSoundArgument extends ArgsConstructor {
             return true;
         }
 
-        this.pmSoundsMap.setSound(target.getName(), sound.name());
+        this.pmSoundsCollection.setSound(target.getName(), sound.name());
 
         final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
         if (sender != target || messageForTargetIsEmpty) {

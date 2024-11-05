@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
 
-public final class DisabledPrivateMessagesMap {
+public final class DisabledPrivateMessagesCollection {
 
     private final List<String> players = new ObjectArrayList<>();
 

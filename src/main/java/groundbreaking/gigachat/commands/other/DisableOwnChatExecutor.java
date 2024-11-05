@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.DisabledChatMap;
+import groundbreaking.gigachat.collections.DisabledChatCollection;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import org.bukkit.command.Command;
@@ -40,13 +40,13 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
 
     private boolean processDisable(final Player sender) {
         final String name = sender.getName();
-        if (DisabledChatMap.contains(name)) {
+        if (DisabledChatCollection.contains(name)) {
             sender.sendMessage(this.messages.getOwnChatDisabled());
-            DisabledChatMap.remove(name);
+            DisabledChatCollection.remove(name);
             DatabaseQueries.removePlayerFromDisabledChat(name);
         } else {
             sender.sendMessage(this.messages.getOwnChatEnabled());
-            DisabledChatMap.add(name);
+            DisabledChatCollection.add(name);
         }
 
         return true;

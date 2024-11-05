@@ -6,7 +6,7 @@ import org.bukkit.entity.Player;
 
 import java.util.Set;
 
-public final class SocialSpyMap {
+public final class SocialSpyCollection {
 
     private static final Set<String> listening = new ObjectOpenHashSet<>();
 

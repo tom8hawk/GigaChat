@@ -1,9 +1,9 @@
 package groundbreaking.gigachat;
 
 import groundbreaking.gigachat.automessages.AutoMessages;
-import groundbreaking.gigachat.collections.CooldownsMaps;
-import groundbreaking.gigachat.collections.DisabledPrivateMessagesMap;
-import groundbreaking.gigachat.collections.PmSoundsMap;
+import groundbreaking.gigachat.collections.CooldownsCollection;
+import groundbreaking.gigachat.collections.DisabledPrivateMessagesCollection;
+import groundbreaking.gigachat.collections.PmSoundsCollection;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.commands.args.*;
 import groundbreaking.gigachat.commands.other.BroadcastCommand;
@@ -60,10 +60,10 @@ public final class GigaChat extends JavaPlugin {
     private NewbieCommandsValues newbieCommandsValues;
     private PrivateMessagesValues pmValues;
 
-    private CooldownsMaps cooldownsMaps;
-    private PmSoundsMap pmSoundsMap;
+    private CooldownsCollection cooldownsCollection;
+    private PmSoundsCollection pmSoundsCollection;
 
-    private DisabledPrivateMessagesMap disabled;
+    private DisabledPrivateMessagesCollection disabled;
 
     private VanishChecker vanishChecker;
 
@@ -165,13 +165,13 @@ public final class GigaChat extends JavaPlugin {
         this.newbieChatValues = new NewbieChatValues(this);
         this.pmValues = new PrivateMessagesValues(this);
         this.newbieCommandsValues = new NewbieCommandsValues(this);
-        this.cooldownsMaps = new CooldownsMaps(this);
-        this.disabled = new DisabledPrivateMessagesMap();
+        this.cooldownsCollection = new CooldownsCollection(this);
+        this.disabled = new DisabledPrivateMessagesCollection();
         this.chatListener = new ChatListener(this);
         this.commandListener = new CommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
         this.autoMessages = new AutoMessages(this);
-        this.pmSoundsMap = new PmSoundsMap();
+        this.pmSoundsCollection = new PmSoundsCollection();
     }
 
     public void setupConfigValues() {
@@ -185,7 +185,7 @@ public final class GigaChat extends JavaPlugin {
             this.newbieCommandsValues.setValues();
         }
         this.pmValues.setValues();
-        this.cooldownsMaps.setCooldowns();
+        this.cooldownsCollection.setCooldowns();
     }
 
     public void setupVanishChecker() {

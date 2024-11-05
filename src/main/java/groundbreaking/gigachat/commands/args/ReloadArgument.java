@@ -28,7 +28,7 @@ public final class ReloadArgument extends ArgsConstructor {
         this.plugin.reloadConfig();
         this.plugin.setupVanishChecker();
         this.plugin.setupConfigValues();
-        this.plugin.getCooldownsMaps().setCooldowns();
+        this.plugin.getCooldownsCollection().setCooldowns();
         this.plugin.getAutoMessages().run();
         this.plugin.registerReloadableEvents();
         this.plugin.registerPluginCommands();

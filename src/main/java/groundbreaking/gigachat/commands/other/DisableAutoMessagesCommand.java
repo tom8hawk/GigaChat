@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.AutoMessagesMap;
+import groundbreaking.gigachat.collections.AutoMessagesCollection;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import org.bukkit.command.Command;
@@ -40,13 +40,13 @@ public final class DisableAutoMessagesCommand implements CommandExecutor, TabCom
 
     private boolean processDisable(final Player sender) {
         final String name = sender.getName();
-        if (AutoMessagesMap.contains(name)) {
+        if (AutoMessagesCollection.contains(name)) {
             sender.sendMessage(this.messages.getAutoMessagesEnabled());
-            AutoMessagesMap.remove(name);
+            AutoMessagesCollection.remove(name);
             DatabaseQueries.removePlayerFromAutoMessages(name);
         } else {
             sender.sendMessage(this.messages.getAutoMessagesDisabled());
-            AutoMessagesMap.add(name);
+            AutoMessagesCollection.add(name);
         }
 
         return true;

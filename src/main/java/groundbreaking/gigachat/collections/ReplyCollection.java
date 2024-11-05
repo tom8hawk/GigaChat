@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
 import java.util.Map;
 
-public final class ReplyMap {
+public final class ReplyCollection {
 
     private static final Map<String, String> reply = new Object2ObjectOpenHashMap<>();
 

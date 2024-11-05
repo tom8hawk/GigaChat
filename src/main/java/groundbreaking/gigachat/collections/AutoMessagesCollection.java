@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.Set;
 
-public final class AutoMessagesMap {
+public final class AutoMessagesCollection {
 
     private static final Set<String> players = new ObjectOpenHashSet<>();
 

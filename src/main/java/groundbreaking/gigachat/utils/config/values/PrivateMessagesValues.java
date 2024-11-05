@@ -169,7 +169,7 @@ public final class PrivateMessagesValues {
         } else {
             final String[] params = soundString.split(";");
             final String sound = params.length >= 1 ? params[0].toUpperCase(Locale.ENGLISH) : "BLOCK_BREWING_STAND_BREW";
-            this.plugin.getPmSoundsMap().setDefaultSound(sound);
+            this.plugin.getPmSoundsCollection().setDefaultSound(sound);
             this.soundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
             this.soundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
             this.isSoundEnabled = true;

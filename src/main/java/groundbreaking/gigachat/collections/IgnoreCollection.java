@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public final class IgnoreMap {
+public final class IgnoreCollection {
 
     private static final Map<String, List<String>> ignoredChat = new Object2ObjectOpenHashMap<>();
     private static final Map<String, List<String>> ignoredPrivate = new Object2ObjectOpenHashMap<>();

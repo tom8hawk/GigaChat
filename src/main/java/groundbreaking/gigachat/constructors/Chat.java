@@ -1,8 +1,8 @@
 package groundbreaking.gigachat.constructors;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.DisabledChatMap;
-import groundbreaking.gigachat.collections.IgnoreMap;
+import groundbreaking.gigachat.collections.DisabledChatCollection;
+import groundbreaking.gigachat.collections.IgnoreCollection;
 import groundbreaking.gigachat.commands.other.SpyModeCommand;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -141,7 +141,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
 
         for (final Player target : onlinePlayers) {
             final String targetName = target.getName();
-            if (IgnoreMap.isIgnoredChat(targetName, senderName) || DisabledChatMap.contains(targetName)) {
+            if (IgnoreCollection.isIgnoredChat(targetName, senderName) || DisabledChatCollection.contains(targetName)) {
                 continue;
             }
 
@@ -164,7 +164,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
         final String senderName = sender.getName();
         for (final Player target : onlinePlayers) {
             final String targetName = target.getName();
-            if (!IgnoreMap.isIgnoredChat(targetName, senderName)) {
+            if (!IgnoreCollection.isIgnoredChat(targetName, senderName)) {
                 playerList.add(target);
             }
         }

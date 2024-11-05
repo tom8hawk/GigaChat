@@ -4,7 +4,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
 
-public final class DisabledChatMap {
+public final class DisabledChatCollection {
 
     private static final List<String> disabled = new ObjectArrayList<>();
 
