@@ -92,7 +92,7 @@ public final class GigaChat extends JavaPlugin {
         super.saveDefaultConfig();
         this.setupVanishChecker();
         this.loadClasses();
-        this.setupAll();
+        this.setupConfigValues();
 
         DatabaseHandler.createConnection(this);
         DatabaseQueries.createTables();
@@ -173,7 +173,7 @@ public final class GigaChat extends JavaPlugin {
         this.pmSoundsMap = new PmSoundsMap();
     }
 
-    public void setupAll() {
+    public void setupConfigValues() {
         this.messages.setupMessages();
         this.autoMessagesValues.setValues();
         this.broadcastValues.setValues();
