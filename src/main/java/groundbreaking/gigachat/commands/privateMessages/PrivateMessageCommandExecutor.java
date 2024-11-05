@@ -59,7 +59,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
         final boolean isPlayerSender = sender instanceof Player;
         if (args.length == 1 && isPlayerSender && args[0].equalsIgnoreCase("disable")) {
-            processDisable((Player) sender);
+            this.processDisable((Player) sender);
             return true;
         }
 
