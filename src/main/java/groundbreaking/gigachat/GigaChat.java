@@ -29,6 +29,8 @@ import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandExecutor;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventPriority;
@@ -258,46 +260,24 @@ public final class GigaChat extends JavaPlugin {
     }
 
     public void registerPluginCommands() {
-        this.registerBroadcastCommand();
-        this.registerDisableOwnChat();
-        this.registerDisableAutoMessagesCommand();
+        this.registerCommand("broadcast", BroadcastCommand.class, BroadcastCommand.class);
+        this.registerCommand("disable-own-chat", DisableOwnChatExecutor.class, DisableOwnChatExecutor.class);
+        this.registerCommand("disable-auto-messages", DisableAutoMessagesCommand.class, DisableAutoMessagesCommand.class);
     }
 
-    private void registerBroadcastCommand() {
-        final ConfigurationSection broadcast = super.getConfig().getConfigurationSection("broadcast");
-        if (broadcast != null) {
-            final String command = broadcast.getString("command");
+    private void registerCommand(final String configSectionName, final Class<? extends CommandExecutor> commandClass, final Class<? extends TabCompleter> commandTabClass) {
+        final ConfigurationSection configSection = super.getConfig().getConfigurationSection(configSectionName);
+        if (configSection != null) {
+            final String command = configSection.getString("command");
             if (!command.isEmpty()) {
-                final List<String> aliases = broadcast.getStringList("aliases");
-                final BroadcastCommand broadcastCommand = new BroadcastCommand(this);
-
-                this.commandRegisterer.register(command, aliases, broadcastCommand, broadcastCommand);
-            }
-        }
-    }
-
-    private void registerDisableOwnChat() {
-        final ConfigurationSection disableOwnChat = super.getConfig().getConfigurationSection("disable-own-chat");
-        if (disableOwnChat != null) {
-            final String command = disableOwnChat.getString("command");
-            if (!command.isEmpty()) {
-                final List<String> aliases = disableOwnChat.getStringList("aliases");
-                final DisableOwnChatExecutor disableOwnChatCommand = new DisableOwnChatExecutor(this);
-
-                this.commandRegisterer.register(command, aliases, disableOwnChatCommand, disableOwnChatCommand);
-            }
-        }
-    }
-
-    private void registerDisableAutoMessagesCommand() {
-        final ConfigurationSection disableAutoMessages = super.getConfig().getConfigurationSection("disable-auto-messages");
-        if (disableAutoMessages != null) {
-            final String command = disableAutoMessages.getString("command");
-            if (!command.isEmpty()) {
-                final List<String> aliases = disableAutoMessages.getStringList("aliases");
-                final DisableAutoMessagesCommand disableAutoMessagesCommand = new DisableAutoMessagesCommand(this);
-
-                this.commandRegisterer.register(command, aliases, disableAutoMessagesCommand, disableAutoMessagesCommand);
+                final List<String> aliases = configSection.getStringList("aliases");
+                try {
+                    final CommandExecutor commandInstance = commandClass.getConstructor(GigaChat.class).newInstance(this);
+                    final TabCompleter tabInstance = commandTabClass.getConstructor(GigaChat.class).newInstance(this);
+                    this.commandRegisterer.register(command, aliases, commandInstance, tabInstance);
+                } catch (final Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }
     }
