@@ -38,12 +38,8 @@ public final class DatabaseHandler {
     }
 
     public static void closeConnection() {
-        try {
-            if (dataSource != null && dataSource.getConnection() != null) {
-                dataSource.close();
-            }
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
+        if (dataSource != null) {
+            dataSource.close();
         }
     }
 }
