@@ -161,25 +161,6 @@ public final class DatabaseQueries {
      * Checks the "ignoreChat" table for a player's name, to see if he ignores anybody.
      *
      * @param username of the player
-     * @return true if the table contains the player's name
-     */
-    public static boolean ignoreChatContains(final String username) {
-        final String query = "SELECT 1 FROM ignoreChat WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Checks the "ignoreChat" table for a player's name, to see if he ignores anybody.
-     *
-     * @param username of the player
      * @return a list of ignored players' names
      */
     public static List<String> getIgnoredChat(final String username) {
@@ -284,25 +265,6 @@ public final class DatabaseQueries {
     }
 
     /**
-     * Checks the "ignorePrivate" table for a player's name, to see if he ignores anybody.
-     *
-     * @param username of the player
-     * @return true if the player is ignoring someone
-     */
-    public static boolean ignorePrivateContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM ignorePrivate WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
      * Retrieves all players ignored by the player from the "ignorePrivate" table.
      *
      * @param username of the player
@@ -357,25 +319,6 @@ public final class DatabaseQueries {
             statement.executeUpdate();
         } catch (final SQLException ex) {
             ex.printStackTrace();
-        }
-    }
-
-    /**
-     * Checks the "privateMessagesSounds" table for the player's name.
-     *
-     * @param username of the player
-     * @return true if the table contains the player's name
-     */
-    public static boolean privateMessagesSoundsContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM privateMessagesSounds WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-            return false;
         }
     }
 
