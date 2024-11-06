@@ -47,27 +47,41 @@ public final class DisconnectListener implements Listener {
     }
 
     private void loadData(final String name) {
-        if (DatabaseQueries.disabledChatContainsPlayer(name)) {
-            DisabledChatCollection.add(name);
-        }
-        if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(name)) {
-            this.disabledPrivateMessagesCollection.add(name);
-        }
-        if (DatabaseQueries.ignoreChatContains(name)) {
-            IgnoreCollection.addToIgnoredChat(name, DatabaseQueries.getIgnoredChat(name));
-        }
-        if (DatabaseQueries.ignorePrivateContainsPlayer(name)) {
-            IgnoreCollection.addToIgnoredPrivate(name, DatabaseQueries.getIgnoredPrivate(name));
-        }
-        if (DatabaseQueries.privateMessagesSoundsContainsPlayer(name)) {
-            this.pmSoundsCollection.setSound(name, DatabaseQueries.getSound(name));
-        }
-        if (DatabaseQueries.socialSpyContainsPlayer(name)) {
-            SocialSpyCollection.add(name);
-        }
-        if (DatabaseQueries.containsPlayerFromAutoMessages(name)) {
-            AutoMessagesCollection.add(name);
-        }
+        DatabaseQueries.disabledChatContainsPlayer(name).thenAccept(value -> {
+            if (value) {
+                DisabledChatCollection.add(name);
+            }
+        });
+        DatabaseQueries.disabledPrivateMessagesContainsPlayer(name).thenAccept(value -> {
+            if (value) {
+                this.disabledPrivateMessagesCollection.add(name);
+            }
+        });
+        DatabaseQueries.getIgnoredChat(name).thenAccept(value -> {
+            if (value != null && !value.isEmpty()) {
+                IgnoreCollection.addToIgnoredChat(name, value);
+            }
+        });
+        DatabaseQueries.getIgnoredPrivate(name).thenAccept(value -> {
+            if (value != null && !value.isEmpty()) {
+                IgnoreCollection.addToIgnoredPrivate(name, value);
+            }
+        });
+        DatabaseQueries.getSound(name).thenAccept(value -> {
+            if (value != null) {
+                this.pmSoundsCollection.setSound(name, value);
+            }
+        });
+        DatabaseQueries.socialSpyContainsPlayer(name).thenAccept(value -> {
+            if (value) {
+                SocialSpyCollection.add(name);
+            }
+        });
+        DatabaseQueries.containsPlayerFromAutoMessages(name).thenAccept(value -> {
+            if (value) {
+                AutoMessagesCollection.add(name);
+            }
+        });
     }
 
     private void removeCooldown(final String name) {

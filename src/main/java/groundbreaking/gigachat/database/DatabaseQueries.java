@@ -7,6 +7,7 @@ import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 public final class DatabaseQueries {
 
@@ -41,12 +42,6 @@ public final class DatabaseQueries {
                     );
                 """;
 
-//        final String localSpyQuery = """
-//                    CREATE TABLE IF NOT EXISTS localSpy (
-//                        username TEXT NOT NULL UNIQUE
-//                    );
-//                """;
-
         final String privateMessagesSoundsQuery = """
                     CREATE TABLE IF NOT EXISTS privateMessagesSounds (
                         username TEXT NOT NULL UNIQUE,
@@ -71,7 +66,6 @@ public final class DatabaseQueries {
             statement.execute(disabledPrivateMessagesQuery);
             statement.execute(ignoreChatQuery);
             statement.execute(ignorePrivateQuery);
-//            statement.execute(localSpyQuery);
             statement.execute(privateMessagesSoundsQuery);
             statement.execute(socialSpyQuery);
             statement.execute(autoMessagesQuery);
@@ -86,13 +80,20 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToDisabledChat(final String username) {
-        final String query = "INSERT OR IGNORE INTO disabledChat(username) VALUES(?)";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "INSERT OR IGNORE INTO disabledChat(username) VALUES(?)";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -101,13 +102,20 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromDisabledChat(final String username) {
-        final String query = "DELETE FROM disabledChat WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM disabledChat WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -116,18 +124,22 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return true if the table contains the player's name
      */
-    public static boolean disabledChatContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM disabledChat WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<Boolean> disabledChatContainsPlayer(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM disabledChat WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
+                final ResultSet result = statement.executeQuery();
+                return result.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 
     /**
@@ -136,18 +148,25 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToIgnoreChat(final String username, final List<String> ignored) {
-        final String query = """
+        CompletableFuture.supplyAsync(() -> {
+            final String query = """
                     INSERT INTO ignoreChat(username, ignored)
                     VALUES(?, ?)
                     ON CONFLICT(username) DO UPDATE SET sound = excluded.ignored;
                 """;
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.setString(2, String.join(";", ignored));
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.setString(2, String.join(";", ignored));
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -156,13 +175,20 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromIgnoreChat(final String username) {
-        final String query = "DELETE FROM ignoreChat WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM ignoreChat WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -171,18 +197,22 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return true if the table contains the player's name
      */
-    public static boolean ignoreChatContains(final String username) {
-        final String query = "SELECT 1 FROM ignoreChat WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<Boolean> ignoreChatContains(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM ignoreChat WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
+                final ResultSet result = statement.executeQuery();
+                return result.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 
     /**
@@ -191,21 +221,26 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return a list of ignored players' names
      */
-    public static List<String> getIgnoredChat(final String username) {
-        final String query = "SELECT ignored FROM ignoreChat WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<List<String>> getIgnoredChat(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT ignored FROM ignoreChat WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                final String listString = result.getString("ignored");
-                return Arrays.asList(listString.split(";"));
+                final ResultSet result = statement.executeQuery();
+                if (result.next()) {
+                    final String listString = result.getString("ignored");
+                    return Arrays.asList(listString.split(";"));
+                }
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
             }
-        } catch (final SQLException ex) {
-            ex.printStackTrace();
-        }
 
-        return Collections.emptyList();
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
+            ex.printStackTrace();
+            return Collections.emptyList();
+        });
     }
 
     /**
@@ -214,13 +249,20 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToDisabledPrivateMessages(final String username) {
-        final String query = "INSERT OR IGNORE INTO disabledPrivateMessages(username) VALUES(?)";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "INSERT OR IGNORE INTO disabledPrivateMessages(username) VALUES(?)";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -229,13 +271,20 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromDisabledPrivateMessages(final String username) {
-        final String query = "DELETE FROM disabledPrivateMessages WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM disabledPrivateMessages WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -244,18 +293,22 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return true if the player has disabled
      */
-    public static boolean disabledPrivateMessagesContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM disabledPrivateMessages WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<Boolean> disabledPrivateMessagesContainsPlayer(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM disabledPrivateMessages WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
+                final ResultSet result = statement.executeQuery();
+                return result.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 
     /**
@@ -264,18 +317,25 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToIgnorePrivate(final String username, final List<String> ignored) {
-        final String query = """
+        CompletableFuture.supplyAsync(() -> {
+            final String query = """
                     INSERT INTO ignorePrivate(username, ignored)
                     VALUES(?, ?)
                     ON CONFLICT(username) DO UPDATE SET sound = excluded.ignored;
                 """;
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.setString(2, String.join(";", ignored));
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.setString(2, String.join(";", ignored));
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -284,13 +344,20 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromIgnorePrivate(final String username) {
-        final String query = "DELETE FROM ignorePrivate WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM ignorePrivate WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -299,19 +366,22 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return true if the player is ignoring someone
      */
-    public static boolean ignorePrivateContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM ignorePrivate WHERE username = ? LIMIT 1";
+    public static CompletableFuture<Boolean> ignorePrivateContainsPlayer(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM ignorePrivate WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
+                final ResultSet result = statement.executeQuery();
+                return result.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 
     /**
@@ -320,74 +390,27 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return a list of ignored players' names
      */
-    public static List<String> getIgnoredPrivate(final String username) {
-        final String query = "SELECT ignored FROM ignorePrivate WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<List<String>> getIgnoredPrivate(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT ignored FROM ignorePrivate WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                final String listString = result.getString("ignored");
-                return Arrays.asList(listString.split(";"));
+                final ResultSet result = statement.executeQuery();
+                if (result.next()) {
+                    final String listString = result.getString("ignored");
+                    return Arrays.asList(listString.split(";"));
+                }
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
             }
-        } catch (final SQLException ex) {
+
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return Collections.emptyList();
+            return Collections.emptyList();
+        });
     }
-
-/////// Temporarily not functional.
-//
-//    /**
-//     * Adds the player name to the "localSpy" table, to save the player's choice
-//     *
-//     * @param username of the player
-//     */
-//    public static void addPlayerToLocalSpy(final String username) {
-//        final String query = "INSERT OR IGNORE INTO localSpy(username) VALUES(?)";
-//        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-//            statement.setString(1, username);
-//            statement.executeUpdate();
-//        } catch (final SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//    }
-//
-//    /**
-//     * Removes the player's name from the "localSpy" table
-//     *
-//     * @param username of the player
-//     */
-//    public static void removePlayerFromLocalSpy(final String username) {
-//        final String query = "DELETE FROM localSpy WHERE username = ? LIMIT 1";
-//        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-//            statement.setString(1, username);
-//            statement.executeUpdate();
-//        } catch (final SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//    }
-//
-//    /**
-//     * Checks the "localSpy" table for a player's name, to see if he is spying on the local chat.
-//     *
-//     * @param username of the player
-//     * @return true if the table contains the player's name
-//     */
-//    public static boolean localSpyContainsPlayer(final String username) {
-//        final String query = "SELECT 1 FROM localSpy WHERE username = ? LIMIT 1";
-//        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-//            statement.setString(1, username);
-//
-//            final ResultSet result = statement.executeQuery();
-//            return result.next();
-//        } catch (final SQLException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        return false;
-//    }
 
     /**
      * Adds the player name to the "privateMessagesSounds" table, to save the player's choice
@@ -395,18 +418,24 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerPmSoundToPmSounds(final String username, final String sound) {
-        final String query = """
+        CompletableFuture.supplyAsync(() -> {
+            final String query = """
                     INSERT INTO privateMessagesSounds(username, sound)
                     VALUES(?, ?)
                     ON CONFLICT(username) DO UPDATE SET sound = excluded.sound;
                 """;
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.setString(2, sound);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.setString(2, sound);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -415,13 +444,19 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromPmSounds(final String username) {
-        final String query = "DELETE FROM privateMessagesSounds WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM privateMessagesSounds WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -430,18 +465,22 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return true if the table contains the player's name
      */
-    public static boolean privateMessagesSoundsContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM privateMessagesSounds WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<Boolean> privateMessagesSoundsContainsPlayer(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM privateMessagesSounds WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
+                final ResultSet result = statement.executeQuery();
+                return result.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 
     /**
@@ -450,20 +489,24 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return name of the sound player has chosen
      */
-    public static String getSound(final String username) {
-        final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<String> getSound(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT sound FROM privateMessagesSounds WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                return result.getString("sound");
+                final ResultSet result = statement.executeQuery();
+                if (result.next()) {
+                    return result.getString("sound");
+                }
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
             }
-        } catch (final SQLException ex) {
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return null;
+            return null;
+        });
     }
 
     /**
@@ -472,13 +515,19 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void addPlayerToSocialSpy(final String username) {
-        final String query = "INSERT OR IGNORE INTO socialSpy(username) VALUES(?)";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "INSERT OR IGNORE INTO socialSpy(username) VALUES(?)";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -487,13 +536,19 @@ public final class DatabaseQueries {
      * @param username of the player
      */
     public static void removePlayerFromSocialSpy(final String username) {
-        final String query = "DELETE FROM socialSpy WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM socialSpy WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     /**
@@ -502,51 +557,71 @@ public final class DatabaseQueries {
      * @param username of the player
      * @return true if the table contains the player's name
      */
-    public static boolean socialSpyContainsPlayer(final String username) {
-        final String query = "SELECT 1 FROM socialSpy WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, username);
+    public static CompletableFuture<Boolean> socialSpyContainsPlayer(final String username) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM socialSpy WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, username);
 
-            final ResultSet result = statement.executeQuery();
-            return result.next();
-        } catch (final SQLException ex) {
+                final ResultSet result = statement.executeQuery();
+                return result.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 
     public static void addPlayerToAutoMessages(final String name) {
-        final String query = "INSERT OR IGNORE autoMessages(name) VALUES(?)";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, name);
-            statement.execute();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "INSERT OR IGNORE autoMessages(name) VALUES(?)";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, name);
+                statement.execute();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
     public static void removePlayerFromAutoMessages(final String name) {
-        final String query = "DELETE FROM autoMessages WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, name);
-            statement.executeUpdate();
-        } catch (final SQLException ex) {
+        CompletableFuture.supplyAsync(() -> {
+            final String query = "DELETE FROM autoMessages WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, name);
+                statement.executeUpdate();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+            return null;
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
+            return null;
+        });
     }
 
-    public static boolean containsPlayerFromAutoMessages(final String name) {
-        final String query = "SELECT 1 FROM autoMessages WHERE username = ? LIMIT 1";
-        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
-            statement.setString(1, name);
+    public static CompletableFuture<Boolean> containsPlayerFromAutoMessages(final String name) {
+        return CompletableFuture.supplyAsync(() -> {
+            final String query = "SELECT 1 FROM autoMessages WHERE username = ? LIMIT 1";
+            try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+                statement.setString(1, name);
 
-            final ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        } catch (final SQLException ex) {
+                final ResultSet resultSet = statement.executeQuery();
+                return resultSet.next();
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+                return false;
+            }
+        }, DatabaseHandler.customThreadPool).exceptionally(ex -> {
             ex.printStackTrace();
-        }
-
-        return false;
+            return false;
+        });
     }
 }
