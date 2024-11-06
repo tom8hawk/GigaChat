@@ -23,12 +23,14 @@ import java.util.List;
 
 public final class IgnoreCommandExecutor implements CommandExecutor, TabCompleter {
 
+    private final GigaChat plugin;
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
     private final CooldownsCollection cooldownsCollection;
     private final VanishChecker vanishChecker;
 
     public IgnoreCommandExecutor(final GigaChat plugin) {
+        this.plugin = plugin;
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
         this.cooldownsCollection = plugin.getCooldownsCollection();
@@ -118,11 +120,15 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
         if (IgnoreCollection.ignoredChatContains(senderName, targetName)) {
             IgnoreCollection.removeFromIgnoredChat(senderName, targetName);
-            DatabaseQueries.removePlayerFromIgnoreChat(senderName);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.removePlayerFromIgnoreChat(senderName)
+            );
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
         } else {
             IgnoreCollection.addToIgnoredChat(senderName, targetName);
-            DatabaseQueries.addPlayerToIgnoreChat(senderName, IgnoreCollection.getAllIgnoredChat(senderName));
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToIgnoreChat(senderName, IgnoreCollection.getAllIgnoredChat(senderName))
+            );
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
 
@@ -138,11 +144,15 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
         if (IgnoreCollection.ignoredPrivateContains(senderName, targetName)) {
             IgnoreCollection.removeFromIgnoredPrivate(senderName, targetName);
-            DatabaseQueries.removePlayerFromIgnorePrivate(senderName);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.removePlayerFromIgnorePrivate(senderName)
+            );
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
         } else {
             IgnoreCollection.addToIgnoredPrivate(senderName, targetName);
-            DatabaseQueries.addPlayerToIgnorePrivate(senderName, IgnoreCollection.getAllIgnoredChat(senderName));
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToIgnorePrivate(senderName, IgnoreCollection.getAllIgnoredChat(senderName))
+            );
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
 

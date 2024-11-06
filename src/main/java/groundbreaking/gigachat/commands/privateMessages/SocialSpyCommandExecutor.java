@@ -7,6 +7,7 @@ import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.config.values.PrivateMessagesValues;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -19,11 +20,13 @@ import java.util.List;
 
 public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
 
+    private final GigaChat plugin;
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
     private final CooldownsCollection cooldownsCollection;
 
     public SocialSpyCommandExecutor(final GigaChat plugin) {
+        this.plugin = plugin;
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
         this.cooldownsCollection = plugin.getCooldownsCollection();
@@ -50,11 +53,15 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
 
         if (SocialSpyCollection.contains(senderName)) {
             SocialSpyCollection.remove(senderName);
-            DatabaseQueries.removePlayerFromSocialSpy(senderName);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.removePlayerFromSocialSpy(senderName)
+            );
             sender.sendMessage(this.messages.getSpyDisabled());
         } else {
             SocialSpyCollection.add(senderName);
-            DatabaseQueries.addPlayerToSocialSpy(senderName);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToSocialSpy(senderName)
+            );
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 

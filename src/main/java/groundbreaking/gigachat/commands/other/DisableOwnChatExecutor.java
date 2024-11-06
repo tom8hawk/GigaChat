@@ -4,6 +4,7 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.DisabledChatCollection;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -16,9 +17,11 @@ import java.util.List;
 
 public final class DisableOwnChatExecutor implements CommandExecutor, TabCompleter {
 
+    private final GigaChat plugin;
     private final Messages messages;
 
     public DisableOwnChatExecutor(final GigaChat plugin) {
+        this.plugin = plugin;
         this.messages = plugin.getMessages();
     }
 
@@ -43,11 +46,15 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
         if (DisabledChatCollection.contains(name)) {
             sender.sendMessage(this.messages.getOwnChatDisabled());
             DisabledChatCollection.remove(name);
-            DatabaseQueries.removePlayerFromDisabledChat(name);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.removePlayerFromDisabledChat(name)
+            );
         } else {
             sender.sendMessage(this.messages.getOwnChatEnabled());
             DisabledChatCollection.add(name);
-            DatabaseQueries.addPlayerToDisabledChat(name);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToDisabledChat(name)
+            );
         }
 
         return true;

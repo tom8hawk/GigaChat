@@ -138,11 +138,15 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         final String name = sender.getName();
         if (this.disabled.contains(name)) {
             this.disabled.remove(name);
-            DatabaseQueries.removePlayerFromDisabledPrivateMessages(name);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.removePlayerFromDisabledPrivateMessages(name)
+            );
             sender.sendMessage(this.messages.getPmDisabled());
         } else {
             this.disabled.add(name);
-            DatabaseQueries.addPlayerToDisabledPrivateMessages(name);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToDisabledPrivateMessages(name)
+            );
             sender.sendMessage(this.messages.getPmEnabled());
         }
     }
@@ -237,7 +241,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             messageSender.playSound(location, sound, volume, pitch);
         }
     }
-    
+
     private void process(final CommandSender sender, final Player recipient, final String senderName,
                          final String recipientName, final boolean isPlayerSender, final String message, final String[] replacementList) {
         final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;

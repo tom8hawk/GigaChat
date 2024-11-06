@@ -6,22 +6,26 @@ import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.List;
 import java.util.Map;
 
 public final class DisconnectListener implements Listener {
 
+    private final GigaChat plugin;
     private final ChatValues chatValues;
     private final CooldownsCollection cooldownsCollection;
     private final PmSoundsCollection pmSoundsCollection;
     private final DisabledPrivateMessagesCollection disabledPrivateMessagesCollection;
 
     public DisconnectListener(final GigaChat plugin) {
+        this.plugin = plugin;
         this.chatValues = plugin.getChatValues();
         this.cooldownsCollection = plugin.getCooldownsCollection();
         this.pmSoundsCollection = plugin.getPmSoundsCollection();
@@ -47,38 +51,29 @@ public final class DisconnectListener implements Listener {
     }
 
     private void loadData(final String name) {
-        DatabaseQueries.disabledChatContainsPlayer(name).thenAccept(value -> {
-            if (value) {
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            if (DatabaseQueries.disabledChatContainsPlayer(name)) {
                 DisabledChatCollection.add(name);
             }
-        });
-        DatabaseQueries.disabledPrivateMessagesContainsPlayer(name).thenAccept(value -> {
-            if (value) {
+            if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(name)) {
                 this.disabledPrivateMessagesCollection.add(name);
             }
-        });
-        DatabaseQueries.getIgnoredChat(name).thenAccept(value -> {
-            if (value != null && !value.isEmpty()) {
-                IgnoreCollection.addToIgnoredChat(name, value);
+            final List<String> ignoredChat = DatabaseQueries.getIgnoredChat(name);
+            if (!ignoredChat.isEmpty()) {
+                IgnoreCollection.addToIgnoredChat(name, ignoredChat);
             }
-        });
-        DatabaseQueries.getIgnoredPrivate(name).thenAccept(value -> {
-            if (value != null && !value.isEmpty()) {
-                IgnoreCollection.addToIgnoredPrivate(name, value);
+            final List<String> ignoredPrivate = DatabaseQueries.getIgnoredPrivate(name);
+            if (!ignoredPrivate.isEmpty()) {
+                IgnoreCollection.addToIgnoredPrivate(name, ignoredPrivate);
             }
-        });
-        DatabaseQueries.getSound(name).thenAccept(value -> {
-            if (value != null) {
-                this.pmSoundsCollection.setSound(name, value);
+            final String sound = DatabaseQueries.getSound(name);
+            if (sound != null) {
+                this.pmSoundsCollection.setSound(name, sound);
             }
-        });
-        DatabaseQueries.socialSpyContainsPlayer(name).thenAccept(value -> {
-            if (value) {
+            if (DatabaseQueries.socialSpyContainsPlayer(name)) {
                 SocialSpyCollection.add(name);
             }
-        });
-        DatabaseQueries.containsPlayerFromAutoMessages(name).thenAccept(value -> {
-            if (value) {
+            if (DatabaseQueries.containsPlayerFromAutoMessages(name)) {
                 AutoMessagesCollection.add(name);
             }
         });

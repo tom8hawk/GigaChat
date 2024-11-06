@@ -12,10 +12,12 @@ import org.jetbrains.annotations.NotNull;
 
 public final class DisableAutoMessagesArgument extends ArgsConstructor {
 
+    private final GigaChat plugin;
     private final Messages messages;
 
     public DisableAutoMessagesArgument(final GigaChat plugin, final String name, final String permission) {
         super(name, permission);
+        this.plugin = plugin;
         this.messages = plugin.getMessages();
     }
 
@@ -43,12 +45,16 @@ public final class DisableAutoMessagesArgument extends ArgsConstructor {
             sender.sendMessage(this.messages.getAutoMessagesEnabledOther().replace("{player}", targetName));
             target.sendMessage(this.messages.getAutoMessagesEnabledByOther().replace("{player}", senderName));
             AutoMessagesCollection.remove(targetName);
-            DatabaseQueries.removePlayerFromAutoMessages(targetName);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                DatabaseQueries.removePlayerFromAutoMessages(targetName)
+            );
         } else {
             sender.sendMessage(this.messages.getAutoMessagesDisabledOther().replace("{player}", targetName));
             target.sendMessage(this.messages.getAutoMessagesDisabledByOther().replace("{player}", senderName));
             AutoMessagesCollection.add(targetName);
-            DatabaseQueries.addPlayerToAutoMessages(targetName);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToAutoMessages(targetName)
+            );
         }
 
         return true;
