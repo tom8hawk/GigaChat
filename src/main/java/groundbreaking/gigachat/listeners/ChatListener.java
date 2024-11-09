@@ -15,7 +15,8 @@ import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.ArrayList;
@@ -39,31 +40,6 @@ public final class ChatListener implements Listener {
 
     @EventHandler
     public void onMessageSend(final AsyncPlayerChatEvent event) {
-        this.processEvent(event);
-    }
-
-    public void registerEvent() {
-        if (this.isRegistered) {
-            this.unregisterEvent();
-        }
-
-        final Class<? extends Event> eventClass = AsyncPlayerChatEvent.class;
-        final EventPriority eventPriority = this.plugin.getEventPriority(this.chatValues.getPriority(), "chats.yml");
-
-        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority,
-                (listener, event) -> this.onMessageSend((AsyncPlayerChatEvent) event),
-                this.plugin
-        );
-
-        this.isRegistered = true;
-    }
-
-    private void unregisterEvent() {
-        HandlerList.unregisterAll(this);
-        this.isRegistered = false;
-    }
-
-    private void processEvent(final AsyncPlayerChatEvent event) {
         final Player sender = event.getPlayer();
 
         if (this.isDisabled(sender, event)) {

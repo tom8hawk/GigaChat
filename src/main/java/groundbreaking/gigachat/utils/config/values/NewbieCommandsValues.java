@@ -1,6 +1,8 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
+import groundbreaking.gigachat.listeners.NewbieCommandListener;
+import groundbreaking.gigachat.utils.ListenerRegisterUtil;
 import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import groundbreaking.gigachat.utils.counter.Counter;
@@ -11,6 +13,9 @@ import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.plugin.EventExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,10 +26,6 @@ public final class NewbieCommandsValues {
 
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
-
-    private boolean isEnabled;
-
-    private String priority;
 
     private Counter counter;
 
@@ -58,18 +59,27 @@ public final class NewbieCommandsValues {
     private void setupSettings(final FileConfiguration config, final Colorizer colorizer) {
         final ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings != null) {
-            this.isEnabled = settings.getBoolean("enable");
-            this.priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
-            this.counter = settings.getBoolean("count-time-from-first-join") ? new FirstEntryCounter() : new OnlineTimeCounter();
-            this.requiredTime = settings.getInt("required-time");
-            this.isGiveBypassPermissionEnabled = settings.getBoolean("if-reached.give-permission");
-            this.requiredTimeToGetBypassPerm = settings.getInt("if-reached.required-time");
-            this.denyMessage = colorizer.colorize(settings.getString("deny-message"));
+            final NewbieCommandListener newbieCommandListener = this.plugin.getNewbieCommandListener();
+            if (settings.getBoolean("enable") && !this.plugin.getServer().getPluginManager().isPluginEnabled("NewbieGuard")) {
+                final String priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
+                final boolean ignoreCanceled = settings.getBoolean("ignore-canceled");
 
-            this.setupSound(settings);
+                final EventPriority eventPriority = this.plugin.getEventPriority(priority, "newbie-chat.yml");
+                final EventExecutor eventExecutor = (listener, event) -> newbieCommandListener.onCommandUse((PlayerCommandPreprocessEvent) event);
+                ListenerRegisterUtil.register(this.plugin, newbieCommandListener, PlayerCommandPreprocessEvent.class, eventPriority, ignoreCanceled, eventExecutor);
+                this.counter = settings.getBoolean("count-time-from-first-join") ? new FirstEntryCounter() : new OnlineTimeCounter();
+                this.requiredTime = settings.getInt("required-time");
+                this.isGiveBypassPermissionEnabled = settings.getBoolean("if-reached.give-permission");
+                this.requiredTimeToGetBypassPerm = settings.getInt("if-reached.required-time");
+                this.denyMessage = colorizer.colorize(settings.getString("deny-message"));
 
-            this.blockedCommands.clear();
-            this.blockedCommands.addAll(settings.getStringList("blocked-commands"));
+                this.setupSound(settings);
+
+                this.blockedCommands.clear();
+                this.blockedCommands.addAll(settings.getStringList("blocked-commands"));
+            } else {
+                ListenerRegisterUtil.unregister(newbieCommandListener);
+            }
         }
         else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"newbie-commands.yml\". Please check your configuration file, or delete it and restart your server!");

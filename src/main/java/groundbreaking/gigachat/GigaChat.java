@@ -13,9 +13,9 @@ import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.exceptions.UnsupportedPrioritySpecified;
 import groundbreaking.gigachat.listeners.ChatListener;
-import groundbreaking.gigachat.listeners.CommandListener;
 import groundbreaking.gigachat.listeners.DisconnectListener;
 import groundbreaking.gigachat.listeners.NewbieChatListener;
+import groundbreaking.gigachat.listeners.NewbieCommandListener;
 import groundbreaking.gigachat.utils.CommandRegisterer;
 import groundbreaking.gigachat.utils.ServerInfo;
 import groundbreaking.gigachat.utils.colorizer.basic.*;
@@ -70,7 +70,7 @@ public final class GigaChat extends JavaPlugin {
     private Logger myLogger;
 
     private ChatListener chatListener;
-    private CommandListener commandListener;
+    private NewbieCommandListener newbieCommandListener;
     private NewbieChatListener newbieChatListener;
 
     private final CommandRegisterer commandRegisterer = new CommandRegisterer(this);
@@ -168,7 +168,7 @@ public final class GigaChat extends JavaPlugin {
         this.cooldownsCollection = new CooldownsCollection(this);
         this.disabled = new DisabledPrivateMessagesCollection();
         this.chatListener = new ChatListener(this);
-        this.commandListener = new CommandListener(this);
+        this.newbieCommandListener = new NewbieCommandListener(this);
         this.newbieChatListener = new NewbieChatListener(this);
         this.autoMessages = new AutoMessages(this);
         this.pmSoundsCollection = new PmSoundsCollection();
@@ -180,9 +180,11 @@ public final class GigaChat extends JavaPlugin {
         this.broadcastValues.setValues();
         this.chatValues.setValues();
         final PluginManager pluginManager = super.getServer().getPluginManager();
-        if (pluginManager.getPlugin("NewbieGuard") == null) {
+        if (!pluginManager.isPluginEnabled("NewbieGuard")) {
             this.newbieChatValues.setValues();
             this.newbieCommandsValues.setValues();
+        } else {
+            this.myLogger.info("Newbie protections will be disabled because NewbieGuard is detected.");
         }
         this.pmValues.setValues();
         this.cooldownsCollection.setCooldowns();
@@ -221,20 +223,6 @@ public final class GigaChat extends JavaPlugin {
     private void registerEvents() {
         final PluginManager pluginManager = super.getServer().getPluginManager();
         pluginManager.registerEvents(new DisconnectListener(this), this);
-        this.registerReloadableEvents();
-    }
-
-    public void registerReloadableEvents() {
-        this.chatListener.registerEvent();
-        this.commandListener.unregisterEvent();
-        this.newbieChatListener.unregisterEvent();
-        final PluginManager pluginManager = super.getServer().getPluginManager();
-        if (pluginManager.getPlugin("NewbieGuard") == null) {
-            this.commandListener.registerEvent();
-            this.newbieChatListener.registerEvent();
-        } else {
-            this.myLogger.info("Newbie protections will be disabled because NewbieGuard is detected.");
-        }
     }
 
     private void registerMainPluginCommand() {

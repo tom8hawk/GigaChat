@@ -6,56 +6,24 @@ import groundbreaking.gigachat.utils.config.values.NewbieCommandsValues;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
-public final class CommandListener implements Listener {
+public final class NewbieCommandListener implements Listener {
 
     private final GigaChat plugin;
     private final NewbieCommandsValues newbieValues;
 
     private boolean isRegistered = false;
 
-    public CommandListener(final GigaChat plugin) {
+    public NewbieCommandListener(final GigaChat plugin) {
         this.plugin = plugin;
         this.newbieValues = plugin.getNewbieCommandsValues();
     }
 
     @EventHandler
     public void onCommandUse(final PlayerCommandPreprocessEvent event) {
-        this.processEvent(event);
-    }
-
-    public void registerEvent() {
-        if (this.isRegistered || !this.newbieValues.isEnabled()) {
-            this.unregisterEvent();
-        }
-
-        final Class<? extends Event> eventClass = PlayerCommandPreprocessEvent.class;
-        final EventPriority eventPriority = this.plugin.getEventPriority(this.newbieValues.getPriority(), "newbie-commands.yml");
-
-        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority,
-                (listener, event) -> this.onCommandUse((PlayerCommandPreprocessEvent) event),
-                this.plugin
-        );
-
-        this.isRegistered = true;
-    }
-
-    public void unregisterEvent() {
-        if (!this.isRegistered) {
-            return;
-        }
-
-        HandlerList.unregisterAll(this);
-        this.isRegistered = false;
-    }
-
-    private void processEvent(final PlayerCommandPreprocessEvent event) {
-        if (!this.newbieValues.isEnabled()) {
-            return;
-        }
-
         final Player player = event.getPlayer();
 
         if (player.hasPermission("gigachat.bypass.commandsnewbie")) {

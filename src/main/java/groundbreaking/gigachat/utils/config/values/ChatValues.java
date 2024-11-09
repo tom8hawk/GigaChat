@@ -4,6 +4,8 @@ import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.constructors.Chat;
 import groundbreaking.gigachat.exceptions.FormatNullException;
+import groundbreaking.gigachat.listeners.ChatListener;
+import groundbreaking.gigachat.utils.ListenerRegisterUtil;
 import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.ChatColorizer;
@@ -15,6 +17,9 @@ import lombok.Getter;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.bukkit.plugin.EventExecutor;
 
 import java.util.List;
 import java.util.Locale;
@@ -26,8 +31,6 @@ public final class ChatValues {
 
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
-
-    private String priority;
 
     private boolean isHoverEnabled;
     private boolean isAdminHoverEnabled;
@@ -90,7 +93,14 @@ public final class ChatValues {
     private void setupSettings(final FileConfiguration config) {
         final ConfigurationSection settings = config.getConfigurationSection("settings");
         if (settings != null) {
-            this.priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
+            final String priority = settings.getString("listener-priority").toUpperCase(Locale.ENGLISH);
+
+            final ChatListener chatListener = this.plugin.getChatListener();
+            final EventPriority eventPriority = this.plugin.getEventPriority(priority, "chats.yml");
+            final EventExecutor eventExecutor = (listener, event) -> chatListener.onMessageSend((AsyncPlayerChatEvent) event);
+            ListenerRegisterUtil.unregister(chatListener);
+            ListenerRegisterUtil.register(this.plugin, chatListener, AsyncPlayerChatEvent.class, eventPriority, false, eventExecutor);
+
             this.formatsColorizer = plugin.getColorizer(config, "settings.serializer-for-formats");
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");

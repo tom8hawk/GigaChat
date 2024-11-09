@@ -6,7 +6,8 @@ import groundbreaking.gigachat.utils.config.values.NewbieChatValues;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.event.*;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 public final class NewbieChatListener implements Listener {
@@ -23,39 +24,6 @@ public final class NewbieChatListener implements Listener {
 
     @EventHandler
     public void onMessageSend(final AsyncPlayerChatEvent event) {
-        processEvent(event);
-    }
-
-    public void registerEvent() {
-        if (this.isRegistered || !this.newbieValues.isEnabled()) {
-            this.unregisterEvent();
-        }
-
-        final Class<? extends Event> eventClass = AsyncPlayerChatEvent.class;
-        final EventPriority eventPriority = this.plugin.getEventPriority(this.newbieValues.getPriority(), "newbie-chat.yml");
-
-        this.plugin.getServer().getPluginManager().registerEvent(eventClass, this, eventPriority,
-                (listener, event) -> this.onMessageSend((AsyncPlayerChatEvent) event),
-                this.plugin
-        );
-
-        this.isRegistered = true;
-    }
-
-    public void unregisterEvent() {
-        if (!this.isRegistered) {
-            return;
-        }
-
-        HandlerList.unregisterAll(this);
-        this.isRegistered = false;
-    }
-
-    private void processEvent(final AsyncPlayerChatEvent event) {
-        if (!this.newbieValues.isEnabled()) {
-            return;
-        }
-
         final Player player = event.getPlayer();
 
         if (player.hasPermission("gigachat.bypass.chatnewbie")) {
