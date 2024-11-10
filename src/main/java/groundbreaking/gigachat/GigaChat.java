@@ -1,5 +1,6 @@
 package groundbreaking.gigachat;
 
+import com.earth2me.essentials.libs.bstats.bukkit.Metrics;
 import groundbreaking.gigachat.automessages.AutoMessages;
 import groundbreaking.gigachat.collections.CooldownsCollection;
 import groundbreaking.gigachat.collections.DisabledPrivateMessagesCollection;
@@ -85,6 +86,8 @@ public final class GigaChat extends JavaPlugin {
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
+
+        new Metrics(this, 23871);
 
         final int subVersion = serverInfo.getSubVersion(this);
         this.setupLogger(subVersion);
