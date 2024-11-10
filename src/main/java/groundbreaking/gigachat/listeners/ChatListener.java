@@ -63,9 +63,6 @@ public final class ChatListener implements Listener {
         }
 
         final List<Player> recipients = chat.getRecipients(sender);
-        if (chat.isNoOneHeard(sender, recipients, plugin.getVanishChecker())) {
-            sender.sendMessage(messages.getNoOneHear());
-        }
 
         final String[] replacementList = this.getReplacements(sender, chat);
 
@@ -101,6 +98,9 @@ public final class ChatListener implements Listener {
             event.getRecipients().clear();
             event.getRecipients().addAll(recipients);
             event.setFormat(formattedMessage);
+        }
+        if (chat.isNoOneHeard(sender, recipients, plugin.getVanishChecker())) {
+            sender.sendMessage(messages.getNoOneHear());
         }
     }
 
