@@ -94,7 +94,6 @@ public final class DisconnectListener implements Listener {
         this.disabledPrivateMessagesCollection.remove(targetUUID);
         IgnoreCollection.removeFromIgnoredChat(targetUUID);
         IgnoreCollection.removeFromIgnoredPrivate(targetUUID);
-        LocalSpyCollection.remove(targetUUID);
         this.pmSoundsCollection.remove(targetUUID);
         ReplyCollection.removeFromAll(targetUUID);
         SocialSpyCollection.remove(targetUUID);
