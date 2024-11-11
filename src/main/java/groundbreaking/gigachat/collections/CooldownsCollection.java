@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
@@ -14,13 +15,13 @@ public final class CooldownsCollection {
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    private ExpiringMap<String, Long> privateCooldowns;
+    private ExpiringMap<UUID, Long> privateCooldowns;
 
-    private ExpiringMap<String, Long> ignoreCooldowns;
+    private ExpiringMap<UUID, Long> ignoreCooldowns;
 
-    private ExpiringMap<String, Long> spyCooldowns;
+    private ExpiringMap<UUID, Long> spyCooldowns;
 
-    private ExpiringMap<String, Long> broadcastCooldowns;
+    private ExpiringMap<UUID, Long> broadcastCooldowns;
 
     public CooldownsCollection(final GigaChat plugin) {
         this.plugin = plugin;
@@ -33,31 +34,31 @@ public final class CooldownsCollection {
         this.broadcastCooldowns = new ExpiringMap<>(this.plugin.getBroadcastValues().getCooldown(), TimeUnit.MILLISECONDS);
     }
 
-    public void removePlayerPrivateCooldown(final String playerName) {
-        this.privateCooldowns.remove(playerName);
+    public void removePlayerPrivateCooldown(final UUID uuid) {
+        this.privateCooldowns.remove(uuid);
     }
 
-    public void removePlayerIgnoreCooldown(final String playerName) {
-        this.ignoreCooldowns.remove(playerName);
+    public void removePlayerIgnoreCooldown(final UUID uuid) {
+        this.ignoreCooldowns.remove(uuid);
     }
 
-    public void removePlayerSpyCooldown(final String playerName) {
-        this.spyCooldowns.remove(playerName);
+    public void removePlayerSpyCooldown(final UUID uuid) {
+        this.spyCooldowns.remove(uuid);
     }
 
-    public void removeBroadcastCooldown(final String playerName) {
-        this.broadcastCooldowns.remove(playerName);
+    public void removeBroadcastCooldown(final UUID uuid) {
+        this.broadcastCooldowns.remove(uuid);
     }
 
-    public boolean hasCooldown(final Player player, final String name, final String permission, final ExpiringMap<String, Long> playerCooldown) {
-        if (player.hasPermission(permission)) {
+    public boolean hasCooldown(final Player target, final UUID targetUUID, final String permission, final ExpiringMap<UUID, Long> playerCooldown) {
+        if (target.hasPermission(permission)) {
             return false;
         }
 
-        return playerCooldown.containsKey(name);
+        return playerCooldown.containsKey(targetUUID);
     }
 
-    public void addCooldown(final String name, final ExpiringMap<String, Long> playerCooldown) {
-        playerCooldown.put(name, System.currentTimeMillis());
+    public void addCooldown(final UUID uuid, final ExpiringMap<UUID, Long> playerCooldown) {
+        playerCooldown.put(uuid, System.currentTimeMillis());
     }
 }

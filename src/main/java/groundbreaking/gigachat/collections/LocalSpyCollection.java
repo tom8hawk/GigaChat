@@ -7,35 +7,36 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 public final class LocalSpyCollection {
 
-    private static final Set<String> PLAYERS = new ObjectOpenHashSet<>();
+    private static final Set<UUID> PLAYERS = new ObjectOpenHashSet<>();
 
-    public static void add(final String name) {
-        PLAYERS.add(name);
+    public static void add(final UUID playerUUID) {
+        PLAYERS.add(playerUUID);
     }
 
-    public static void remove(final String name) {
+    public static void remove(final UUID playerUUID) {
         if (PLAYERS.isEmpty()) {
             return;
         }
 
-        PLAYERS.remove(name);
+        PLAYERS.remove(playerUUID);
     }
 
-    public static boolean contains(final String name) {
+    public static boolean contains(final UUID playerUUID) {
         if (PLAYERS.isEmpty()) {
             return false;
         }
 
-        return PLAYERS.contains(name);
+        return PLAYERS.contains(playerUUID);
     }
 
     public static List<Player> getAll() {
         final List<Player> players = new ArrayList<>();
-        for (final String playerName : PLAYERS) {
-            final Player player = Bukkit.getPlayer(playerName);
+        for (final UUID playerUuid : PLAYERS) {
+            final Player player = Bukkit.getPlayer(playerUuid);
             if (player != null) {
                 players.add(player);
             }

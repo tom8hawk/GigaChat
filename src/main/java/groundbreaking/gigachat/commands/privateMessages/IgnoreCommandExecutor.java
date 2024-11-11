@@ -16,10 +16,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class IgnoreCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -45,9 +42,9 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             return true;
         }
 
-        final String senderName = playerSender.getName();
-        if (this.hasCooldown(playerSender, senderName)) {
-            this.sendMessageHasCooldown(playerSender, senderName);
+        final UUID senderUUID = playerSender.getUniqueId();
+        if (this.hasCooldown(playerSender, senderUUID)) {
+            this.sendMessageHasCooldown(playerSender, senderUUID);
             return true;
         }
 
@@ -89,74 +86,83 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
         }
 
         final String targetName = target.getName();
+        final UUID targetUUID = target.getUniqueId();
 
         switch (ignoreType) {
-            case CHAT -> this.processChat(playerSender, senderName, targetName);
-            case PRIVATE -> this.processPrivate(playerSender, senderName, targetName);
+            case CHAT -> this.processChat(playerSender, targetName, senderUUID, targetUUID);
+            case PRIVATE -> this.processPrivate(playerSender, targetName, senderUUID, targetUUID);
             default -> playerSender.sendMessage(this.messages.getIgnoreUsageError());
         }
 
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.ignore", this.cooldownsCollection.getIgnoreCooldowns());
+    private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
+        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.ignore", this.cooldownsCollection.getIgnoreCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsCollection.getIgnoreCooldowns().get(senderName) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
+        final long timeLeftInMillis = this.cooldownsCollection.getIgnoreCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
         playerSender.sendMessage(message);
     }
 
-    private void processChat(final Player sender, final String senderName, final String targetName) {
-        if (!IgnoreCollection.ignoredChatContains(senderName)) {
-            IgnoreCollection.addToIgnoredChat(senderName, new ArrayList<>(List.of(targetName)));
+    private void processChat(final Player sender, final String targetName, final UUID senderUUID, final UUID targetUUID) {
+        if (!IgnoreCollection.ignoredChatContains(senderUUID)) {
+            IgnoreCollection.addToIgnoredChat(senderUUID, new ArrayList<>(List.of(targetUUID)));
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
             return;
         }
 
-        if (IgnoreCollection.ignoredChatContains(senderName, targetName)) {
-            IgnoreCollection.removeFromIgnoredChat(senderName, targetName);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromIgnoreChat(senderName)
-            );
+        if (IgnoreCollection.ignoredChatContains(senderUUID, targetUUID)) {
+            IgnoreCollection.removeFromIgnoredChat(senderUUID, targetUUID);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                if (IgnoreCollection.isIgnoredChatEmpty()) {
+                    DatabaseQueries.removePlayerFromIgnoreChat(senderUUID);
+                } else {
+                    DatabaseQueries.removePlayerFromIgnoreChat(senderUUID, targetUUID);
+                }
+            });
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
         } else {
-            IgnoreCollection.addToIgnoredChat(senderName, targetName);
+            IgnoreCollection.addToIgnoredChat(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToIgnoreChat(senderName, IgnoreCollection.getAllIgnoredChat(senderName))
+                    DatabaseQueries.addPlayerToIgnoreChat(senderUUID, targetUUID)
             );
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
 
-        this.cooldownsCollection.addCooldown(senderName, this.cooldownsCollection.getIgnoreCooldowns());
+        this.cooldownsCollection.addCooldown(senderUUID, this.cooldownsCollection.getIgnoreCooldowns());
     }
 
-    private void processPrivate(final Player sender, final String senderName, final String targetName) {
-        if (!IgnoreCollection.ignoredPrivateContains(senderName)) {
-            IgnoreCollection.addToIgnoredPrivate(senderName, new ArrayList<>(List.of(targetName)));
+    private void processPrivate(final Player sender, final String targetName, final UUID senderUUID, final UUID targetUUID) {
+        if (!IgnoreCollection.ignoredPrivateContains(senderUUID)) {
+            IgnoreCollection.addToIgnoredPrivate(senderUUID, new ArrayList<>(List.of(targetUUID)));
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
             return;
         }
 
-        if (IgnoreCollection.ignoredPrivateContains(senderName, targetName)) {
-            IgnoreCollection.removeFromIgnoredPrivate(senderName, targetName);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromIgnorePrivate(senderName)
-            );
+        if (IgnoreCollection.ignoredPrivateContains(senderUUID, targetUUID)) {
+            IgnoreCollection.removeFromIgnoredPrivate(senderUUID, targetUUID);
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                if (IgnoreCollection.isIgnoredPrivateEmpty()) {
+                    DatabaseQueries.removePlayerFromIgnorePrivate(senderUUID);
+                } else {
+                    DatabaseQueries.removePlayerFromIgnorePrivate(senderUUID, targetUUID);
+                }
+            });
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
         } else {
-            IgnoreCollection.addToIgnoredPrivate(senderName, targetName);
+            IgnoreCollection.addToIgnoredPrivate(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToIgnorePrivate(senderName, IgnoreCollection.getAllIgnoredChat(senderName))
+                    DatabaseQueries.addPlayerToIgnorePrivate(senderUUID, targetUUID)
             );
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
 
-        this.cooldownsCollection.addCooldown(senderName, this.cooldownsCollection.getIgnoreCooldowns());
+        this.cooldownsCollection.addCooldown(senderUUID, this.cooldownsCollection.getIgnoreCooldowns());
     }
 
     @Override
@@ -186,23 +192,22 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     }
 
     private List<String> getPlayer(final Player sender, final String input) {
-        final String senderName = sender.getName();
-
+        final UUID senderUUID = sender.getUniqueId();
         final List<String> players = new ArrayList<>();
         final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-
         for (final Player target : onlinePlayers) {
             if (sender == target) {
                 continue;
             }
 
-            final String playerName = target.getName();
-            if (IgnoreCollection.isIgnoredChat(senderName, playerName) || IgnoreCollection.isIgnoredChat(playerName, senderName)) {
+            final UUID targetUUID = target.getUniqueId();
+            if (IgnoreCollection.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollection.isIgnoredChat(targetUUID, senderUUID)) {
                 continue;
             }
 
-            if (playerName.toLowerCase().startsWith(input) && !this.vanishChecker.isVanished(target)) {
-                players.add(playerName);
+            final String targetName = target.getName();
+            if (targetName.toLowerCase().startsWith(input) && !this.vanishChecker.isVanished(target)) {
+                players.add(targetName);
             }
         }
 

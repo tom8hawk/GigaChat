@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -42,7 +43,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
 
-        if (!(sender instanceof Player playerSender)) {
+        if (!(sender instanceof final Player playerSender)) {
             sender.sendMessage(this.messages.getPlayerOnly());
             return true;
         }
@@ -57,40 +58,37 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
             return true;
         }
 
-        final String senderName = sender.getName();
-        if (this.hasCooldown(playerSender, senderName)) {
-            this.sendMessageHasCooldown(playerSender, senderName);
+        final UUID senderUUID = playerSender.getUniqueId();
+        if (this.hasCooldown(playerSender, senderUUID)) {
+            this.sendMessageHasCooldown(playerSender, senderUUID);
             return true;
         }
 
-        final String recipientName = ReplyCollection.getRecipientName(senderName);
-
-        if (recipientName == null) {
+        final UUID recipientUUID = ReplyCollection.getRecipientName(senderUUID);
+        if (recipientUUID == null) {
             sender.sendMessage(this.messages.getNobodyToAnswer());
             return true;
         }
 
-        final Player recipient = Bukkit.getPlayer(recipientName);
-
+        final Player recipient = Bukkit.getPlayer(recipientUUID);
         if (recipient == null || !playerSender.canSee(recipient) || this.vanishChecker.isVanished(recipient)) {
             sender.sendMessage(this.messages.getPlayerNotFound());
             return true;
         }
 
         if (!sender.hasPermission("gigachat.bypass.ignore.private")) {
-            if (isIgnored(recipientName, senderName)) {
+            if (isIgnored(senderUUID, recipientUUID)) {
                 sender.sendMessage(this.messages.getRecipientIgnoresSender());
                 return true;
             }
 
-            if (isIgnored(senderName, recipientName)) {
+            if (isIgnored(recipientUUID, senderUUID)) {
                 sender.sendMessage(this.messages.getSenderIgnoresRecipient());
                 return true;
             }
         }
 
         String message = this.getMessage(playerSender, args);
-
         message = this.getValidMessage(playerSender, message);
         if (message == null) {
             return true;
@@ -98,21 +96,23 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
 
         final String senderPrefix = this.getPrefix(playerSender);
         final String senderSuffix = this.getSuffix(playerSender);
-        final String recipientPrefix = this.getPrefix(recipient), recipientSuffix = getSuffix(recipient);
+        final String recipientPrefix = this.getPrefix(recipient);
+        final String recipientSuffix = getSuffix(recipient);
 
+        final String senderName = playerSender.getName();
+        final String recipientName = recipient.getName();
         final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix };
-        final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;
 
-        formattedMessageForSender = this.getFormattedMessage(playerSender, message, this.pmValues.getSenderFormat(), replacementList);
-        formattedMessageForRecipient = this.getFormattedMessage(playerSender, message, this.pmValues.getRecipientFormat(), replacementList);
-        formattedMessageForConsole = this.getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
-        formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
+        final String formattedMessageForSender = this.getFormattedMessage(playerSender, message, this.pmValues.getSenderFormat(), replacementList);
+        final String formattedMessageForRecipient = this.getFormattedMessage(playerSender, message, this.pmValues.getRecipientFormat(), replacementList);
+        final String formattedMessageForConsole = this.getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
+        final String formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
 
-        ReplyCollection.add(recipientName, senderName);
+        ReplyCollection.add(recipientUUID, senderUUID);
         this.processLogs(formattedMessageForConsole);
         SocialSpyCollection.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
 
-        sender.sendMessage(formattedMessageForSender);
+        playerSender.sendMessage(formattedMessageForSender);
         recipient.sendMessage(formattedMessageForRecipient);
 
         this.playSound(recipient);
@@ -120,20 +120,20 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsCollection.getPrivateCooldowns());
+    private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
+        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownsCollection.getPrivateCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsCollection.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
+        final long timeLeftInMillis = this.cooldownsCollection.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
         playerSender.sendMessage(message);
     }
 
-    private boolean isIgnored(final String ignoredName, final String ignoringName) {
-        return IgnoreCollection.isIgnoredPrivate(ignoringName, ignoredName);
+    private boolean isIgnored(final UUID ignoringUUID, final UUID ignoredUUID) {
+        return IgnoreCollection.isIgnoredPrivate(ignoringUUID, ignoredUUID);
     }
 
     private String getPrefix(final Player player) {
@@ -171,7 +171,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private void playSound(final Player recipient) {
-        final Sound sound = this.pmSoundsCollection.getSound(recipient.getName());
+        final Sound sound = this.pmSoundsCollection.getSound(recipient.getUniqueId());
         if (this.pmValues.isSoundEnabled()) {
             final Location recipientLocation = recipient.getLocation();
             final float volume = this.pmValues.getSoundVolume();

@@ -3,20 +3,21 @@ package groundbreaking.gigachat.collections;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 
 import java.util.Set;
+import java.util.UUID;
 
 public final class AutoMessagesCollection {
 
-    private static final Set<String> players = new ObjectOpenHashSet<>();
+    private static final Set<UUID> players = new ObjectOpenHashSet<>();
 
-    public static void add(final String name) {
-        players.add(name);
+    public static void add(final UUID targetUUID) {
+        players.add(targetUUID);
     }
 
-    public static void remove(final String name) {
-        players.remove(name);
+    public static void remove(final UUID targetUUID) {
+        players.remove(targetUUID);
     }
 
-    public static boolean contains(final String name) {
-        return players.contains(name);
+    public static boolean contains(final UUID targetUUID) {
+        return players.contains(targetUUID);
     }
 }

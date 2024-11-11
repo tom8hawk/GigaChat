@@ -10,6 +10,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public final class DisableAutoMessagesArgument extends ArgsConstructor {
 
     private final GigaChat plugin;
@@ -39,21 +41,20 @@ public final class DisableAutoMessagesArgument extends ArgsConstructor {
     }
 
     private boolean process(final CommandSender sender, final Player target) {
-        final String senderName = sender.getName();
-        final String targetName = target.getName();
-        if (AutoMessagesCollection.contains(targetName)) {
-            sender.sendMessage(this.messages.getAutoMessagesEnabledOther().replace("{player}", targetName));
-            target.sendMessage(this.messages.getAutoMessagesEnabledByOther().replace("{player}", senderName));
-            AutoMessagesCollection.remove(targetName);
+        final UUID targetUUID = target.getUniqueId();
+        if (AutoMessagesCollection.contains(targetUUID)) {
+            sender.sendMessage(this.messages.getAutoMessagesEnabledOther().replace("{player}", target.getName()));
+            target.sendMessage(this.messages.getAutoMessagesEnabledByOther().replace("{player}", sender.getName()));
+            AutoMessagesCollection.remove(targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                DatabaseQueries.removePlayerFromAutoMessages(targetName)
+                DatabaseQueries.removePlayerFromAutoMessages(targetUUID)
             );
         } else {
-            sender.sendMessage(this.messages.getAutoMessagesDisabledOther().replace("{player}", targetName));
-            target.sendMessage(this.messages.getAutoMessagesDisabledByOther().replace("{player}", senderName));
-            AutoMessagesCollection.add(targetName);
+            sender.sendMessage(this.messages.getAutoMessagesDisabledOther().replace("{player}", target.getName()));
+            target.sendMessage(this.messages.getAutoMessagesDisabledByOther().replace("{player}", sender.getName()));
+            AutoMessagesCollection.add(targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToAutoMessages(targetName)
+                    DatabaseQueries.addPlayerToAutoMessages(targetUUID)
             );
         }
 

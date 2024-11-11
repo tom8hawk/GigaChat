@@ -17,10 +17,7 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -81,25 +78,26 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         }
 
         final String senderName = sender.getName();
-        if (isPlayerSender && this.hasCooldown((Player) sender, senderName)) {
-            this.sendMessageHasCooldown((Player) sender, senderName);
+        if (isPlayerSender && this.hasCooldown((Player) sender)) {
+            this.sendMessageHasCooldown((Player) sender);
             return true;
         }
 
-        final String recipientName = recipient.getName();
+        final UUID recipientUUID = recipient.getUniqueId();
 
         if (isPlayerSender && !sender.hasPermission("gigachat.bypass.ignore")) {
-            if (IgnoreCollection.isIgnoredPrivate(recipientName, senderName)) {
+            final UUID senderUUID = ((Player) sender).getUniqueId();
+            if (IgnoreCollection.isIgnoredPrivate(recipientUUID, senderUUID)) {
                 sender.sendMessage(this.messages.getRecipientIgnoresSender());
                 return true;
             }
 
-            if (IgnoreCollection.isIgnoredPrivate(senderName, recipientName)) {
+            if (IgnoreCollection.isIgnoredPrivate(senderUUID, recipientUUID)) {
                 sender.sendMessage(this.messages.getSenderIgnoresRecipient());
                 return true;
             }
 
-            if (this.disabled.contains(recipientName)) {
+            if (this.disabled.contains(recipientUUID)) {
                 sender.sendMessage(this.messages.getHasDisabledPm());
                 return true;
             }
@@ -115,19 +113,22 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             }
         }
 
+        final String recipientName = recipient.getName();
         final String[] replacementList = getReplacements(sender, recipient, isPlayerSender, senderName, recipientName);
 
-        this.process(sender, recipient, senderName, recipientName, isPlayerSender, message, replacementList);
+        this.process(sender, recipient, recipientUUID, isPlayerSender, message, replacementList);
 
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.pm", this.cooldownsCollection.getPrivateCooldowns());
+    private boolean hasCooldown(final Player playerSender) {
+        final UUID senderUUID = playerSender.getUniqueId();
+        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.pm", this.cooldownsCollection.getPrivateCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsCollection.getPrivateCooldowns().get(senderName) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player playerSender) {
+        final UUID senderUUID = playerSender.getUniqueId();
+        final long timeLeftInMillis = this.cooldownsCollection.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -135,17 +136,17 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private void processDisable(final Player sender) {
-        final String name = sender.getName();
-        if (this.disabled.contains(name)) {
-            this.disabled.remove(name);
+        final UUID senderUUID = sender.getUniqueId();
+        if (this.disabled.contains(senderUUID)) {
+            this.disabled.remove(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromDisabledPrivateMessages(name)
+                    DatabaseQueries.removePlayerFromDisabledPrivateMessages(senderUUID)
             );
             sender.sendMessage(this.messages.getPmDisabled());
         } else {
-            this.disabled.add(name);
+            this.disabled.add(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToDisabledPrivateMessages(name)
+                    DatabaseQueries.addPlayerToDisabledPrivateMessages(senderUUID)
             );
             sender.sendMessage(this.messages.getPmEnabled());
         }
@@ -242,8 +243,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         }
     }
 
-    private void process(final CommandSender sender, final Player recipient, final String senderName,
-                         final String recipientName, final boolean isPlayerSender, final String message, final String[] replacementList) {
+    private void process(final CommandSender sender, final Player recipient,
+                         final UUID recipientUUID, final boolean isPlayerSender, final String message, final String[] replacementList) {
         final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;
         if (isPlayerSender) {
             final Player playerSender = (Player) sender;
@@ -252,7 +253,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             formattedMessageForConsole = getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
             formattedMessageForSocialSpy = getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
 
-            ReplyCollection.add(recipientName, senderName);
+            final UUID senderUUID = ((Player) sender).getUniqueId();
+            ReplyCollection.add(recipientUUID, senderUUID);
             processLogs(formattedMessageForConsole);
             SocialSpyCollection.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
         } else {
@@ -295,7 +297,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
     private void playSound(final Player recipient) {
         if (pmValues.isSoundEnabled()) {
-            final Sound sound = this.pmSoundsCollection.getSound(recipient.getName());
+            final Sound sound = this.pmSoundsCollection.getSound(recipient.getUniqueId());
             if (sound != null) {
                 final Location recipientLocation = recipient.getLocation();
                 final float volume = this.pmValues.getSoundVolume();
@@ -317,22 +319,24 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             final String input = args[0].toLowerCase();
             final List<String> players = new ArrayList<>();
 
-            if (sender instanceof Player playerSender) {
-                for (final Player player : Bukkit.getOnlinePlayers()) {
-                    final String playerName = player.getName();
-                    if (IgnoreCollection.isIgnoredChat(playerSender.getName(), playerName) || IgnoreCollection.isIgnoredChat(playerName, playerSender.getName())) {
+            if (sender instanceof final Player playerSender) {
+                final UUID senderUUID = playerSender.getUniqueId();
+                for (final Player target : Bukkit.getOnlinePlayers()) {
+                    final UUID targetUUID = target.getUniqueId();
+                    if (IgnoreCollection.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollection.isIgnoredChat(targetUUID, senderUUID)) {
                         continue;
                     }
 
-                    if (playerName.toLowerCase().startsWith(input) && !this.vanishChecker.isVanished(player)) {
+                    final String playerName = target.getName();
+                    if (playerName.toLowerCase().startsWith(input) && !this.vanishChecker.isVanished(target)) {
                         players.add(playerName);
                     }
                 }
             } else {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    final String playerName = player.getName();
-                    if (playerName.toLowerCase().startsWith(input)) {
-                        players.add(playerName);
+                for (final Player target : Bukkit.getOnlinePlayers()) {
+                    final String targetName = target.getName();
+                    if (targetName.toLowerCase().startsWith(input)) {
+                        players.add(targetName);
                     }
                 }
             }

@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public final class DisableOwnChatExecutor implements CommandExecutor, TabCompleter {
 
@@ -42,18 +43,18 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
     }
 
     private boolean processDisable(final Player sender) {
-        final String name = sender.getName();
-        if (DisabledChatCollection.contains(name)) {
+        final UUID senderUUID = sender.getUniqueId();
+        if (DisabledChatCollection.contains(senderUUID)) {
             sender.sendMessage(this.messages.getOwnChatDisabled());
-            DisabledChatCollection.remove(name);
+            DisabledChatCollection.remove(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromDisabledChat(name)
+                    DatabaseQueries.removePlayerFromDisabledChat(senderUUID)
             );
         } else {
             sender.sendMessage(this.messages.getOwnChatEnabled());
-            DisabledChatCollection.add(name);
+            DisabledChatCollection.add(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToDisabledChat(name)
+                    DatabaseQueries.addPlayerToDisabledChat(senderUUID)
             );
         }
 

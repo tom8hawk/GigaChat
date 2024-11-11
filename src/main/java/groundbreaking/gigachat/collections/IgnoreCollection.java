@@ -5,97 +5,102 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public final class IgnoreCollection {
 
-    private static final Map<String, List<String>> ignoredChat = new Object2ObjectOpenHashMap<>();
-    private static final Map<String, List<String>> ignoredPrivate = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, List<UUID>> ignoredChat = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, List<UUID>> ignoredPrivate = new Object2ObjectOpenHashMap<>();
 
-    public static boolean ignoredChatContains(final String name) {
-        return !ignoredChat.isEmpty() && ignoredChat.containsKey(name);
+    private IgnoreCollection() {
+
     }
 
-    public static boolean ignoredPrivateContains(final String name) {
-        return !ignoredPrivate.isEmpty() && ignoredPrivate.containsKey(name);
+    public static boolean isIgnoredChatEmpty() {
+        return ignoredChat.isEmpty();
     }
 
-    public static boolean playerIgnoresChatAnyOne(final String name) {
+    public static boolean isIgnoredPrivateEmpty() {
+        return ignoredPrivate.isEmpty();
+    }
+
+    public static boolean ignoredChatContains(final UUID targetUUID) {
+        return !ignoredChat.isEmpty() && ignoredChat.containsKey(targetUUID);
+    }
+
+    public static boolean ignoredPrivateContains(final UUID targetUUID) {
+        return !ignoredPrivate.isEmpty() && ignoredPrivate.containsKey(targetUUID);
+    }
+
+    public static boolean playerIgnoresChatAnyOne(final UUID targetUUID) {
         return !ignoredChat.isEmpty()
-                && ignoredChat.containsKey(name)
-                && ignoredChat.get(name) != null
-                && !ignoredChat.get(name).isEmpty();
+                && ignoredChat.containsKey(targetUUID)
+                && ignoredChat.get(targetUUID) != null
+                && !ignoredChat.get(targetUUID).isEmpty();
     }
 
-    public static boolean playerIgnoresPrivateAnyOne(final String name) {
+    public static boolean playerIgnoresPrivateAnyOne(final UUID targetUUID) {
         return !ignoredPrivate.isEmpty()
-                && ignoredPrivate.containsKey(name)
-                && ignoredPrivate.get(name) != null
-                && !ignoredPrivate.get(name).isEmpty();
+                && ignoredPrivate.containsKey(targetUUID)
+                && ignoredPrivate.get(targetUUID) != null
+                && !ignoredPrivate.get(targetUUID).isEmpty();
     }
 
-    public static boolean ignoredChatContains(final String name, final String targetName) {
-        return !ignoredChat.isEmpty() && ignoredChat.get(name).contains(targetName);
+    public static boolean ignoredChatContains(final UUID searchUUID, final UUID targetUuid) {
+        return !ignoredChat.isEmpty() && ignoredChat.get(searchUUID).contains(targetUuid);
     }
 
-    public static boolean ignoredPrivateContains(final String name, final String targetName) {
-        return !ignoredPrivate.isEmpty() && ignoredPrivate.get(name).contains(targetName);
+    public static boolean ignoredPrivateContains(final UUID searchUUID, final UUID targetUuid) {
+        return !ignoredPrivate.isEmpty() && ignoredPrivate.get(searchUUID).contains(targetUuid);
     }
 
-    public static void addToIgnoredChat(final String name, final List<String> list) {
-        ignoredChat.put(name, list);
+    public static void addToIgnoredChat(final UUID targetUuid, final List<UUID> list) {
+        ignoredChat.put(targetUuid, list);
     }
 
 
-    public static void addToIgnoredPrivate(final String name, final List<String> list) {
-        ignoredPrivate.put(name, list);
+    public static void addToIgnoredPrivate(final UUID targetUuid, final List<UUID> list) {
+        ignoredPrivate.put(targetUuid, list);
     }
 
-    public static void addToIgnoredChat(final String name, final String targetName) {
-        ignoredChat.get(name).add(targetName);
+    public static void addToIgnoredChat(final UUID searchUuid, final UUID targetUuid) {
+        ignoredChat.get(searchUuid).add(targetUuid);
     }
 
-    public static void addToIgnoredPrivate(final String name, final String targetName) {
-        ignoredPrivate.get(name).add(targetName);
+    public static void addToIgnoredPrivate(final UUID searchUuid, final UUID targetUuid) {
+        ignoredPrivate.get(searchUuid).add(targetUuid);
     }
 
-    public static void removeFromIgnoredChat(final String name) {
-        ignoredChat.remove(name);
+    public static void removeFromIgnoredChat(final UUID targetUuid) {
+        ignoredChat.remove(targetUuid);
     }
 
-    public static void removeFromIgnoredPrivate(final String name) {
-        ignoredPrivate.remove(name);
+    public static void removeFromIgnoredPrivate(final UUID targetUuid) {
+        ignoredPrivate.remove(targetUuid);
     }
 
-    public static void removeFromIgnoredChat(final String name, final String targetName) {
-        ignoredChat.get(name).remove(targetName);
+    public static void removeFromIgnoredChat(final UUID searchUuid, final UUID targetUuid) {
+        ignoredChat.get(searchUuid).remove(targetUuid);
     }
 
-    public static void removeFromIgnoredPrivate(final String name, final String targetName) {
-        ignoredPrivate.get(name).remove(targetName);
+    public static void removeFromIgnoredPrivate(final UUID searchUuid, final UUID targetUuid) {
+        ignoredPrivate.get(searchUuid).remove(targetUuid);
     }
 
-    public static boolean isIgnoredChat(final String playerName, final String targetName) {
-        if (ignoredChat.isEmpty() || !ignoredChat.containsKey(playerName)) {
+    public static boolean isIgnoredChat(final UUID searchUuid, final UUID targetUuid) {
+        if (ignoredChat.isEmpty() || !ignoredChat.containsKey(targetUuid)) {
             return false;
         }
 
-        return ignoredChat.get(playerName).contains(targetName);
+        return ignoredChat.get(searchUuid).contains(targetUuid);
     }
 
-    public static boolean isIgnoredPrivate(final String playerName, final String targetName) {
-        if (ignoredPrivate.isEmpty() || !ignoredPrivate.containsKey(playerName)) {
-            ignoredPrivate.put(playerName, new ArrayList<>());
+    public static boolean isIgnoredPrivate(final UUID searchUuid, final UUID targetUuid) {
+        if (ignoredPrivate.isEmpty() || !ignoredPrivate.containsKey(targetUuid)) {
+            ignoredPrivate.put(searchUuid, new ArrayList<>());
             return false;
         }
 
-        return ignoredPrivate.get(playerName).contains(targetName);
-    }
-
-    public static List<String> getAllIgnoredChat(final String name) {
-        return ignoredChat.get(name);
-    }
-
-    public static List<String> getAllIgnoredPrivate(final String name) {
-        return ignoredPrivate.get(name);
+        return ignoredPrivate.get(searchUuid).contains(targetUuid);
     }
 }

@@ -18,7 +18,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -41,9 +40,9 @@ public final class Chat implements CommandExecutor, TabCompleter {
     private final boolean isNoOneHeardHideVanished;
     private final boolean isNoOneHeardHideSpectators;
     private final Map<String, String> groupsColors;
-    private final ExpiringMap<String, Long> chatCooldowns;
-    private final ExpiringMap<String, Long> spyCooldowns;
-    private final List<Player> spyListeners;
+    private final ExpiringMap<UUID, Long> chatCooldowns;
+    private final ExpiringMap<UUID, Long> spyCooldowns;
+    private final List<UUID> spyListeners;
     private final SpyModeCommand spyModeCommand;
 
     public Chat(
@@ -97,15 +96,13 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return Collections.emptyList();
     }
 
-    public boolean hasCooldown(final Player sender, final Messages messages, final AsyncPlayerChatEvent event) {
-        if (!sender.hasPermission(this.bypassCooldownPermission) && this.chatCooldowns.containsKey(sender.getName())) {
-            final String senderName = sender.getName();
-            final int time = (int) (this.chatCooldown / 1000 + (this.chatCooldowns.get(senderName) - System.currentTimeMillis()) / 1000);
+    public boolean hasCooldown(final Player sender, final Messages messages) {
+        final UUID senderUUID = sender.getUniqueId();
+        if (!sender.hasPermission(this.bypassCooldownPermission) && this.chatCooldowns.containsKey(senderUUID)) {
+            final int time = (int) (this.chatCooldown / 1000 + (this.chatCooldowns.get(senderUUID) - System.currentTimeMillis()) / 1000);
             final String restTime = Utils.getTime(time);
             final String cooldownMessage = messages.getChatCooldownMessage().replace("{time}", restTime);
             sender.sendMessage(cooldownMessage);
-            event.setCancelled(true);
-
             return true;
         }
 
@@ -132,16 +129,15 @@ public final class Chat implements CommandExecutor, TabCompleter {
             return playerList;
         }
 
-        final String senderName = sender.getName();
+        final UUID senderUUID = sender.getUniqueId();
         final World senderWorld = sender.getWorld();
         final Location senderLocation = sender.getLocation();
 
 
         final double maxDist = Math.pow(this.distance, 2.0D);
-
         for (final Player target : onlinePlayers) {
-            final String targetName = target.getName();
-            if (IgnoreCollection.isIgnoredChat(targetName, senderName) || DisabledChatCollection.contains(targetName)) {
+            final UUID targetUUID = target.getUniqueId();
+            if (IgnoreCollection.isIgnoredChat(targetUUID, senderUUID) || DisabledChatCollection.contains(targetUUID)) {
                 continue;
             }
 
@@ -161,10 +157,10 @@ public final class Chat implements CommandExecutor, TabCompleter {
     private List<Player> getNotIgnored(final Player sender) {
         final List<Player> playerList = new ArrayList<>();
         final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
-        final String senderName = sender.getName();
+        final UUID senderUUID = sender.getUniqueId();
         for (final Player target : onlinePlayers) {
-            final String targetName = target.getName();
-            if (!IgnoreCollection.isIgnoredChat(targetName, senderName)) {
+            final UUID targetUUID = target.getUniqueId();
+            if (!IgnoreCollection.isIgnoredChat(targetUUID, senderUUID)) {
                 playerList.add(target);
             }
         }

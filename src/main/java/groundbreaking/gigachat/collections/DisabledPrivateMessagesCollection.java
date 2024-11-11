@@ -3,21 +3,22 @@ package groundbreaking.gigachat.collections;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 
 import java.util.List;
+import java.util.UUID;
 
 public final class DisabledPrivateMessagesCollection {
 
-    private final List<String> players = new ObjectArrayList<>();
+    private final List<UUID> players = new ObjectArrayList<>();
 
-    public void add(final String name) {
-        this.players.remove(name);
+    public void add(final UUID targetUUID) {
+        this.players.remove(targetUUID);
     }
 
-    public void remove(final String name) {
-        this.players.remove(name);
+    public void remove(final UUID targetUUID) {
+        this.players.remove(targetUUID);
     }
 
-    public boolean contains(final String name) {
-        return !this.players.isEmpty() && this.players.contains(name);
+    public boolean contains(final UUID targetUUID) {
+        return !this.players.isEmpty() && this.players.contains(targetUUID);
     }
 
 }

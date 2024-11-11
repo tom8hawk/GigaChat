@@ -49,7 +49,8 @@ public final class ChatListener implements Listener {
         String message = event.getMessage();
         final Chat chat = this.getChat(message);
 
-        if (chat.hasCooldown(sender, this.messages, event)) {
+        if (chat.hasCooldown(sender, this.messages)) {
+            event.setCancelled(true);
             return;
         }
 

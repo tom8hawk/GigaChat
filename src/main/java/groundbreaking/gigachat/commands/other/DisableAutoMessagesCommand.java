@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public final class DisableAutoMessagesCommand implements CommandExecutor, TabCompleter {
 
@@ -39,15 +40,15 @@ public final class DisableAutoMessagesCommand implements CommandExecutor, TabCom
     }
 
     private boolean processDisable(final Player sender) {
-        final String name = sender.getName();
-        if (AutoMessagesCollection.contains(name)) {
+        final UUID senderUUID = sender.getUniqueId();
+        if (AutoMessagesCollection.contains(senderUUID)) {
             sender.sendMessage(this.messages.getAutoMessagesEnabled());
-            AutoMessagesCollection.remove(name);
-            DatabaseQueries.removePlayerFromAutoMessages(name);
+            AutoMessagesCollection.remove(senderUUID);
+            DatabaseQueries.removePlayerFromAutoMessages(senderUUID);
         } else {
             sender.sendMessage(this.messages.getAutoMessagesDisabled());
-            AutoMessagesCollection.add(name);
-            DatabaseQueries.addPlayerToAutoMessages(name);
+            AutoMessagesCollection.add(senderUUID);
+            DatabaseQueries.addPlayerToAutoMessages(senderUUID);
         }
 
         return true;

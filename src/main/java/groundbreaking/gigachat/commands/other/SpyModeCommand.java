@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.UUID;
 
 public class SpyModeCommand {
 
@@ -19,7 +20,7 @@ public class SpyModeCommand {
         this.messages = plugin.getMessages();
     }
 
-    public boolean execute(@NotNull CommandSender sender, @NotNull Chat chat, final ExpiringMap<String, Long> spyCooldowns, final int spyCooldown) {
+    public boolean execute(@NotNull CommandSender sender, @NotNull Chat chat, final ExpiringMap<UUID, Long> spyCooldowns, final int spyCooldown) {
         if (!(sender instanceof final Player playerSender)) {
             sender.sendMessage(this.messages.getPlayerOnly());
             return true;
@@ -30,9 +31,9 @@ public class SpyModeCommand {
             return true;
         }
 
-        if (!sender.hasPermission("gigachat.bypass.spycooldown." + chat.getName()) && spyCooldowns.containsKey(sender.getName())) {
-            final String senderName = sender.getName();
-            final int time = (int) (spyCooldown / 1000 + (spyCooldowns.get(senderName) - System.currentTimeMillis()) / 1000);
+        final UUID senderUUID = playerSender.getUniqueId();
+        if (!sender.hasPermission("gigachat.bypass.spycooldown." + chat.getName()) && spyCooldowns.containsKey(senderUUID)) {
+            final int time = (int) (spyCooldown / 1000 + (spyCooldowns.get(senderUUID) - System.currentTimeMillis()) / 1000);
             final String restTime = Utils.getTime(time);
             final String cooldownMessage = messages.getCommandCooldownMessage().replace("{time}", restTime);
             sender.sendMessage(cooldownMessage);
@@ -42,13 +43,13 @@ public class SpyModeCommand {
         final String chatName = chat.getName();
         final String replacement = this.messages.getChatsNames().getOrDefault(chatName, chatName);
 
-        final List<Player> players = chat.getSpyListeners();
-        if (players.contains(playerSender)) {
+        final List<UUID> players = chat.getSpyListeners();
+        if (players.contains(senderUUID)) {
             sender.sendMessage(this.messages.getChatsSpyDisabled().replace("{chat}", replacement));
-            players.remove(playerSender);
+            players.remove(senderUUID);
         } else {
             sender.sendMessage(this.messages.getChatsSpyEnabled().replace("{chat}", replacement));
-            players.add(playerSender);
+            players.add(senderUUID);
         }
 
         return true;

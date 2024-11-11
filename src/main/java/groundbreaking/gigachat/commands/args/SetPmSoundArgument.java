@@ -11,6 +11,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public final class SetPmSoundArgument extends ArgsConstructor {
 
     private final GigaChat plugin;
@@ -38,10 +40,11 @@ public final class SetPmSoundArgument extends ArgsConstructor {
             return true;
         }
 
+        final UUID targetUUID = target.getUniqueId();
         if (args[2].equalsIgnoreCase("none")) {
-            this.pmSoundsCollection.remove(target.getName());
+            this.pmSoundsCollection.remove(targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromPmSounds(target.getName())
+                    DatabaseQueries.removePlayerFromPmSounds(targetUUID)
             );
 
             final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
@@ -66,9 +69,9 @@ public final class SetPmSoundArgument extends ArgsConstructor {
             return true;
         }
 
-        final String targetName = target.getName();
-        this.pmSoundsCollection.setSound(targetName, sound.name());
+        this.pmSoundsCollection.setSound(targetUUID, sound);
 
+        final String targetName = target.getName();
         final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
         if (sender != target || messageForTargetIsEmpty) {
             sender.sendMessage(this.messages.getTargetPmSoundSet()
@@ -84,7 +87,7 @@ public final class SetPmSoundArgument extends ArgsConstructor {
         }
 
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                DatabaseQueries.addPlayerPmSoundToPmSounds(targetName, sound.name())
+                DatabaseQueries.addPlayerPmSoundToPmSounds(targetUUID, sound.name())
         );
 
         return true;
