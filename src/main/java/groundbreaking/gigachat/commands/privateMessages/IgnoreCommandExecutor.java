@@ -52,7 +52,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
         final boolean hasPrivateIgnorePerm = sender.hasPermission("gigachat.command.ignore.private");
 
         int argsLength = 1;
-        IgnoreCommandExecutor.IgnoreType ignoreType = hasChatIgnorePerm ? IgnoreCommandExecutor.IgnoreType.CHAT : IgnoreCommandExecutor.IgnoreType.PRIVATE;
+        IgnoreType ignoreType = hasChatIgnorePerm ? IgnoreType.CHAT : IgnoreType.PRIVATE;
 
         if (hasChatIgnorePerm && hasPrivateIgnorePerm) {
             argsLength = 2;
@@ -60,7 +60,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             switch (args[0].toLowerCase()) {
                 case "chat" -> {
                 }
-                case "private" -> ignoreType = IgnoreCommandExecutor.IgnoreType.PRIVATE;
+                case "private" -> ignoreType = IgnoreType.PRIVATE;
                 default -> {
                     playerSender.sendMessage(this.messages.getIgnoreUsageError());
                     return true;
