@@ -159,17 +159,6 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         return this.pmValues.getMessagesColorizer().colorize(sender, String.join(" ", args).trim());
     }
 
-    private void playDenySoundCharsFailed(final Player messageSender) {
-        if (this.pmValues.isCharsValidatorDenySoundEnabled()) {
-            final Location location = messageSender.getLocation();
-            final Sound sound = this.pmValues.getTextValidatorDenySound();
-            final float volume = this.pmValues.getTextValidatorDenySoundVolume();
-            final float pitch = this.pmValues.getTextValidatorDenySoundPitch();
-
-            messageSender.playSound(location, sound, volume, pitch);
-        }
-    }
-
     private void playSound(final Player recipient) {
         final Sound sound = this.pmSoundsCollection.getSound(recipient.getUniqueId());
         if (this.pmValues.isSoundEnabled()) {
