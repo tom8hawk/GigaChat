@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -45,37 +46,37 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
             return true;
         }
 
-        final String senderName = sender.getName();
-        if (this.hasCooldown(playerSender, senderName)) {
-            this.sendMessageHasCooldown(playerSender, senderName);
+        final UUID senderUUID = playerSender.getUniqueId();
+        if (this.hasCooldown(playerSender, senderUUID)) {
+            this.sendMessageHasCooldown(playerSender, senderUUID);
             return true;
         }
 
-        if (SocialSpyCollection.contains(senderName)) {
-            SocialSpyCollection.remove(senderName);
+        if (SocialSpyCollection.contains(senderUUID)) {
+            SocialSpyCollection.remove(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromSocialSpy(senderName)
+                    DatabaseQueries.removePlayerFromSocialSpy(senderUUID)
             );
             sender.sendMessage(this.messages.getSpyDisabled());
         } else {
-            SocialSpyCollection.add(senderName);
+            SocialSpyCollection.add(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToSocialSpy(senderName)
+                    DatabaseQueries.addPlayerToSocialSpy(senderUUID)
             );
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 
-        this.cooldownsCollection.addCooldown(senderName, this.cooldownsCollection.getSpyCooldowns());
+        this.cooldownsCollection.addCooldown(senderUUID, this.cooldownsCollection.getSpyCooldowns());
 
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.socialspy", this.cooldownsCollection.getSpyCooldowns());
+    private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
+        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownsCollection.getSpyCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsCollection.getSpyCooldowns().get(senderName) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
+        final long timeLeftInMillis = this.cooldownsCollection.getSpyCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getSpyCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);

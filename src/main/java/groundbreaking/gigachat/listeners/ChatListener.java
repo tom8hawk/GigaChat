@@ -12,6 +12,7 @@ import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -69,7 +70,7 @@ public final class ChatListener implements Listener {
 
         final String spyFormat = chat.getSpyFormat();
         if (spyFormat != null && !spyFormat.isEmpty()) {
-            final List<Player> spyListeners = new ArrayList<>(chat.getSpyListeners());
+            final List<Player> spyListeners = new ArrayList<>(chat.getSpyListeners()).stream().map(Bukkit::getPlayer).toList();
             spyListeners.remove(sender);
             this.sendSpy(sender, message, spyFormat, spyListeners, replacementList);
         }

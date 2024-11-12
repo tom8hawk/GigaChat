@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public class SpyArgument extends ArgsConstructor {
 
@@ -60,24 +61,25 @@ public class SpyArgument extends ArgsConstructor {
     }
 
     private boolean process(final CommandSender sender, final Player target, final Chat chat) {
-        final List<Player> players = chat.getSpyListeners();
+        final List<UUID> players = chat.getSpyListeners();
         final String chatName = chat.getName();
         final String replacement = this.messages.getChatsNames().getOrDefault(chatName, chatName);
         final String targetName = target.getName();
-        if (players.contains(target)) {
+        final UUID targetUUID = target.getUniqueId();
+        if (players.contains(targetUUID)) {
             sender.sendMessage(this.messages.getChatsSpyDisabledOther().replace("{player}", targetName).replace("{chat}", replacement));
             final String message = this.messages.getChatsSpyDisabledByOther();
             if (!message.isEmpty()){
                 target.sendMessage(message.replace("{chat}", replacement));
             }
-            players.remove(target);
+            players.remove(targetUUID);
         } else {
             sender.sendMessage(this.messages.getChatsSpyEnabledOther().replace("{player}", targetName).replace("{chat}", replacement));
             final String message = this.messages.getChatsSpyEnabledByOther();
             if (!message.isEmpty()){
                 target.sendMessage(message.replace("{chat}", replacement));
             }
-            players.add(target);
+            players.add(targetUUID);
         }
 
         return true;

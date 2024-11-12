@@ -54,7 +54,7 @@ public final class AutoMessages {
         final float soundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
 
         for (final Player player : Bukkit.getOnlinePlayers()) {
-            if (AutoMessagesCollection.contains(player.getName())) {
+            if (AutoMessagesCollection.contains(player.getUniqueId())) {
                 continue;
             }
 

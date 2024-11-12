@@ -18,10 +18,7 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public final class BroadcastCommand implements CommandExecutor, TabCompleter {
 
@@ -57,9 +54,9 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         final boolean isPlayerSender = sender instanceof Player;
         if (isPlayerSender) {
             final Player playerSender = (Player) sender;
-            final String senderName = playerSender.getName();
-            if (this.hasCooldown(playerSender, senderName)) {
-                this.sendMessageHasCooldown(playerSender, senderName);
+            final UUID senderUUID = playerSender.getUniqueId();
+            if (this.hasCooldown(playerSender, senderUUID)) {
+                this.sendMessageHasCooldown(playerSender, senderUUID);
                 return true;
             }
         }
@@ -79,7 +76,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         }
 
         if (isPlayerSender) {
-            this.cooldownsCollection.addCooldown(sender.getName(), this.cooldownsCollection.getBroadcastCooldowns());
+            this.cooldownsCollection.addCooldown(((Player) sender).getUniqueId(), this.cooldownsCollection.getBroadcastCooldowns());
         }
 
         this.consoleCommandSender.sendMessage(message);
@@ -87,12 +84,12 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final String senderName) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderName, "gigachat.bypass.cooldown.broadcast", cooldownsCollection.getBroadcastCooldowns());
+    private boolean hasCooldown(final Player playerSender, final UUID playerUUID) {
+        return this.cooldownsCollection.hasCooldown(playerSender, playerUUID, "gigachat.bypass.cooldown.broadcast", cooldownsCollection.getBroadcastCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final String senderName) {
-        final long timeLeftInMillis = this.cooldownsCollection.getBroadcastCooldowns().get(senderName) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player playerSender, final UUID playerUUID) {
+        final long timeLeftInMillis = this.cooldownsCollection.getBroadcastCooldowns().get(playerUUID) - System.currentTimeMillis();
         final int result = (int) (this.broadcastValues.getCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -101,7 +98,8 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
 
     private String[] getPlaceholders(final CommandSender sender, final String[] args, final boolean isPlayerSender) {
         final String name = sender.getName();
-        String prefix = "", suffix = "";
+        String prefix = "";
+        String suffix = "";
         final String message;
 
         final PermissionsColorizer colorizer = this.broadcastValues.getMessageColorizer();
