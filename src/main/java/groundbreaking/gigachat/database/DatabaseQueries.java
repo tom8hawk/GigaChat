@@ -1,5 +1,6 @@
 package groundbreaking.gigachat.database;
 
+import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Sound;
 
 import java.sql.PreparedStatement;
@@ -36,7 +37,7 @@ public final class DatabaseQueries {
 
         final String ignoreChatQuery = """
                     CREATE TABLE IF NOT EXISTS ignoreChat (
-                        playerUUID TEXT NOT NULL UNIQUE,
+                        playerUUID TEXT NOT NULL,
                         ignoredUUID TEXT NOT NULL,
                         PRIMARY KEY(playerUUID, ignoredUUID)
                     );
@@ -44,7 +45,7 @@ public final class DatabaseQueries {
 
         final String ignorePrivateQuery = """
                     CREATE TABLE IF NOT EXISTS ignorePrivate (
-                        playerUUID TEXT NOT NULL UNIQUE,
+                        playerUUID TEXT NOT NULL,
                         ignoredUUID TEXT NOT NULL,
                         PRIMARY KEY(playerUUID, ignoredUUID)
                     );
@@ -69,6 +70,14 @@ public final class DatabaseQueries {
                     );
                 """;
 
+        final String chatListenersQuery = """
+                    CREATE TABLE IF NOT EXISTS chatListeners (
+                        playerUUID TEXT NOT NULL,
+                        chatName TEXT NOT NULL,
+                        PRIMARY KEY(playerUUID, chatName)
+                    );
+                """;
+
         try (final Statement statement = DatabaseHandler.getConnection().createStatement()) {
             statement.execute(disabledChatQuery);
             statement.execute(disabledPrivateMessagesQuery);
@@ -77,6 +86,7 @@ public final class DatabaseQueries {
             statement.execute(privateMessagesSoundsQuery);
             statement.execute(socialSpyQuery);
             statement.execute(autoMessagesQuery);
+            statement.execute(chatListenersQuery);
         } catch (final SQLException ex) {
             ex.printStackTrace();
         }
@@ -433,6 +443,11 @@ public final class DatabaseQueries {
         }
     }
 
+    /**
+     * Adds the player name to the "autoMessages" table, to save the player's choice.
+     *
+     * @param playerUUID UUID of the player
+     */
     public static void addPlayerToAutoMessages(final UUID playerUUID) {
         final String query = "INSERT OR IGNORE INTO autoMessages(playerUUID) VALUES(?);";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
@@ -443,6 +458,11 @@ public final class DatabaseQueries {
         }
     }
 
+    /**
+     * Removes the player's name from the "autoMessages" table.
+     *
+     * @param playerUUID UUID of the player
+     */
     public static void removePlayerFromAutoMessages(final UUID playerUUID) {
         final String query = "DELETE FROM autoMessages WHERE playerUUID = ?;";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
@@ -453,7 +473,13 @@ public final class DatabaseQueries {
         }
     }
 
-    public static boolean containsPlayerFromAutoMessages(final UUID playerUUID) {
+    /**
+     * Checks the "autoMessages" table for a player's name, to see if he has disabled auto messages.
+     *
+     * @param playerUUID UUID of the player
+     * @return true if the table contains the player's name
+     */
+    public static boolean autoMessagesContainsPlayer(final UUID playerUUID) {
         final String query = "SELECT EXISTS(SELECT 1 FROM autoMessages WHERE playerUUID = ?);";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
@@ -463,6 +489,65 @@ public final class DatabaseQueries {
         } catch (final SQLException ex) {
             ex.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Adds the player name to the "chatListeners" table, to save the player's choice.
+     *
+     * @param playerUUID UUID of the player
+     * @param chatNames  list with chat names
+     */
+    public static void addPlayerToChatListeners(final UUID playerUUID, final List<String> chatNames) {
+        final String query = "INSERT OR IGNORE INTO chatListeners(playerUUID, chatName) VALUES(?, ?);";
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            for (int i = 0; i < chatNames.size(); i++) {
+                statement.setString(1, playerUUID.toString());
+                statement.setString(2, chatNames.get(i));
+                statement.addBatch();
+            }
+            statement.executeBatch();
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    /**
+     * Returns the list from "chatListeners" table with chat names of chats where a player has spy mode enabled.
+     *
+     * @param playerUUID UUID of the player
+     * @return list with the chat names
+     */
+    public static List<String> getChatsWherePlayerListen(final UUID playerUUID) {
+        final String query = "SELECT chatName FROM chatListeners WHERE playerUUID = ?;";
+        final List<String> chats = new ObjectArrayList<>();
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            statement.setString(1, playerUUID.toString());
+            final ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                final String chatName = resultSet.getString("chatName");
+                chats.add(chatName);
+            }
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
+        }
+        return chats;
+    }
+
+    /**
+     * Removes the chat for the player from the "chatListeners" table.
+     *
+     * @param playerUUID UUID of the player
+     * @param chatName   name of the chat
+     */
+    public static void removeChatForPlayerFromChatsListeners(final UUID playerUUID, final String chatName) {
+        final String query = "DELETE FROM chatListeners WHERE playerUUID = ? and chatName = ?;";
+        try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
+            statement.setString(1, playerUUID.toString());
+            statement.setString(2, chatName);
+            statement.executeUpdate();
+        } catch (final SQLException ex) {
+            ex.printStackTrace();
         }
     }
 }

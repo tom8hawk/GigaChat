@@ -22,84 +22,89 @@ public final class DisconnectListener implements Listener {
 
     private final GigaChat plugin;
     private final ChatValues chatValues;
-    private final CooldownsCollection cooldownsCollection;
     private final PmSoundsCollection pmSoundsCollection;
     private final DisabledPrivateMessagesCollection disabledPrivateMessagesCollection;
 
     public DisconnectListener(final GigaChat plugin) {
         this.plugin = plugin;
         this.chatValues = plugin.getChatValues();
-        this.cooldownsCollection = plugin.getCooldownsCollection();
         this.pmSoundsCollection = plugin.getPmSoundsCollection();
         this.disabledPrivateMessagesCollection = plugin.getDisabled();
     }
 
     @EventHandler
     public void onJoin(final PlayerJoinEvent event) {
-        final UUID targetUUID = event.getPlayer().getUniqueId();
-        this.loadData(targetUUID);
+        final UUID playerUUID = event.getPlayer().getUniqueId();
+        this.loadData(playerUUID);
     }
 
     @EventHandler
     public void onQuit(final PlayerQuitEvent event) {
-        final UUID targetUUID = event.getPlayer().getUniqueId();
-        this.removeCooldown(targetUUID);
+        final UUID playerUUID = event.getPlayer().getUniqueId();
+        this.removeData(playerUUID);
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onKick(final PlayerKickEvent event) {
-        final UUID targetUUID = event.getPlayer().getUniqueId();
-        this.removeCooldown(targetUUID);
+        final UUID playerUUID = event.getPlayer().getUniqueId();
+        this.removeData(playerUUID);
     }
 
-    private void loadData(final UUID targetUUID) {
+    private void loadData(final UUID playerUUID) {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-            if (DatabaseQueries.disabledChatContainsPlayer(targetUUID)) {
-                DisabledChatCollection.add(targetUUID);
+            if (DatabaseQueries.disabledChatContainsPlayer(playerUUID)) {
+                DisabledChatCollection.add(playerUUID);
             }
-            if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(targetUUID)) {
-                this.disabledPrivateMessagesCollection.add(targetUUID);
+            if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(playerUUID)) {
+                this.disabledPrivateMessagesCollection.add(playerUUID);
             }
-            final List<UUID> ignoredChat = DatabaseQueries.getIgnoredChat(targetUUID);
+            final List<UUID> ignoredChat = DatabaseQueries.getIgnoredChat(playerUUID);
             if (!ignoredChat.isEmpty()) {
-                IgnoreCollection.addToIgnoredChat(targetUUID, ignoredChat);
+                IgnoreCollection.addToIgnoredChat(playerUUID, ignoredChat);
             }
-            final List<UUID> ignoredPrivate = DatabaseQueries.getIgnoredPrivate(targetUUID);
+            final List<UUID> ignoredPrivate = DatabaseQueries.getIgnoredPrivate(playerUUID);
             if (!ignoredPrivate.isEmpty()) {
-                IgnoreCollection.addToIgnoredPrivate(targetUUID, ignoredPrivate);
+                IgnoreCollection.addToIgnoredPrivate(playerUUID, ignoredPrivate);
             }
-            final Sound sound = DatabaseQueries.getSound(targetUUID);
+            final Sound sound = DatabaseQueries.getSound(playerUUID);
             if (sound != null) {
-                this.pmSoundsCollection.setSound(targetUUID, sound);
+                this.pmSoundsCollection.setSound(playerUUID, sound);
             }
-            if (DatabaseQueries.socialSpyContainsPlayer(targetUUID)) {
-                SocialSpyCollection.add(targetUUID);
+            if (DatabaseQueries.socialSpyContainsPlayer(playerUUID)) {
+                SocialSpyCollection.add(playerUUID);
             }
-            if (DatabaseQueries.containsPlayerFromAutoMessages(targetUUID)) {
-                AutoMessagesCollection.add(targetUUID);
+            if (DatabaseQueries.autoMessagesContainsPlayer(playerUUID)) {
+                AutoMessagesCollection.add(playerUUID);
             }
+
+            this.loadPlayerListenData(playerUUID);
         });
     }
 
-    private void removeCooldown(final UUID targetUUID) {
+    private void loadPlayerListenData(final UUID playerUUID) {
+        final List<String> chatsWherePlayerListen = DatabaseQueries.getChatsWherePlayerListen(playerUUID);
         final Object2ObjectOpenHashMap<Character, Chat> chats = this.chatValues.getChats();
         for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
             final Chat chat = entry.getValue();
-            chat.getChatCooldowns().remove(targetUUID);
-            chat.getSpyCooldowns().remove(targetUUID);
-            chat.getSpyListeners().remove(targetUUID);
+            if (chatsWherePlayerListen.contains(chat.getName())) {
+                chat.getSpyListeners().add(playerUUID);
+                chatsWherePlayerListen.remove(chat.getName());
+            }
         }
-        this.cooldownsCollection.removePlayerPrivateCooldown(targetUUID);
-        this.cooldownsCollection.removePlayerIgnoreCooldown(targetUUID);
-        this.cooldownsCollection.removePlayerSpyCooldown(targetUUID);
-        this.cooldownsCollection.removeBroadcastCooldown(targetUUID);
-        DisabledChatCollection.remove(targetUUID);
-        this.disabledPrivateMessagesCollection.remove(targetUUID);
-        IgnoreCollection.removeFromIgnoredChat(targetUUID);
-        IgnoreCollection.removeFromIgnoredPrivate(targetUUID);
-        this.pmSoundsCollection.remove(targetUUID);
-        ReplyCollection.removeFromAll(targetUUID);
-        SocialSpyCollection.remove(targetUUID);
-        AutoMessagesCollection.remove(targetUUID);
+        for (int i = 0; i < chatsWherePlayerListen.size(); i++) {
+            final String chatName = chatsWherePlayerListen.get(i);
+            DatabaseQueries.removeChatForPlayerFromChatsListeners(playerUUID, chatName);
+        }
+    }
+
+    private void removeData(final UUID playerUUID) {
+        DisabledChatCollection.remove(playerUUID);
+        this.disabledPrivateMessagesCollection.remove(playerUUID);
+        IgnoreCollection.removeFromIgnoredChat(playerUUID);
+        IgnoreCollection.removeFromIgnoredPrivate(playerUUID);
+        this.pmSoundsCollection.remove(playerUUID);
+        ReplyCollection.removeFromAll(playerUUID);
+        SocialSpyCollection.remove(playerUUID);
+        AutoMessagesCollection.remove(playerUUID);
     }
 }

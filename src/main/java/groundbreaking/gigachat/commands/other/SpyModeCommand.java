@@ -2,6 +2,7 @@ package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.constructors.Chat;
+import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.map.ExpiringMap;
@@ -14,9 +15,11 @@ import java.util.UUID;
 
 public class SpyModeCommand {
 
+    private final GigaChat plugin;
     private final Messages messages;
 
     public SpyModeCommand(final GigaChat plugin) {
+        this.plugin = plugin;
         this.messages = plugin.getMessages();
     }
 
@@ -47,9 +50,15 @@ public class SpyModeCommand {
         if (players.contains(senderUUID)) {
             sender.sendMessage(this.messages.getChatsSpyDisabled().replace("{chat}", replacement));
             players.remove(senderUUID);
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.removeChatForPlayerFromChatsListeners(senderUUID, chatName)
+            );
         } else {
             sender.sendMessage(this.messages.getChatsSpyEnabled().replace("{chat}", replacement));
             players.add(senderUUID);
+            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () ->
+                    DatabaseQueries.addPlayerToChatListeners(senderUUID, List.of(chatName))
+            );
         }
 
         return true;
