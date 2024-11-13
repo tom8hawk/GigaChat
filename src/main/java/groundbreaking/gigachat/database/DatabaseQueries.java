@@ -8,7 +8,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,9 +131,9 @@ public final class DatabaseQueries {
         final String query = "SELECT EXISTS(SELECT 1 FROM disabledChat WHERE playerUUID = ?);";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            return result.getInt(1) == 1;
+            try (final ResultSet result = statement.executeQuery()) {
+                return result.next() && result.getInt(1) == 1;
+            }
         } catch (final SQLException ex) {
             ex.printStackTrace();
             return false;
@@ -196,22 +195,21 @@ public final class DatabaseQueries {
      */
     public static List<UUID> getIgnoredChat(final UUID playerUUID) {
         final String query = "SELECT ignoredUUID FROM ignoreChat WHERE playerUUID = ?;";
+        final List<UUID> ignoredPlayers = new ArrayList<>();
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            final List<UUID> ignoredPlayers = new ArrayList<>();
-            while (result.next()) {
-                final String string = result.getString("ignoredUUID");
-                final UUID ignoredUUID = UUID.fromString(string);
-                ignoredPlayers.add(ignoredUUID);
+            try (final ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    final String string = result.getString("ignoredUUID");
+                    final UUID ignoredUUID = UUID.fromString(string);
+                    ignoredPlayers.add(ignoredUUID);
+                }
             }
-            return ignoredPlayers;
         } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
-        return Collections.emptyList();
+        return ignoredPlayers;
     }
 
     /**
@@ -254,9 +252,9 @@ public final class DatabaseQueries {
         final String query = "SELECT EXISTS(SELECT 1 FROM disabledPrivateMessages WHERE playerUUID = ?);";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            return result.getInt(1) == 1;
+            try (final ResultSet result = statement.executeQuery()) {
+                return result.next() && result.getInt(1) == 1;
+            }
         } catch (final SQLException ex) {
             ex.printStackTrace();
             return false;
@@ -318,22 +316,21 @@ public final class DatabaseQueries {
      */
     public static List<UUID> getIgnoredPrivate(final UUID playerUUID) {
         final String query = "SELECT ignoredUUID FROM ignorePrivate WHERE playerUUID = ?;";
+        final List<UUID> ignoredPlayers = new ArrayList<>();
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            final List<UUID> ignoredPlayers = new ArrayList<>();
-            while (result.next()) {
-                final String string = result.getString("ignoredUUID");
-                final UUID ignoredUUID = UUID.fromString(string);
-                ignoredPlayers.add(ignoredUUID);
+            try (final ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    final String string = result.getString("ignoredUUID");
+                    final UUID ignoredUUID = UUID.fromString(string);
+                    ignoredPlayers.add(ignoredUUID);
+                }
             }
-            return ignoredPlayers;
         } catch (final SQLException ex) {
             ex.printStackTrace();
         }
 
-        return Collections.emptyList();
+        return ignoredPlayers;
     }
 
     /**
@@ -381,11 +378,11 @@ public final class DatabaseQueries {
         final String query = "SELECT soundName FROM privateMessagesSounds WHERE playerUUID = ?;";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                final String string = result.getString("soundName");
-                return string == null ? null : Sound.valueOf(string);
+            try (final ResultSet result = statement.executeQuery()) {
+                if (result.next()) {
+                    final String string = result.getString("soundName");
+                    return string == null ? null : Sound.valueOf(string);
+                }
             }
         } catch (final SQLException ex) {
             ex.printStackTrace();
@@ -434,9 +431,9 @@ public final class DatabaseQueries {
         final String query = "SELECT EXISTS(SELECT 1 FROM socialSpy WHERE playerUUID = ?);";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            return result.getInt(1) == 1;
+            try (final ResultSet result = statement.executeQuery()) {
+                return result.next() && result.getInt(1) == 1;
+            }
         } catch (final SQLException ex) {
             ex.printStackTrace();
             return false;
@@ -483,9 +480,9 @@ public final class DatabaseQueries {
         final String query = "SELECT EXISTS(SELECT 1 FROM autoMessages WHERE playerUUID = ?);";
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-
-            final ResultSet result = statement.executeQuery();
-            return result.getInt(1) == 1;
+            try (final ResultSet result = statement.executeQuery()) {
+                return result.next() && result.getInt(1) == 1;
+            }
         } catch (final SQLException ex) {
             ex.printStackTrace();
             return false;
@@ -523,10 +520,11 @@ public final class DatabaseQueries {
         final List<String> chats = new ObjectArrayList<>();
         try (final PreparedStatement statement = DatabaseHandler.getConnection().prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
-            final ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()) {
-                final String chatName = resultSet.getString("chatName");
-                chats.add(chatName);
+            try (final ResultSet result = statement.executeQuery()) {
+                while (result.next()) {
+                    final String chatName = result.getString("chatName");
+                    chats.add(chatName);
+                }
             }
         } catch (final SQLException ex) {
             ex.printStackTrace();
