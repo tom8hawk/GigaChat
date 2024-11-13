@@ -22,6 +22,11 @@ public final class ExpiringMap<K, V> {
         return this.cache.getIfPresent(key);
     }
 
+    public V getOrDefault(final K key, final V defaultValue) {
+        final V value;
+        return (value = this.cache.getIfPresent(key)) == null ? defaultValue : value;
+    }
+
     public boolean containsKey(final K key) {
         return this.cache.getIfPresent(key) != null;
     }
