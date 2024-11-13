@@ -109,14 +109,14 @@ public final class ChatValues {
     }
 
     private void setupChats(final FileConfiguration config) {
-        final ConfigurationSection chats = config.getConfigurationSection("chats");
-        if (chats != null) {
-            final Set<String> chatsKeys = chats.getKeys(false);
+        final ConfigurationSection chatsSection = config.getConfigurationSection("chats");
+        if (chatsSection != null) {
+            final Set<String> chatsKeys = chatsSection.getKeys(false);
             MainCommandHandler.CHATS.clear();
             MainCommandHandler.CHATS.addAll(chatsKeys);
 
             for (final String key : chatsKeys) {
-                final ConfigurationSection keySection = chats.getConfigurationSection(key);
+                final ConfigurationSection keySection = chatsSection.getConfigurationSection(key);
                 if (keySection == null) {
                     this.plugin.getMyLogger().warning("Failed to load section \"chats." + key + "\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
                     this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
