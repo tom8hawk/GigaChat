@@ -22,6 +22,8 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 public final class ChatListener implements Listener {
 
@@ -70,9 +72,12 @@ public final class ChatListener implements Listener {
 
         final String spyFormat = chat.getSpyFormat();
         if (spyFormat != null && !spyFormat.isEmpty()) {
-            final List<Player> spyListeners = new ArrayList<>(chat.getSpyListeners()).stream().map(Bukkit::getPlayer).toList();
-            spyListeners.remove(sender);
-            this.sendSpy(sender, message, spyFormat, spyListeners, replacementList);
+            final List<UUID> spyListenersUUIDs = chat.getSpyListeners();
+            if (!spyListenersUUIDs.isEmpty()){
+                final List<Player> spyListeners = new ArrayList<>(spyListenersUUIDs).stream().map(Bukkit::getPlayer).collect(Collectors.toList());
+                spyListeners.remove(sender);
+                this.sendSpy(sender, message, spyFormat, spyListeners, replacementList);
+            }
         }
 
         final String chatFormat = chat.getFormat();
