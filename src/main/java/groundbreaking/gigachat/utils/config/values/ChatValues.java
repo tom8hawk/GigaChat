@@ -99,7 +99,7 @@ public final class ChatValues {
             final EventPriority eventPriority = this.plugin.getEventPriority(priority, "chats.yml");
             final EventExecutor eventExecutor = (listener, event) -> chatListener.onMessageSend((AsyncPlayerChatEvent) event);
             ListenerRegisterUtil.unregister(chatListener);
-            ListenerRegisterUtil.register(this.plugin, chatListener, AsyncPlayerChatEvent.class, eventPriority, false, eventExecutor);
+            ListenerRegisterUtil.register(this.plugin, chatListener, AsyncPlayerChatEvent.class, eventPriority, true, eventExecutor);
 
             this.formatsColorizer = plugin.getColorizer(config, "settings.serializer-for-formats");
         } else {
