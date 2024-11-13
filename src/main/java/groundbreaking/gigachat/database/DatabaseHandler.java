@@ -7,11 +7,8 @@ import groundbreaking.gigachat.GigaChat;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.concurrent.ForkJoinPool;
 
 public final class DatabaseHandler {
-
-    public static final ForkJoinPool customThreadPool = new ForkJoinPool(3);
 
     private static HikariDataSource dataSource;
 
