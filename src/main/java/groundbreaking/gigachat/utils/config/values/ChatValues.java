@@ -101,7 +101,7 @@ public final class ChatValues {
             ListenerRegisterUtil.unregister(chatListener);
             ListenerRegisterUtil.register(this.plugin, chatListener, AsyncPlayerChatEvent.class, eventPriority, true, eventExecutor);
 
-            this.formatsColorizer = plugin.getColorizer(config, "settings.serializer-for-formats");
+            this.formatsColorizer = this.plugin.getColorizer(config, "settings.serializer-for-formats");
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
