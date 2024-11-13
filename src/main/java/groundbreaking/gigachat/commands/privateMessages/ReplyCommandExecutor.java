@@ -25,7 +25,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     private final Messages messages;
     private final VanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
-    private final CooldownsCollection cooldownsCollection;
+    private final CooldownCollections cooldownCollections;
     private final PmSoundsCollection pmSoundsCollection;
 
     private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
@@ -36,7 +36,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         this.messages = plugin.getMessages();
         this.vanishChecker = plugin.getVanishChecker();
         this.consoleSender = plugin.getServer().getConsoleSender();
-        this.cooldownsCollection = plugin.getCooldownsCollection();
+        this.cooldownCollections = plugin.getCooldownCollections();
         this.pmSoundsCollection = plugin.getPmSoundsCollection();
     }
 
@@ -121,11 +121,11 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownsCollection.getPrivateCooldowns());
+        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownCollections.getPrivateCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
-        final long timeLeftInMillis = this.cooldownsCollection.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownCollections.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -133,7 +133,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     }
 
     private boolean isIgnored(final UUID ignoringUUID, final UUID ignoredUUID) {
-        return IgnoreCollection.isIgnoredPrivate(ignoringUUID, ignoredUUID);
+        return IgnoreCollections.isIgnoredPrivate(ignoringUUID, ignoredUUID);
     }
 
     private String getPrefix(final Player player) {

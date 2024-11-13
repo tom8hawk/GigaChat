@@ -1,8 +1,8 @@
 package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.CooldownsCollection;
-import groundbreaking.gigachat.collections.IgnoreCollection;
+import groundbreaking.gigachat.collections.CooldownCollections;
+import groundbreaking.gigachat.collections.IgnoreCollections;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -23,14 +23,14 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     private final GigaChat plugin;
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
-    private final CooldownsCollection cooldownsCollection;
+    private final CooldownCollections cooldownCollections;
     private final VanishChecker vanishChecker;
 
     public IgnoreCommandExecutor(final GigaChat plugin) {
         this.plugin = plugin;
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
-        this.cooldownsCollection = plugin.getCooldownsCollection();
+        this.cooldownCollections = plugin.getCooldownCollections();
         this.vanishChecker = plugin.getVanishChecker();
     }
 
@@ -98,11 +98,11 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     }
 
     private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.ignore", this.cooldownsCollection.getIgnoreCooldowns());
+        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.ignore", this.cooldownCollections.getIgnoreCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
-        final long timeLeftInMillis = this.cooldownsCollection.getIgnoreCooldowns().get(senderUUID) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownCollections.getIgnoreCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -110,16 +110,16 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
     }
 
     private void processChat(final Player sender, final String targetName, final UUID senderUUID, final UUID targetUUID) {
-        if (!IgnoreCollection.ignoredChatContains(senderUUID)) {
-            IgnoreCollection.addToIgnoredChat(senderUUID, new ArrayList<>(List.of(targetUUID)));
+        if (!IgnoreCollections.ignoredChatContains(senderUUID)) {
+            IgnoreCollections.addToIgnoredChat(senderUUID, new ArrayList<>(List.of(targetUUID)));
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
             return;
         }
 
-        if (IgnoreCollection.ignoredChatContains(senderUUID, targetUUID)) {
-            IgnoreCollection.removeFromIgnoredChat(senderUUID, targetUUID);
+        if (IgnoreCollections.ignoredChatContains(senderUUID, targetUUID)) {
+            IgnoreCollections.removeFromIgnoredChat(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                if (IgnoreCollection.isIgnoredChatEmpty()) {
+                if (IgnoreCollections.isIgnoredChatEmpty()) {
                     DatabaseQueries.removePlayerFromIgnoreChat(senderUUID);
                 } else {
                     DatabaseQueries.removePlayerFromIgnoreChat(senderUUID, targetUUID);
@@ -127,27 +127,27 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             });
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
         } else {
-            IgnoreCollection.addToIgnoredChat(senderUUID, targetUUID);
+            IgnoreCollections.addToIgnoredChat(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
                     DatabaseQueries.addPlayerToIgnoreChat(senderUUID, targetUUID)
             );
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
 
-        this.cooldownsCollection.addCooldown(senderUUID, this.cooldownsCollection.getIgnoreCooldowns());
+        this.cooldownCollections.addCooldown(senderUUID, this.cooldownCollections.getIgnoreCooldowns());
     }
 
     private void processPrivate(final Player sender, final String targetName, final UUID senderUUID, final UUID targetUUID) {
-        if (!IgnoreCollection.ignoredPrivateContains(senderUUID)) {
-            IgnoreCollection.addToIgnoredPrivate(senderUUID, new ArrayList<>(List.of(targetUUID)));
+        if (!IgnoreCollections.ignoredPrivateContains(senderUUID)) {
+            IgnoreCollections.addToIgnoredPrivate(senderUUID, new ArrayList<>(List.of(targetUUID)));
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
             return;
         }
 
-        if (IgnoreCollection.ignoredPrivateContains(senderUUID, targetUUID)) {
-            IgnoreCollection.removeFromIgnoredPrivate(senderUUID, targetUUID);
+        if (IgnoreCollections.ignoredPrivateContains(senderUUID, targetUUID)) {
+            IgnoreCollections.removeFromIgnoredPrivate(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                if (IgnoreCollection.isIgnoredPrivateEmpty()) {
+                if (IgnoreCollections.isIgnoredPrivateEmpty()) {
                     DatabaseQueries.removePlayerFromIgnorePrivate(senderUUID);
                 } else {
                     DatabaseQueries.removePlayerFromIgnorePrivate(senderUUID, targetUUID);
@@ -155,14 +155,14 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             });
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
         } else {
-            IgnoreCollection.addToIgnoredPrivate(senderUUID, targetUUID);
+            IgnoreCollections.addToIgnoredPrivate(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
                     DatabaseQueries.addPlayerToIgnorePrivate(senderUUID, targetUUID)
             );
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
 
-        this.cooldownsCollection.addCooldown(senderUUID, this.cooldownsCollection.getIgnoreCooldowns());
+        this.cooldownCollections.addCooldown(senderUUID, this.cooldownCollections.getIgnoreCooldowns());
     }
 
     @Override
@@ -201,7 +201,7 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
             }
 
             final UUID targetUUID = target.getUniqueId();
-            if (IgnoreCollection.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollection.isIgnoredChat(targetUUID, senderUUID)) {
+            if (IgnoreCollections.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
                 continue;
             }
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public final class CooldownsCollection {
+public final class CooldownCollections {
 
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
@@ -23,7 +23,7 @@ public final class CooldownsCollection {
 
     private ExpiringMap<UUID, Long> broadcastCooldowns;
 
-    public CooldownsCollection(final GigaChat plugin) {
+    public CooldownCollections(final GigaChat plugin) {
         this.plugin = plugin;
     }
     

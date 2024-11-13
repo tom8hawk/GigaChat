@@ -2,7 +2,7 @@ package groundbreaking.gigachat.constructors;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.DisabledChatCollection;
-import groundbreaking.gigachat.collections.IgnoreCollection;
+import groundbreaking.gigachat.collections.IgnoreCollections;
 import groundbreaking.gigachat.commands.other.SpyModeCommand;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -137,7 +137,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
         final double maxDist = Math.pow(this.distance, 2.0D);
         for (final Player target : onlinePlayers) {
             final UUID targetUUID = target.getUniqueId();
-            if (IgnoreCollection.isIgnoredChat(targetUUID, senderUUID) || DisabledChatCollection.contains(targetUUID)) {
+            if (IgnoreCollections.isIgnoredChat(targetUUID, senderUUID) || DisabledChatCollection.contains(targetUUID)) {
                 continue;
             }
 
@@ -160,7 +160,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
         final UUID senderUUID = sender.getUniqueId();
         for (final Player target : onlinePlayers) {
             final UUID targetUUID = target.getUniqueId();
-            if (!IgnoreCollection.isIgnoredChat(targetUUID, senderUUID)) {
+            if (!IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
                 playerList.add(target);
             }
         }

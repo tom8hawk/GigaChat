@@ -25,7 +25,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
     private final Colorizer hexColorizer;
-    private final CooldownsCollection cooldownsCollection;
+    private final CooldownCollections cooldownCollections;
     private final PmSoundsCollection pmSoundsCollection;
     private final DisabledPrivateMessagesCollection disabled;
     private final VanishChecker vanishChecker;
@@ -39,7 +39,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
         this.hexColorizer = plugin.getColorizerByVersion();
-        this.cooldownsCollection = plugin.getCooldownsCollection();
+        this.cooldownCollections = plugin.getCooldownCollections();
         this.pmSoundsCollection = plugin.getPmSoundsCollection();
         this.disabled = plugin.getDisabled();
         this.vanishChecker = plugin.getVanishChecker();
@@ -87,12 +87,12 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
         if (isPlayerSender && !sender.hasPermission("gigachat.bypass.ignore")) {
             final UUID senderUUID = ((Player) sender).getUniqueId();
-            if (IgnoreCollection.isIgnoredPrivate(recipientUUID, senderUUID)) {
+            if (IgnoreCollections.isIgnoredPrivate(recipientUUID, senderUUID)) {
                 sender.sendMessage(this.messages.getRecipientIgnoresSender());
                 return true;
             }
 
-            if (IgnoreCollection.isIgnoredPrivate(senderUUID, recipientUUID)) {
+            if (IgnoreCollections.isIgnoredPrivate(senderUUID, recipientUUID)) {
                 sender.sendMessage(this.messages.getSenderIgnoresRecipient());
                 return true;
             }
@@ -123,12 +123,12 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
     private boolean hasCooldown(final Player playerSender) {
         final UUID senderUUID = playerSender.getUniqueId();
-        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.pm", this.cooldownsCollection.getPrivateCooldowns());
+        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.pm", this.cooldownCollections.getPrivateCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender) {
         final UUID senderUUID = playerSender.getUniqueId();
-        final long timeLeftInMillis = this.cooldownsCollection.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownCollections.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
@@ -323,7 +323,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
                 final UUID senderUUID = playerSender.getUniqueId();
                 for (final Player target : Bukkit.getOnlinePlayers()) {
                     final UUID targetUUID = target.getUniqueId();
-                    if (IgnoreCollection.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollection.isIgnoredChat(targetUUID, senderUUID)) {
+                    if (IgnoreCollections.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
                         continue;
                     }
 

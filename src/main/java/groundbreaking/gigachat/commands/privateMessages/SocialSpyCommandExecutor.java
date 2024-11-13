@@ -1,7 +1,7 @@
 package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
-import groundbreaking.gigachat.collections.CooldownsCollection;
+import groundbreaking.gigachat.collections.CooldownCollections;
 import groundbreaking.gigachat.collections.SocialSpyCollection;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
@@ -24,13 +24,13 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
     private final GigaChat plugin;
     private final PrivateMessagesValues pmValues;
     private final Messages messages;
-    private final CooldownsCollection cooldownsCollection;
+    private final CooldownCollections cooldownCollections;
 
     public SocialSpyCommandExecutor(final GigaChat plugin) {
         this.plugin = plugin;
         this.pmValues = plugin.getPmValues();
         this.messages = plugin.getMessages();
-        this.cooldownsCollection = plugin.getCooldownsCollection();
+        this.cooldownCollections = plugin.getCooldownCollections();
     }
 
     @Override
@@ -66,17 +66,17 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 
-        this.cooldownsCollection.addCooldown(senderUUID, this.cooldownsCollection.getSpyCooldowns());
+        this.cooldownCollections.addCooldown(senderUUID, this.cooldownCollections.getSpyCooldowns());
 
         return true;
     }
 
     private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
-        return this.cooldownsCollection.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownsCollection.getSpyCooldowns());
+        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownCollections.getSpyCooldowns());
     }
 
     private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
-        final long timeLeftInMillis = this.cooldownsCollection.getSpyCooldowns().get(senderUUID) - System.currentTimeMillis();
+        final long timeLeftInMillis = this.cooldownCollections.getSpyCooldowns().get(senderUUID) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getSpyCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);

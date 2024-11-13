@@ -60,11 +60,11 @@ public final class DisconnectListener implements Listener {
             }
             final List<UUID> ignoredChat = DatabaseQueries.getIgnoredChat(playerUUID);
             if (!ignoredChat.isEmpty()) {
-                IgnoreCollection.addToIgnoredChat(playerUUID, ignoredChat);
+                IgnoreCollections.addToIgnoredChat(playerUUID, ignoredChat);
             }
             final List<UUID> ignoredPrivate = DatabaseQueries.getIgnoredPrivate(playerUUID);
             if (!ignoredPrivate.isEmpty()) {
-                IgnoreCollection.addToIgnoredPrivate(playerUUID, ignoredPrivate);
+                IgnoreCollections.addToIgnoredPrivate(playerUUID, ignoredPrivate);
             }
             final Sound sound = DatabaseQueries.getSound(playerUUID);
             if (sound != null) {
@@ -100,8 +100,8 @@ public final class DisconnectListener implements Listener {
     private void removeData(final UUID playerUUID) {
         DisabledChatCollection.remove(playerUUID);
         this.disabledPrivateMessagesCollection.remove(playerUUID);
-        IgnoreCollection.removeFromIgnoredChat(playerUUID);
-        IgnoreCollection.removeFromIgnoredPrivate(playerUUID);
+        IgnoreCollections.removeFromIgnoredChat(playerUUID);
+        IgnoreCollections.removeFromIgnoredPrivate(playerUUID);
         this.pmSoundsCollection.remove(playerUUID);
         ReplyCollection.removeFromAll(playerUUID);
         SocialSpyCollection.remove(playerUUID);

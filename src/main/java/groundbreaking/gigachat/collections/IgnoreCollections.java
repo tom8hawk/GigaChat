@@ -7,12 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public final class IgnoreCollection {
+public final class IgnoreCollections {
 
     private static final Map<UUID, List<UUID>> ignoredChat = new Object2ObjectOpenHashMap<>();
     private static final Map<UUID, List<UUID>> ignoredPrivate = new Object2ObjectOpenHashMap<>();
 
-    private IgnoreCollection() {
+    private IgnoreCollections() {
 
     }
 

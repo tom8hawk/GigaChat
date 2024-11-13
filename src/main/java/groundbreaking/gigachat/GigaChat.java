@@ -2,7 +2,7 @@ package groundbreaking.gigachat;
 
 import com.earth2me.essentials.libs.bstats.bukkit.Metrics;
 import groundbreaking.gigachat.automessages.AutoMessages;
-import groundbreaking.gigachat.collections.CooldownsCollection;
+import groundbreaking.gigachat.collections.CooldownCollections;
 import groundbreaking.gigachat.collections.DisabledPrivateMessagesCollection;
 import groundbreaking.gigachat.collections.PmSoundsCollection;
 import groundbreaking.gigachat.commands.MainCommandHandler;
@@ -61,7 +61,7 @@ public final class GigaChat extends JavaPlugin {
     private NewbieCommandsValues newbieCommandsValues;
     private PrivateMessagesValues pmValues;
 
-    private CooldownsCollection cooldownsCollection;
+    private CooldownCollections cooldownCollections;
     private PmSoundsCollection pmSoundsCollection;
 
     private DisabledPrivateMessagesCollection disabled;
@@ -168,7 +168,7 @@ public final class GigaChat extends JavaPlugin {
         this.newbieChatValues = new NewbieChatValues(this);
         this.pmValues = new PrivateMessagesValues(this);
         this.newbieCommandsValues = new NewbieCommandsValues(this);
-        this.cooldownsCollection = new CooldownsCollection(this);
+        this.cooldownCollections = new CooldownCollections(this);
         this.disabled = new DisabledPrivateMessagesCollection();
         this.chatListener = new ChatListener(this);
         this.newbieCommandListener = new NewbieCommandListener(this);
@@ -190,7 +190,7 @@ public final class GigaChat extends JavaPlugin {
             this.myLogger.info("Newbie protections will be disabled because NewbieGuard is detected.");
         }
         this.pmValues.setValues();
-        this.cooldownsCollection.setCooldowns();
+        this.cooldownCollections.setCooldowns();
     }
 
     public void setupVanishChecker() {
