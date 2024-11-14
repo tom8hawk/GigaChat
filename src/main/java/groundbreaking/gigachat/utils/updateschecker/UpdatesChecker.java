@@ -66,7 +66,7 @@ public final class UpdatesChecker {
                 this.plugin.getMyLogger().info("\u001b[92mNo updates were found!\u001b[0m");
             } else {
                 this.plugin.getMyLogger().warning("\u001b[31mCheck was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
-                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
+                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
             }
         }).join();
     }
@@ -90,7 +90,7 @@ public final class UpdatesChecker {
             return;
         } else if (downloadLink.isEmpty()) {
             this.plugin.getMyLogger().warning("\u001b[31mDownload link for new version of the plugin is empty!.\u001b[0m");
-            this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
+            this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
             return;
         }
 
@@ -134,7 +134,7 @@ public final class UpdatesChecker {
                 }
             } else {
                 this.plugin.getMyLogger().warning("\u001b[31mJar downloading was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
-                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GagiChat/issues \u001b[31mand report this error.\u001b[0m");
+                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
             }
         } catch (final IOException | InterruptedException ex) {
             ex.printStackTrace();
