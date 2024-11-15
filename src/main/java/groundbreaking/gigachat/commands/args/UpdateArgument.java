@@ -19,12 +19,12 @@ public class UpdateArgument extends ArgsConstructor {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
         if (!(sender instanceof ConsoleCommandSender)) {
-            sender.sendMessage("§cThis command can only be executed only by the console!");
+            sender.sendMessage("§4[GigaChat] §cThis command can only be executed only by the console!");
             return true;
         }
 
         if (!UpdatesChecker.hasUpdate()) {
-            sender.sendMessage("§cNothing to update!");
+            sender.sendMessage("§4[GigaChat] §cNothing to update!");
             return true;
         }
 

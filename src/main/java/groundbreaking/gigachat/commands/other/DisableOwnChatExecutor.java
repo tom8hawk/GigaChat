@@ -2,6 +2,7 @@ package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.DisabledChatCollection;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import org.bukkit.Bukkit;
@@ -12,6 +13,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -47,15 +50,23 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
         if (DisabledChatCollection.contains(senderUUID)) {
             sender.sendMessage(this.messages.getOwnChatDisabled());
             DisabledChatCollection.remove(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromDisabledChat(senderUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_DISABLED_CHAT, connection, senderUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
         } else {
             sender.sendMessage(this.messages.getOwnChatEnabled());
             DisabledChatCollection.add(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToDisabledChat(senderUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_DISABLED_CHAT, connection, senderUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
         }
 
         return true;

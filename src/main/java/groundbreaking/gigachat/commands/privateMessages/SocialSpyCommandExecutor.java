@@ -3,6 +3,7 @@ package groundbreaking.gigachat.commands.privateMessages;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.CooldownCollections;
 import groundbreaking.gigachat.collections.SocialSpyCollection;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -15,6 +16,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -54,15 +57,23 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
 
         if (SocialSpyCollection.contains(senderUUID)) {
             SocialSpyCollection.remove(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromSocialSpy(senderUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_SOCIAL_SPY, connection, senderUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
             sender.sendMessage(this.messages.getSpyDisabled());
         } else {
             SocialSpyCollection.add(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToSocialSpy(senderUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_SOCIAL_SPY, connection, senderUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
             sender.sendMessage(this.messages.getSpyEnabled());
         }
 

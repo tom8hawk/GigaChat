@@ -3,6 +3,7 @@ package groundbreaking.gigachat.listeners;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.*;
 import groundbreaking.gigachat.constructors.Chat;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -14,6 +15,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,37 +55,41 @@ public final class DisconnectListener implements Listener {
 
     private void loadData(final UUID playerUUID) {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-            if (DatabaseQueries.disabledChatContainsPlayer(playerUUID)) {
-                DisabledChatCollection.add(playerUUID);
-            }
-            if (DatabaseQueries.disabledPrivateMessagesContainsPlayer(playerUUID)) {
-                this.disabledPrivateMessagesCollection.add(playerUUID);
-            }
-            final List<UUID> ignoredChat = DatabaseQueries.getIgnoredChat(playerUUID);
-            if (!ignoredChat.isEmpty()) {
-                IgnoreCollections.addToIgnoredChat(playerUUID, ignoredChat);
-            }
-            final List<UUID> ignoredPrivate = DatabaseQueries.getIgnoredPrivate(playerUUID);
-            if (!ignoredPrivate.isEmpty()) {
-                IgnoreCollections.addToIgnoredPrivate(playerUUID, ignoredPrivate);
-            }
-            final Sound sound = DatabaseQueries.getSound(playerUUID);
-            if (sound != null) {
-                this.pmSoundsCollection.setSound(playerUUID, sound);
-            }
-            if (DatabaseQueries.socialSpyContainsPlayer(playerUUID)) {
-                SocialSpyCollection.add(playerUUID);
-            }
-            if (DatabaseQueries.autoMessagesContainsPlayer(playerUUID)) {
-                AutoMessagesCollection.add(playerUUID);
-            }
+            try (final Connection connection = DatabaseHandler.getConnection()) {
+                if (DatabaseQueries.containsPlayerInTable(DatabaseQueries.DISABLED_CHAT_CONTAINS_PLAYER, connection, playerUUID)) {
+                    DisabledChatCollection.add(playerUUID);
+                }
+                if (DatabaseQueries.containsPlayerInTable(DatabaseQueries.CHECK_IF_PLAYER_DISABLED_PRIVATE_MESSAGES, connection, playerUUID)) {
+                    this.disabledPrivateMessagesCollection.add(playerUUID);
+                }
+                final List<UUID> ignoredChat = DatabaseQueries.getListOfIgnoredPlayers(DatabaseQueries.GET_IGNORED_PLAYERS_FROM_CHAT, connection, playerUUID);
+                if (!ignoredChat.isEmpty()) {
+                    IgnoreCollections.addToIgnoredChat(playerUUID, ignoredChat);
+                }
+                final List<UUID> ignoredPrivate = DatabaseQueries.getListOfIgnoredPlayers(DatabaseQueries.GET_IGNORED_PRIVATE, connection, playerUUID);
+                if (!ignoredPrivate.isEmpty()) {
+                    IgnoreCollections.addToIgnoredPrivate(playerUUID, ignoredPrivate);
+                }
+                final Sound sound = DatabaseQueries.getPlayerSelectedSound(connection, playerUUID);
+                if (sound != null) {
+                    this.pmSoundsCollection.setSound(playerUUID, sound);
+                }
+                if (DatabaseQueries.containsPlayerInTable(DatabaseQueries.CHECK_IF_PLAYER_ENABLED_SOCIAL_SPY, connection, playerUUID)) {
+                    SocialSpyCollection.add(playerUUID);
+                }
+                if (DatabaseQueries.containsPlayerInTable(DatabaseQueries.CHECK_IF_PLAYER_ENABLED_AUTO_MESSAGES, connection, playerUUID)) {
+                    AutoMessagesCollection.add(playerUUID);
+                }
 
-            this.loadPlayerListenData(playerUUID);
+                this.loadPlayerListenData(connection, playerUUID);
+            } catch(final SQLException ex) {
+                ex.printStackTrace();
+            }
         });
     }
 
-    private void loadPlayerListenData(final UUID playerUUID) {
-        final List<String> chatsWherePlayerListen = DatabaseQueries.getChatsWherePlayerListen(playerUUID);
+    private void loadPlayerListenData(final Connection connection, final UUID playerUUID) throws SQLException {
+        final List<String> chatsWherePlayerListen = DatabaseQueries.getChatsWherePlayerIsListening(connection, playerUUID);
         final Object2ObjectOpenHashMap<Character, Chat> chats = this.chatValues.getChats();
         for (final Map.Entry<Character, Chat> entry : chats.object2ObjectEntrySet()) {
             final Chat chat = entry.getValue();
@@ -93,7 +100,7 @@ public final class DisconnectListener implements Listener {
         }
         for (int i = 0; i < chatsWherePlayerListen.size(); i++) {
             final String chatName = chatsWherePlayerListen.get(i);
-            DatabaseQueries.removeChatForPlayerFromChatsListeners(playerUUID, chatName);
+            DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_CHAT_FOR_PLAYER_FROM_CHATS_LISTENERS, connection, playerUUID.toString(), chatName);
         }
     }
 

@@ -3,6 +3,7 @@ package groundbreaking.gigachat.commands.args;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.PmSoundsCollection;
 import groundbreaking.gigachat.constructors.ArgsConstructor;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import org.bukkit.Bukkit;
@@ -11,6 +12,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.UUID;
 
 public final class SetPmSoundArgument extends ArgsConstructor {
@@ -43,9 +46,13 @@ public final class SetPmSoundArgument extends ArgsConstructor {
         final UUID targetUUID = target.getUniqueId();
         if (args[2].equalsIgnoreCase("none")) {
             this.pmSoundsCollection.remove(targetUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromPmSounds(targetUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_PRIVATE_MESSAGES_SOUNDS, connection, targetUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
 
             final boolean messageForTargetIsEmpty = !this.messages.getPmSoundRemoved().isEmpty();
             if (sender != target || messageForTargetIsEmpty) {
@@ -86,9 +93,13 @@ public final class SetPmSoundArgument extends ArgsConstructor {
             );
         }
 
-        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                DatabaseQueries.addPlayerPmSoundToPmSounds(targetUUID, sound.name())
-        );
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (final Connection connection = DatabaseHandler.getConnection()) {
+                DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_PM_SOUND_TO_PRIVATE_MESSAGES_SOUNDS, connection, targetUUID.toString(), sound.name());
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
 
         return true;
     }

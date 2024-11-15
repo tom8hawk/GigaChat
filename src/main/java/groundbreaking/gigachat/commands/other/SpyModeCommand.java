@@ -2,14 +2,18 @@ package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.constructors.Chat;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.map.ExpiringMap;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,15 +54,23 @@ public class SpyModeCommand {
         if (players.contains(senderUUID)) {
             sender.sendMessage(this.messages.getChatsSpyDisabled().replace("{chat}", replacement));
             players.remove(senderUUID);
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removeChatForPlayerFromChatsListeners(senderUUID, chatName)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_CHAT_FOR_PLAYER_FROM_CHATS_LISTENERS, connection, senderUUID.toString(), chatName);
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
         } else {
             sender.sendMessage(this.messages.getChatsSpyEnabled().replace("{chat}", replacement));
             players.add(senderUUID);
-            this.plugin.getServer().getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToChatListeners(senderUUID, List.of(chatName))
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_CHAT_LISTENERS, connection, senderUUID.toString(), chatName);
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
         }
 
         return true;

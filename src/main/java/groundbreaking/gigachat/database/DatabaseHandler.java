@@ -19,8 +19,8 @@ public final class DatabaseHandler {
     public static void createConnection(final GigaChat plugin) {
         final HikariConfig hikariConfig = new HikariConfig();
         hikariConfig.setJdbcUrl(getDriverUrl(plugin));
-        hikariConfig.setMaximumPoolSize(8);
         hikariConfig.setMinimumIdle(4);
+        hikariConfig.setMaximumPoolSize(16);
         hikariConfig.setConnectionTimeout(10000);
         hikariConfig.setIdleTimeout(600000);
         hikariConfig.setMaxLifetime(1800000);
@@ -33,7 +33,7 @@ public final class DatabaseHandler {
         return "jdbc:sqlite:" + dbFile;
     }
 
-    static Connection getConnection() throws SQLException {
+    public static Connection getConnection() throws SQLException {
         return dataSource.getConnection();
     }
 

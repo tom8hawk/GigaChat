@@ -99,7 +99,7 @@ public final class GigaChat extends JavaPlugin {
         this.setupConfigValues();
 
         DatabaseHandler.createConnection(this);
-        DatabaseQueries.createTables();
+        DatabaseQueries.createDatabaseTables();
 
         this.autoMessages.run();
 

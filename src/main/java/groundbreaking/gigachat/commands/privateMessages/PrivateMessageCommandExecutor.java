@@ -2,6 +2,7 @@ package groundbreaking.gigachat.commands.privateMessages;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.*;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.Utils;
@@ -17,6 +18,8 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 public final class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
@@ -139,15 +142,23 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         final UUID senderUUID = sender.getUniqueId();
         if (this.disabled.contains(senderUUID)) {
             this.disabled.remove(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.removePlayerFromDisabledPrivateMessages(senderUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_DISABLED_PRIVATE_MESSAGES, connection, senderUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
             sender.sendMessage(this.messages.getPmDisabled());
         } else {
             this.disabled.add(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToDisabledPrivateMessages(senderUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_DISABLED_PRIVATE_MESSAGES, connection, senderUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
             sender.sendMessage(this.messages.getPmEnabled());
         }
     }

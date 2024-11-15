@@ -3,6 +3,7 @@ package groundbreaking.gigachat.commands.privateMessages;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.CooldownCollections;
 import groundbreaking.gigachat.collections.IgnoreCollections;
+import groundbreaking.gigachat.database.DatabaseHandler;
 import groundbreaking.gigachat.database.DatabaseQueries;
 import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
@@ -16,6 +17,8 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.*;
 
 public final class IgnoreCommandExecutor implements CommandExecutor, TabCompleter {
@@ -119,18 +122,26 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
         if (IgnoreCollections.ignoredChatContains(senderUUID, targetUUID)) {
             IgnoreCollections.removeFromIgnoredChat(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                if (IgnoreCollections.isIgnoredChatEmpty()) {
-                    DatabaseQueries.removePlayerFromIgnoreChat(senderUUID);
-                } else {
-                    DatabaseQueries.removePlayerFromIgnoreChat(senderUUID, targetUUID);
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    if (IgnoreCollections.isIgnoredChatEmpty()) {
+                        DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_IGNORE_CHAT, connection, senderUUID.toString());
+                    } else {
+                        DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_IGNORED_FROM_IGNORE_CHAT, connection, senderUUID.toString(), targetUUID.toString());
+                    }
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
                 }
             });
             sender.sendMessage(this.messages.getChatIgnoreDisabled().replace("{player}", targetName));
         } else {
             IgnoreCollections.addToIgnoredChat(senderUUID, targetUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToIgnoreChat(senderUUID, targetUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_IGNORE_CHAT, connection, senderUUID.toString(), targetUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
             sender.sendMessage(this.messages.getChatIgnoreEnabled().replace("{player}", targetName));
         }
 
@@ -147,18 +158,26 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
         if (IgnoreCollections.ignoredPrivateContains(senderUUID, targetUUID)) {
             IgnoreCollections.removeFromIgnoredPrivate(senderUUID, targetUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                if (IgnoreCollections.isIgnoredPrivateEmpty()) {
-                    DatabaseQueries.removePlayerFromIgnorePrivate(senderUUID);
-                } else {
-                    DatabaseQueries.removePlayerFromIgnorePrivate(senderUUID, targetUUID);
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    if (IgnoreCollections.isIgnoredPrivateEmpty()) {
+                        DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_IGNORE_PRIVATE_PRIVATE, connection, senderUUID.toString());
+                    } else {
+                        DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_IGNORED_PLAYER_FROM_IGNORE_PRIVATE, connection, senderUUID.toString(), targetUUID.toString());
+                    }
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
                 }
             });
             sender.sendMessage(this.messages.getPrivateIgnoreDisabled().replace("{player}", targetName));
         } else {
             IgnoreCollections.addToIgnoredPrivate(senderUUID, targetUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () ->
-                    DatabaseQueries.addPlayerToIgnorePrivate(senderUUID, targetUUID)
-            );
+            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+                try (final Connection connection = DatabaseHandler.getConnection()) {
+                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_IGNORE_PRIVATE, connection, senderUUID.toString(), targetUUID.toString());
+                } catch (final SQLException ex) {
+                    ex.printStackTrace();
+                }
+            });
             sender.sendMessage(this.messages.getPrivateIgnoreEnabled().replace("{player}", targetName));
         }
 
