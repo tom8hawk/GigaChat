@@ -1,10 +1,15 @@
-name: GigaChat
+name: ${name}
 version: ${project.version}
+description: ${description}
+
 main: com.github.groundbreakingmc.gigachat.GigaChat
 api-version: 1.13
+
 depend: [ PlaceholderAPI, Vault, LuckPerms ]
 softdepend: [ Essentials, CMI, SuperVanish ]
+
 authors: [ Groundbreaking, OverwriteMC ]
+website: ${site}
 
 libraries:
   - com.github.ben-manes.caffeine:caffeine:3.1.8
