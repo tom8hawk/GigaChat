@@ -10,6 +10,8 @@
     <packaging>jar</packaging>
 
     <name>GigaChat</name>
+    <description>Customizable chat for your mc server!</description>
+    <url>https://github.com/groundbreakingmc/GigaChat</url>
 
     <properties>
         <java.version>17</java.version>
