@@ -24,7 +24,7 @@ import com.github.groundbreakingmc.gigachat.utils.logging.BukkitLogger;
 import com.github.groundbreakingmc.gigachat.utils.logging.Logger;
 import com.github.groundbreakingmc.gigachat.utils.logging.PaperLogger;
 import com.github.groundbreakingmc.gigachat.utils.updateschecker.UpdatesChecker;
-import com.github.groundbreakingmc.gigachat.utils.vanish.*;
+import com.github.groundbreakingmc.gigachat.utils.vanish.VanishChecker;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
@@ -34,14 +34,12 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventPriority;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.List;
-import java.util.Locale;
 
 @Getter
 public final class GigaChat extends JavaPlugin {
@@ -65,7 +63,7 @@ public final class GigaChat extends JavaPlugin {
 
     private DisabledPrivateMessagesCollection disabled;
 
-    private VanishChecker vanishChecker;
+    private final VanishChecker vanishChecker = new VanishChecker();
 
     private Logger myLogger;
 
@@ -93,7 +91,6 @@ public final class GigaChat extends JavaPlugin {
         this.logLoggerType();
 
         super.saveDefaultConfig();
-        this.setupVanishChecker();
         this.loadClasses();
         this.setupConfigValues();
 
@@ -190,36 +187,6 @@ public final class GigaChat extends JavaPlugin {
         }
         this.pmValues.setValues();
         this.cooldownCollections.setCooldowns();
-    }
-
-    public void setupVanishChecker() {
-        final String checker = super.getConfig().getString("vanish-provider", "SUPER_VANISH").toUpperCase(Locale.ENGLISH);
-        final PluginManager pluginManager = super.getServer().getPluginManager();
-        switch (checker) {
-            case "SUPER_VANISH":
-                if (pluginManager.getPlugin("SuperVanish") != null) {
-                    this.myLogger.warning("SuperVanish will be used as vanish provider.");
-                    this.vanishChecker = new SuperVanishChecker();
-                    break;
-                }
-            case "ESSENTIALS":
-                final Plugin essentials = pluginManager.getPlugin("Essentials");
-                if (essentials != null) {
-                    this.myLogger.warning("Essentials will be used as vanish provider.");
-                    this.vanishChecker = new EssentialsChecker(essentials);
-                    break;
-                }
-            case "CMI":
-                if (pluginManager.getPlugin("CMI") != null) {
-                    this.myLogger.warning("CMI will be used as vanish provider.");
-                    this.vanishChecker = new CMIChecker();
-                    break;
-                }
-            default:
-                this.myLogger.warning("No vanish provider were found! Plugin will not check if the player is vanished.");
-                this.myLogger.warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-                this.vanishChecker = new NoChecker();
-        }
     }
 
     private void registerEvents() {

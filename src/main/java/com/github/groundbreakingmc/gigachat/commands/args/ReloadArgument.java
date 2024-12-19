@@ -24,7 +24,6 @@ public final class ReloadArgument extends ArgsConstructor {
         this.plugin.getCommandRegisterer().unregisterCustomCommand();
         this.plugin.getAutoMessages().autoMessagesClone.clear();
         this.plugin.reloadConfig();
-        this.plugin.setupVanishChecker();
         this.plugin.setupConfigValues();
         this.plugin.getCooldownCollections().setCooldowns();
         this.plugin.getAutoMessages().cancel();

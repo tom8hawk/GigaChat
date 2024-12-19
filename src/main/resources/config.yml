@@ -7,9 +7,6 @@
 #
 # /gigachat help - чтобы увидеть все доступные команды
 #
-#
-# ESSENTIALS / SUPER_VANISH / CMI
-vanish-provider: ESSENTIALS
 
 # Настройка авто-абновлений
 updates:
