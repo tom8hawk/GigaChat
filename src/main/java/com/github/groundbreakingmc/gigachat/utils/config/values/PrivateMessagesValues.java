@@ -70,7 +70,7 @@ public final class PrivateMessagesValues {
     }
 
     public void setValues() {
-        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("private-messages", 1.0);
+        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("private-messages.yml", 1.0);
 
         this.setupSettings(config);
         this.setupCommands(config);

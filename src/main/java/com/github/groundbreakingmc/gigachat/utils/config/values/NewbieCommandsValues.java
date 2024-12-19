@@ -50,7 +50,7 @@ public final class NewbieCommandsValues {
     }
 
     public void setValues() {
-        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("newbie-commands", 1.0);
+        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("newbie-commands.yml", 1.0);
         final Colorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
 
         this.setupSettings(config, colorizer);

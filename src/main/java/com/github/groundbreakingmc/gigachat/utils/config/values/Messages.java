@@ -90,7 +90,7 @@ public final class Messages {
     }
 
     public void setupMessages() {
-        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("messages", 1.0);
+        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("messages.yml", 1.0);
         final Colorizer colorizer = this.plugin.getColorizer(config, "settings.serializer");
 
         this.setupMessages(config, colorizer);

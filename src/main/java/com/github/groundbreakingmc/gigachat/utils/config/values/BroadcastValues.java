@@ -45,7 +45,7 @@ public final class BroadcastValues {
     }
 
     public void setValues() {
-        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("broadcast", 1.0);
+        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("broadcast.yml", 1.0);
 
         final ConfigurationSection broadcast = config.getConfigurationSection("settings");
         if (broadcast != null) {

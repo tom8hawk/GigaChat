@@ -98,9 +98,9 @@ public class ChatUtil {
         final ConfigurationSection groupsColorsSection = chatSection.getConfigurationSection("group-colors");
         if (groupsColorsSection != null) {
             final Map<String, String> groupsColors = new Object2ObjectOpenHashMap<>();
-            for (final String groupKey : groupsColorsSection.getKeys(false)) {
-                groupsColors.put(groupKey, groupsColorsSection.getString(groupKey));
-            }
+            groupsColorsSection.getValues(false).forEach((key, value) ->
+                    groupsColors.put(key, (String) value)
+            );
 
             return groupsColors;
         }

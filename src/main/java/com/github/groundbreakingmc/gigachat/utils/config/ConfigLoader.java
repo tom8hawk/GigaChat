@@ -18,21 +18,31 @@ public final class ConfigLoader {
         this.plugin = plugin;
     }
 
-    public FileConfiguration loadAndGet(final String fileName, final double fileVersion) {
-        final File file = new File(this.plugin.getDataFolder(), fileName + ".yml");
-        if (!file.exists()) {
-            this.plugin.saveResource(fileName + ".yml", false);
-        }
+    public FileConfiguration loadAndGet(final String fileName) {
+        return this.loadAndGet(fileName, 0);
+    }
 
-        try {
-            new YamlConfiguration().load(file);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+    public FileConfiguration loadAndGet(final String fileName, final double fileVersion) {
+        return this.loadAndGet(fileName, fileVersion, true);
+    }
+
+    public FileConfiguration loadAndGet(final String fileName, final boolean setDefaults) {
+        return this.loadAndGet(fileName, 0, setDefaults);
+    }
+
+    public FileConfiguration loadAndGet(final String fileName, final double fileVersion, final boolean setDefaults) {
+        final File file = new File(this.plugin.getDataFolder(), fileName);
+        if (!file.exists()) {
+            this.plugin.saveResource(fileName, false);
         }
 
         FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-        setDefaults(config, fileName);
-        config = checkVersion(config, fileName, fileVersion);
+        if (fileVersion != 0) {
+            config = this.checkVersion(config, fileName, fileVersion);
+        }
+        if (setDefaults) {
+            this.setDefaults(config, fileName);
+        }
 
         return config;
     }

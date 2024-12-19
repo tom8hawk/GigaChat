@@ -56,7 +56,7 @@ public final class ChatValues {
     }
 
     public void setValues() {
-        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("chats", 1.0);
+        final FileConfiguration config = new ConfigLoader(this.plugin).loadAndGet("chats.yml", 1.0, false);
 
         this.setupChats(config);
         this.setupSettings(config);
