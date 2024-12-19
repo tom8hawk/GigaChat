@@ -107,6 +107,10 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return false;
     }
 
+    public void addCooldown(final Player sender) {
+        this.chatCooldowns.put(sender.getUniqueId(), System.currentTimeMillis());
+    }
+
     public String getColor(final String group) {
         return this.groupColors.getOrDefault(group, "");
     }

@@ -89,6 +89,8 @@ public final class ChatListener implements Listener {
             this.sendHover(sender, formattedMessage, adminHover, adminRecipients, prefix, suffix, color);
         }
 
+        chat.addCooldown(sender);
+
         final Hover hover = chat.getHover();
         if (hover.isEnabled()) {
             this.sendHover(sender, formattedMessage, hover, recipients, prefix, suffix, color);
