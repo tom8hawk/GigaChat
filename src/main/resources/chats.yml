@@ -88,7 +88,7 @@ chats:
         &fОпыт: &6%player_exp%
 
     # Настройка цветов групп для плейсхолдера {color}
-    groups-colors:
+    group-colors:
       default: "&7"
       admin: "&f&l"
 
