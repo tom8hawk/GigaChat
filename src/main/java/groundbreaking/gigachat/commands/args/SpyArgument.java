@@ -10,7 +10,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -61,7 +60,7 @@ public class SpyArgument extends ArgsConstructor {
     }
 
     private boolean process(final CommandSender sender, final Player target, final Chat chat) {
-        final List<UUID> players = chat.getSpyListeners();
+        final Set<UUID> players = chat.getSpyListeners();
         final String chatName = chat.getName();
         final String replacement = this.messages.getChatsNames().getOrDefault(chatName, chatName);
         final String targetName = target.getName();

@@ -3,25 +3,24 @@ package groundbreaking.gigachat.listeners;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.commands.args.DisableServerChatArgument;
 import groundbreaking.gigachat.constructors.Chat;
+import groundbreaking.gigachat.constructors.DenySound;
+import groundbreaking.gigachat.constructors.Hover;
+import groundbreaking.gigachat.utils.HoverUtils;
 import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.Utils;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.values.ChatValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -32,8 +31,6 @@ public final class ChatListener implements Listener {
     private final Messages messages;
 
     private boolean isRegistered = false;
-
-    private final String[] placeholders = { "{player}", "{prefix}", "{suffix}", "{color}" };
 
     public ChatListener(final GigaChat plugin) {
         this.plugin = plugin;
@@ -66,48 +63,44 @@ public final class ChatListener implements Listener {
             message = message.substring(1);
         }
 
-        final List<Player> recipients = chat.getRecipients(sender);
+        final Set<Player> recipients = chat.getRecipients(sender);
 
-        final String[] replacementList = this.getReplacements(sender, chat);
+        final String prefix = this.plugin.getChat().getPlayerPrefix(sender);
+        final String suffix = this.plugin.getChat().getPlayerSuffix(sender);
+        final String groupName = this.plugin.getPerms().getPrimaryGroup(sender);
+        final String color = chat.getColor(groupName);
 
         final String spyFormat = chat.getSpyFormat();
         if (spyFormat != null && !spyFormat.isEmpty()) {
-            final List<UUID> spyListenersUUIDs = chat.getSpyListeners();
-            if (!spyListenersUUIDs.isEmpty()){
-                final List<Player> spyListeners = new ArrayList<>(spyListenersUUIDs).stream().map(Bukkit::getPlayer).collect(Collectors.toList());
+            final Set<UUID> spyListenersUUIDs = chat.getSpyListeners();
+            if (!spyListenersUUIDs.isEmpty()) {
+                final Set<Player> spyListeners = spyListenersUUIDs.stream().map(Bukkit::getPlayer).collect(Collectors.toSet());
                 spyListeners.remove(sender);
-                this.sendSpy(sender, message, spyFormat, spyListeners, replacementList);
+                this.sendSpy(sender, chat, message, spyFormat, spyListeners, prefix, suffix, color);
             }
         }
 
         final String chatFormat = chat.getFormat();
-        final String formattedMessage = this.getFormattedMessage(sender, message, chatFormat, replacementList);
+        final String formattedMessage = this.getFormattedMessage(sender, message, chatFormat, prefix, suffix, color);
 
-        if (chatValues.isAdminHoverEnabled()) {
-            final String adminHoverText = this.chatValues.getAdminHoverText();
-            final String adminHoverAction = this.chatValues.getHoverAction();
-            final String adminHoverValue = this.chatValues.getHoverValue();
-            final List<Player> adminRecipients = this.getAdminRecipients(recipients);
-
-            this.sendHover(sender, formattedMessage, adminHoverText, adminHoverAction, adminHoverValue, adminRecipients, replacementList);
+        final Hover adminHover = chat.getAdminHover();
+        if (adminHover.isEnabled()) {
+            final Set<Player> adminRecipients = this.getAdminRecipients(recipients);
+            this.sendHover(sender, formattedMessage, adminHover, adminRecipients, prefix, suffix, color);
         }
 
-        if (chatValues.isHoverEnabled()) {
-            final String hoverText = this.chatValues.getHoverText();
-            final String hoverAction = this.chatValues.getHoverAction();
-            final String hoverValue = this.chatValues.getHoverValue();
-
-            this.sendHover(sender, formattedMessage, hoverText, hoverAction, hoverValue, recipients, replacementList);
+        final Hover hover = chat.getHover();
+        if (hover.isEnabled()) {
+            this.sendHover(sender, formattedMessage, hover, recipients, prefix, suffix, color);
             this.plugin.getServer().getConsoleSender().sendMessage(formattedMessage);
-
             event.setCancelled(true);
         } else {
             event.getRecipients().clear();
             event.getRecipients().addAll(recipients);
             event.setFormat(formattedMessage);
         }
-        if (chat.isNoOneHeard(sender, recipients, plugin.getVanishChecker())) {
-            sender.sendMessage(messages.getNoOneHear());
+        if (chat.isNoOneHeard(sender, recipients, this.plugin.getVanishChecker())) {
+            sender.sendMessage(this.messages.getNoOneHear());
         }
     }
 
@@ -123,17 +116,7 @@ public final class ChatListener implements Listener {
 
     private Chat getChat(final String message) {
         final char firstChar = message.charAt(0);
-        return chatValues.getChats().getOrDefault(firstChar, chatValues.getDefaultChat());
-    }
-
-    private String[] getReplacements(final Player sender, final Chat chat) {
-        final String name = sender.getName();
-        final String prefix = this.plugin.getChat().getPlayerPrefix(sender);
-        final String suffix = this.plugin.getChat().getPlayerSuffix(sender);
-        final String groupName = this.plugin.getPerms().getPrimaryGroup(sender);
-        final String color = chat.getColor(groupName);
-
-        return new String[]{ name, prefix, suffix, color };
+        return this.chatValues.getChats().getOrDefault(firstChar, this.chatValues.getDefaultChat());
     }
 
     private String getValidMessage(final Player sender, String message, final AsyncPlayerChatEvent event) {
@@ -144,7 +127,7 @@ public final class ChatListener implements Listener {
                 if (!denyMessage.isEmpty()) {
                     sender.sendMessage(denyMessage);
                 }
-                this.playDenySoundCharsCheckFailed(sender);
+                this.playDenySound(sender, this.chatValues.getCharValidatorDenySound());
                 event.setCancelled(true);
                 return null;
             }
@@ -158,7 +141,7 @@ public final class ChatListener implements Listener {
                 if (!denyMessage.isEmpty()) {
                     sender.sendMessage(denyMessage);
                 }
-                this.playDenySoundCapsCheckFailed(sender);
+                this.playDenySound(sender, this.chatValues.getCapsValidatorDenySound());
                 event.setCancelled(true);
                 return null;
             }
@@ -172,7 +155,7 @@ public final class ChatListener implements Listener {
                 if (!denyMessage.isEmpty()) {
                     sender.sendMessage(denyMessage);
                 }
-                this.playDenySoundWordsCheckFailed(sender);
+                this.playDenySound(sender, this.chatValues.getWordsValidatorDenySound());
                 event.setCancelled(true);
                 return null;
             }
@@ -183,103 +166,67 @@ public final class ChatListener implements Listener {
         return message;
     }
 
-    private void playDenySoundCharsCheckFailed(final Player messageSender) {
-        if (this.chatValues.isCharsValidatorDenySoundEnabled()) {
-            final Location location = messageSender.getLocation();
-            final Sound sound = this.chatValues.getTextValidatorDenySound();
-            final float volume = this.chatValues.getTextValidatorDenySoundVolume();
-            final float pitch = this.chatValues.getTextValidatorDenySoundPitch();
-
-            messageSender.playSound(location, sound, volume, pitch);
+    private void playDenySound(final Player player, final DenySound denySound) {
+        if (denySound != null) {
+            denySound.play(player);
         }
     }
 
-    private void playDenySoundCapsCheckFailed(final Player messageSender) {
-        if (this.chatValues.isCapsValidatorDenySoundEnabled()) {
-            final Location location = messageSender.getLocation();
-            final Sound sound = this.chatValues.getCapsValidatorDenySound();
-            final float volume = this.chatValues.getCapsValidatorDenySoundVolume();
-            final float pitch = this.chatValues.getCapsValidatorDenySoundPitch();
-
-            messageSender.playSound(location, sound, volume, pitch);
+    private void sendHover(final Player sender, final String message, final Hover hover, final Set<Player> recipients,
+                           final String prefix, final String suffix, final String color) {
+        final String hoverText = hover.hoverText()
+                .replace("{player}", sender.getName())
+                .replace("{prefix}", prefix)
+                .replace("{suffix}", suffix)
+                .replace("{color}", color);
+        final Colorizer colorizer = this.chatValues.getFormatsColorizer();
+        final BaseComponent[] components = HoverUtils.get(sender, hover, hoverText, message, colorizer);
+        for (final Player recipient : recipients) {
+            recipient.spigot().sendMessage(components);
         }
     }
 
-    private void playDenySoundWordsCheckFailed(final Player messageSender) {
-        if (this.chatValues.isWordsValidatorDenySoundEnabled()) {
-            final Location location = messageSender.getLocation();
-            final Sound sound = this.chatValues.getWordsValidatorDenySound();
-            final float volume = this.chatValues.getWordsValidatorDenySoundVolume();
-            final float pitch = this.chatValues.getWordsValidatorDenySoundPitch();
+    private void sendSpy(final Player sender, final Chat chat, final String message, final String spyFormat, final Set<Player> recipients,
+                         final String prefix, final String suffix, final String color) {
+        final String formattedMessage = this.getFormattedMessage(sender, message, spyFormat, prefix, suffix, color);
 
-            messageSender.playSound(location, sound, volume, pitch);
-        }
-    }
-
-    private void sendHover(final Player player, final String formattedMessage, final String hoverText, final String hoverAction, String hoverValue, final List<Player> recipients, final String[] replacementList) {
-        final String hoverString = this.chatValues.getFormatsColorizer().colorize(
-                Utils.replacePlaceholders(
-                        player,
-                        Utils.replaceEach(hoverText, this.placeholders, replacementList)
-                )
-        );
-        final ClickEvent.Action clickEventAction = ClickEvent.Action.valueOf(hoverAction);
-        hoverValue = hoverValue.replace("{player}", player.getName());
-
-        final HoverEvent hoverEvent = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hoverString)));
-        final ClickEvent clickEvent = new ClickEvent(clickEventAction, hoverValue);
-        final BaseComponent[] comp = TextComponent.fromLegacyText(formattedMessage);
-
-        for (int i = 0; i < comp.length; i++) {
-            comp[i].setHoverEvent(hoverEvent);
-            comp[i].setClickEvent(clickEvent);
-        }
-        for (int i = 0; i < recipients.size(); i++) {
-            recipients.get(i).spigot().sendMessage(comp);
-        }
-    }
-
-    private void sendSpy(final Player sender, final String message, final String spyFormat, final List<Player> recipients, final String[] replacementList) {
-        final String formattedMessage = this.getFormattedMessage(sender, message, spyFormat, replacementList);
-
-        if (this.chatValues.isHoverEnabled()) {
-            final String hoverText = this.chatValues.getHoverText();
-            final String hoverAction = this.chatValues.getHoverAction();
-            final String hoverValue = this.chatValues.getHoverValue();
-
-            this.sendHover(sender, formattedMessage, hoverText, hoverAction, hoverValue, recipients, replacementList);
+        final Hover hover = chat.getHover();
+        if (hover.isEnabled()) {
+            this.sendHover(sender, formattedMessage, hover, recipients, prefix, suffix, color);
             return;
         }
 
-        for (int i = 0; i < recipients.size(); i++) {
-            final Player recipient = recipients.get(i);
+        for (final Player recipient : recipients) {
             recipient.sendMessage(formattedMessage);
         }
     }
 
-    private List<Player> getAdminRecipients(final List<Player> recipients) {
-        final List<Player> adminRecipients = new ArrayList<>();
-        for (int i = recipients.size() - 1; i >= 0; i--) {
-            final Player target = recipients.get(i);
+    private Set<Player> getAdminRecipients(final Set<Player> recipients) {
+        final Set<Player> adminRecipients = new HashSet<>();
+        for (final Iterator<Player> iterator = recipients.iterator(); iterator.hasNext(); ) {
+            final Player target = iterator.next();
             if (target.hasPermission("gigachat.adminhover")) {
                 adminRecipients.add(target);
-                recipients.remove(i);
+                iterator.remove();
             }
         }
 
         return adminRecipients;
     }
 
-    public String getFormattedMessage(final Player messageSender, String message, final String format, final String[] replacementList) {
+    public String getFormattedMessage(final Player sender, String message, final String format,
+                                      final String prefix, final String suffix, final String color) {
         final String formattedMessage = this.chatValues.getFormatsColorizer().colorize(
                 Utils.replacePlaceholders(
-                        messageSender,
-                        Utils.replaceEach(format, this.placeholders, replacementList)
+                        sender,
+                        format.replace("{player}", sender.getName())
+                                .replace("{prefix}", prefix)
+                                .replace("{suffix}", suffix)
+                                .replace("{color}", color)
                 )
         );
 
-        message = this.chatValues.getChatsColorizer().colorize(messageSender, message);
-
-        return formattedMessage.replace("{message}", message).replace("%", "%%");
+        message = this.chatValues.getChatsColorizer().colorize(sender, message);
+        return formattedMessage.replace("{message}", message);
     }
 }

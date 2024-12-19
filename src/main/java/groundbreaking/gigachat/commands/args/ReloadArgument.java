@@ -17,10 +17,8 @@ public final class ReloadArgument extends ArgsConstructor {
         this.plugin = plugin;
         this.messages = plugin.getMessages();
     }
-
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
-
         final long startTime = System.currentTimeMillis();
 
         this.plugin.getCommandRegisterer().unregisterCustomCommand();
@@ -29,17 +27,16 @@ public final class ReloadArgument extends ArgsConstructor {
         this.plugin.setupVanishChecker();
         this.plugin.setupConfigValues();
         this.plugin.getCooldownCollections().setCooldowns();
+        this.plugin.getAutoMessages().cancel();
         this.plugin.getAutoMessages().run();
         this.plugin.registerPluginCommands();
 
-        final long endTime = System.currentTimeMillis();
-        final String result = String.valueOf(endTime - startTime);
-        final String message = this.messages.getReloadMessage().replace("{time}", result);
+        final String reloadTime = String.valueOf(System.currentTimeMillis() - startTime);
+        final String message = this.messages.getReloadMessage().replace("{time}", reloadTime);
         if (sender instanceof Player) {
             this.plugin.getServer().getConsoleSender().sendMessage(message);
         }
         sender.sendMessage(message);
-
         return true;
     }
 }

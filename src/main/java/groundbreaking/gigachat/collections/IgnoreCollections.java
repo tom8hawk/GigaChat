@@ -2,15 +2,15 @@ package groundbreaking.gigachat.collections;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class IgnoreCollections {
 
-    private static final Map<UUID, List<UUID>> ignoredChat = new Object2ObjectOpenHashMap<>();
-    private static final Map<UUID, List<UUID>> ignoredPrivate = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, Set<UUID>> ignoredChat = new Object2ObjectOpenHashMap<>();
+    private static final Map<UUID, Set<UUID>> ignoredPrivate = new Object2ObjectOpenHashMap<>();
 
     private IgnoreCollections() {
 
@@ -54,12 +54,12 @@ public final class IgnoreCollections {
         return !ignoredPrivate.isEmpty() && ignoredPrivate.get(searchUUID).contains(targetUuid);
     }
 
-    public static void addToIgnoredChat(final UUID targetUuid, final List<UUID> list) {
+    public static void addToIgnoredChat(final UUID targetUuid, final Set<UUID> list) {
         ignoredChat.put(targetUuid, list);
     }
 
 
-    public static void addToIgnoredPrivate(final UUID targetUuid, final List<UUID> list) {
+    public static void addToIgnoredPrivate(final UUID targetUuid, final Set<UUID> list) {
         ignoredPrivate.put(targetUuid, list);
     }
 
@@ -88,7 +88,7 @@ public final class IgnoreCollections {
     }
 
     public static boolean isIgnoredChat(final UUID searchUuid, final UUID targetUuid) {
-        if (ignoredChat.isEmpty() || !ignoredChat.containsKey(targetUuid)) {
+        if (ignoredChat.isEmpty() || !ignoredChat.containsKey(searchUuid)) {
             return false;
         }
 
@@ -96,8 +96,8 @@ public final class IgnoreCollections {
     }
 
     public static boolean isIgnoredPrivate(final UUID searchUuid, final UUID targetUuid) {
-        if (ignoredPrivate.isEmpty() || !ignoredPrivate.containsKey(targetUuid)) {
-            ignoredPrivate.put(searchUuid, new ArrayList<>());
+        if (ignoredPrivate.isEmpty() || !ignoredPrivate.containsKey(searchUuid)) {
+            ignoredPrivate.put(searchUuid, new HashSet<>());
             return false;
         }
 

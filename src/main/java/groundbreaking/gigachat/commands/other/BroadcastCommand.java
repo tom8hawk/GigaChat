@@ -2,15 +2,15 @@ package groundbreaking.gigachat.commands.other;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.CooldownCollections;
+import groundbreaking.gigachat.constructors.Hover;
+import groundbreaking.gigachat.utils.HoverUtils;
 import groundbreaking.gigachat.utils.Utils;
+import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.PermissionsColorizer;
 import groundbreaking.gigachat.utils.config.values.BroadcastValues;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.HoverEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.chat.hover.content.Text;
+import net.milkbowl.vault.chat.Chat;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -18,7 +18,9 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 public final class BroadcastCommand implements CommandExecutor, TabCompleter {
 
@@ -27,8 +29,6 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
     private final Messages messages;
     private final CooldownCollections cooldownCollections;
     private final ConsoleCommandSender consoleCommandSender;
-
-    private final String[] placeholders = {"{player}", "{prefix}", "{suffix}", "{message}"};
 
     public BroadcastCommand(final GigaChat plugin) {
         this.plugin = plugin;
@@ -40,7 +40,6 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
         if (!sender.hasPermission("gigachat.command.broadcast")) {
             sender.sendMessage(this.messages.getNoPermission());
             return true;
@@ -54,22 +53,18 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         final boolean isPlayerSender = sender instanceof Player;
         if (isPlayerSender) {
             final Player playerSender = (Player) sender;
-            final UUID senderUUID = playerSender.getUniqueId();
-            if (this.hasCooldown(playerSender, senderUUID)) {
-                this.sendMessageHasCooldown(playerSender, senderUUID);
+            if (this.hasCooldown(playerSender)) {
+                this.sendMessageHasCooldown(playerSender);
                 return true;
             }
         }
 
-        final List<Player> recipients = new ArrayList<>(Bukkit.getOnlinePlayers());
-        final String[] replacementList = this.getPlaceholders(sender, args, isPlayerSender);
-        final String message = this.getMessage(replacementList);
+        final String message = this.getMessage(sender, args);
 
-        if (isPlayerSender && this.broadcastValues.isHoverEnabled()) {
-            this.sendHover((Player) sender, message, recipients, replacementList);
+        if (isPlayerSender && this.broadcastValues.getHover().isEnabled()) {
+            this.sendHover((Player) sender, message);
         } else {
-            for (int i = 0; i < recipients.size(); i++) {
-                final Player recipient = recipients.get(i);
+            for (final Player recipient : Bukkit.getOnlinePlayers()) {
                 recipient.sendMessage(message);
                 this.playerSound(recipient);
             }
@@ -84,62 +79,51 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final UUID playerUUID) {
-        return this.cooldownCollections.hasCooldown(playerSender, playerUUID, "gigachat.bypass.cooldown.broadcast", cooldownCollections.getBroadcastCooldowns());
+    private boolean hasCooldown(final Player sender) {
+        return this.cooldownCollections.hasCooldown(sender, "gigachat.bypass.cooldown.broadcast", cooldownCollections.getBroadcastCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final UUID playerUUID) {
-        final long timeLeftInMillis = this.cooldownCollections.getBroadcastCooldowns().get(playerUUID) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player sender) {
+        final long timeLeftInMillis = this.cooldownCollections.getBroadcastCooldowns()
+                .get(sender.getUniqueId()) - System.currentTimeMillis();
         final int result = (int) (this.broadcastValues.getCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
-        playerSender.sendMessage(message);
+        sender.sendMessage(message);
     }
 
-    private String[] getPlaceholders(final CommandSender sender, final String[] args, final boolean isPlayerSender) {
-        final String name = sender.getName();
+    private String getMessage(final CommandSender sender, final String[] args) {
+        final String message;
         String prefix = "";
         String suffix = "";
-        final String message;
 
         final PermissionsColorizer colorizer = this.broadcastValues.getMessageColorizer();
-        if (isPlayerSender) {
-            final Player playerSender = (Player) sender;
-            prefix = colorizer.colorize(this.plugin.getChat().getPlayerPrefix(playerSender));
-            suffix = colorizer.colorize(this.plugin.getChat().getPlayerSuffix(playerSender));
+        if (sender instanceof final Player player) {
             message = colorizer.colorize((Player) sender, String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
+            prefix = this.plugin.getChat().getPlayerPrefix(player);
+            suffix = this.plugin.getChat().getPlayerSuffix(player);
         } else {
             message = colorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
         }
 
-        return new String[]{name, prefix, suffix, message};
+        return this.broadcastValues.getFormat()
+                .replace("{player}", sender.getName())
+                .replace("{prefix}", prefix)
+                .replace("{suffix}", suffix)
+                .replace("{message}", message);
     }
 
-    private String getMessage(final String[] replacementList) {
-        return Utils.replaceEach(this.broadcastValues.getFormat(), this.placeholders, replacementList);
-    }
-
-    private void sendHover(final Player sender, final String formattedMessage, final List<Player> recipients, final String[] replacementList) {
-        final String hoverString = this.broadcastValues.getColorizer().colorize(
-                Utils.replacePlaceholders(
-                        sender,
-                        Utils.replaceEach(this.broadcastValues.getHoverText(), this.placeholders, replacementList)
-                )
-        );
-        final ClickEvent.Action hoverAction = ClickEvent.Action.valueOf(this.broadcastValues.getHoverAction());
-        final String hoverValue = this.broadcastValues.getHoverValue().replace("{player}", sender.getName());
-
-        final HoverEvent hoverText = new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text(TextComponent.fromLegacyText(hoverString)));
-        final ClickEvent clickEvent = new ClickEvent(hoverAction, hoverValue);
-        final BaseComponent[] comp = TextComponent.fromLegacyText(formattedMessage);
-
-        for (int i = 0; i < comp.length; i++) {
-            comp[i].setHoverEvent(hoverText);
-            comp[i].setClickEvent(clickEvent);
-        }
-        for (int i = 0; i < recipients.size(); i++) {
-            final Player recipient = recipients.get(i);
-            recipient.spigot().sendMessage(comp);
+    private void sendHover(final Player sender, final String message) {
+        final Hover hover = this.broadcastValues.getHover();
+        final Chat chat = this.plugin.getChat();
+        final String hoverText = hover.hoverText()
+                .replace("{player}", sender.getName())
+                .replace("{prefix}", chat.getPlayerPrefix(sender))
+                .replace("{suffix}", chat.getPlayerSuffix(sender));
+        final Colorizer colorizer = this.broadcastValues.getColorizer();
+        final BaseComponent[] components = HoverUtils.get(sender, hover, hoverText, message, colorizer);
+        for (final Player recipient : Bukkit.getOnlinePlayers()) {
+            recipient.spigot().sendMessage(components);
             this.playerSound(recipient);
         }
     }

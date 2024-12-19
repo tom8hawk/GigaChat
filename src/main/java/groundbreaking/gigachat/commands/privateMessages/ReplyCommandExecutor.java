@@ -14,7 +14,6 @@ import org.bukkit.command.*;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +26,6 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
     private final ConsoleCommandSender consoleSender;
     private final CooldownCollections cooldownCollections;
     private final PmSoundsCollection pmSoundsCollection;
-
-    private final String[] placeholders = { "{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}" };
 
     public ReplyCommandExecutor(final GigaChat plugin) {
         this.plugin = plugin;
@@ -58,12 +55,12 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
             return true;
         }
 
-        final UUID senderUUID = playerSender.getUniqueId();
-        if (this.hasCooldown(playerSender, senderUUID)) {
-            this.sendMessageHasCooldown(playerSender, senderUUID);
+        if (this.hasCooldown(playerSender)) {
+            this.sendMessageHasCooldown(playerSender);
             return true;
         }
 
+        final UUID senderUUID = playerSender.getUniqueId();
         final UUID recipientUUID = ReplyCollection.getRecipientName(senderUUID);
         if (recipientUUID == null) {
             sender.sendMessage(this.messages.getNobodyToAnswer());
@@ -88,8 +85,7 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
             }
         }
 
-        String message = this.getMessage(playerSender, args);
-        message = this.getValidMessage(playerSender, message);
+        final String message = this.getValidMessage(playerSender, this.getMessage(playerSender, args));
         if (message == null) {
             return true;
         }
@@ -99,14 +95,10 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         final String recipientPrefix = this.getPrefix(recipient);
         final String recipientSuffix = getSuffix(recipient);
 
-        final String senderName = playerSender.getName();
-        final String recipientName = recipient.getName();
-        final String[] replacementList = { senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix };
-
-        final String formattedMessageForSender = this.getFormattedMessage(playerSender, message, this.pmValues.getSenderFormat(), replacementList);
-        final String formattedMessageForRecipient = this.getFormattedMessage(playerSender, message, this.pmValues.getRecipientFormat(), replacementList);
-        final String formattedMessageForConsole = this.getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
-        final String formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
+        final String formattedMessageForSender = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getSenderFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
+        final String formattedMessageForRecipient = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getRecipientFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
+        final String formattedMessageForConsole = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getConsoleFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
+        final String formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getSocialSpyFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
 
         ReplyCollection.add(recipientUUID, senderUUID);
         this.processLogs(formattedMessageForConsole);
@@ -116,20 +108,20 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         recipient.sendMessage(formattedMessageForRecipient);
 
         this.playSound(recipient);
-
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
-        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownCollections.getPrivateCooldowns());
+    private boolean hasCooldown(final Player playerSender) {
+        return this.cooldownCollections.hasCooldown(playerSender, "gigachat.bypass.cooldown.socialspy", this.cooldownCollections.getPrivateCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
-        final long timeLeftInMillis = this.cooldownCollections.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player sender) {
+        final long timeLeftInMillis = this.cooldownCollections.getPrivateCooldowns()
+                .get(sender.getUniqueId()) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
-        playerSender.sendMessage(message);
+        sender.sendMessage(message);
     }
 
     private boolean isIgnored(final UUID ignoringUUID, final UUID ignoredUUID) {
@@ -144,15 +136,23 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
         return this.plugin.getChat().getPlayerSuffix(player);
     }
 
-    public String getFormattedMessage(final Player player, final String message, final String format, final String[] replacementList) {
+    public String getFormattedMessage(final Player player, final Player recipient,
+                                      final String message, final String format,
+                                      final String senderPrefix, final String senderSuffix,
+                                      final String recipientPrefix, final String recipientSuffix) {
         final String formatted = this.pmValues.getMessagesColorizer().colorize(
                 Utils.replacePlaceholders(
                         player,
-                        Utils.replaceEach(format, this.placeholders, replacementList)
+                        format.replace("{from-prefix}", senderPrefix)
+                        .replace("{from-name}", player.getName())
+                        .replace("{from-suffix}", senderSuffix)
+                        .replace("{to-prefix}", recipientPrefix)
+                        .replace("{to-name}", recipient.getName())
+                        .replace("{to-suffix}", recipientSuffix)
                 )
         );
 
-        return formatted.replace("{message}", message).replace("%", "%%");
+        return formatted.replace("{message}", message);
     }
 
     private String getMessage(final Player sender, final String[] args) {
@@ -254,6 +254,6 @@ public final class ReplyCommandExecutor implements CommandExecutor, TabCompleter
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return Collections.emptyList();
+        return List.of();
     }
 }

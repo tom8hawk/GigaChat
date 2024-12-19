@@ -4,8 +4,9 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Sound;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public final class DatabaseQueries {
@@ -31,8 +32,6 @@ public final class DatabaseQueries {
 
     /**
      * Adds the player name to the "ignoreChat" table, to save the player's choice
-     *
-     * @param playerUUID UUID of the player
      */
     public static final String ADD_PLAYER_TO_IGNORE_CHAT = "INSERT OR IGNORE INTO ignoreChat(playerUUID, ignored) VALUES(?, ?);";
 
@@ -156,7 +155,8 @@ public final class DatabaseQueries {
                 "CREATE TABLE IF NOT EXISTS chatListeners (playerUUID TEXT NOT NULL, chatName TEXT NOT NULL, PRIMARY KEY(playerUUID, chatName));"
         };
 
-        try (final Connection connection = DatabaseHandler.getConnection(); final Statement statement = connection.createStatement()) {
+        try (final Connection connection = DatabaseHandler.getConnection();
+             final Statement statement = connection.createStatement()) {
             for (int i = 0; i < queries.length; i++) {
                 statement.execute(queries[i]);
             }
@@ -199,15 +199,15 @@ public final class DatabaseQueries {
      */
     public static boolean containsPlayerInTable(final String query, final Connection connection, final UUID playerUUID) throws SQLException {
         try (final PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setObject(1, playerUUID);
+            statement.setString(1, playerUUID.toString());
             try (final ResultSet result = statement.executeQuery()) {
-                return result.next();
+                return result.getBoolean(1);
             }
         }
     }
 
-    public static List<UUID> getListOfIgnoredPlayers(final String query, final Connection connection, final UUID playerUUID) throws SQLException {
-        final List<UUID> ignoredPlayers = new ArrayList<>();
+    public static Set<UUID> getListOfIgnoredPlayers(final String query, final Connection connection, final UUID playerUUID) throws SQLException {
+        final Set<UUID> ignoredPlayers = new HashSet<>();
         try (final PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
             try (final ResultSet result = statement.executeQuery()) {

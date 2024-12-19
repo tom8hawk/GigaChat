@@ -28,7 +28,6 @@ public final class DisableAutoMessagesArgument extends ArgsConstructor {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
-
         if (args.length < 1) {
             sender.sendMessage(this.messages.getDisableAutoMessagesUsageError());
             return true;

@@ -3,8 +3,10 @@ package groundbreaking.gigachat.utils.config.values;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.constructors.Chat;
-import groundbreaking.gigachat.exceptions.FormatNullException;
+import groundbreaking.gigachat.constructors.DefaultChat;
+import groundbreaking.gigachat.constructors.DenySound;
 import groundbreaking.gigachat.listeners.ChatListener;
+import groundbreaking.gigachat.utils.ChatUtil;
 import groundbreaking.gigachat.utils.ListenerRegisterUtil;
 import groundbreaking.gigachat.utils.StringValidator;
 import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
@@ -23,7 +25,6 @@ import org.bukkit.plugin.EventExecutor;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -32,43 +33,17 @@ public final class ChatValues {
     @Getter(AccessLevel.NONE)
     private final GigaChat plugin;
 
-    private boolean isHoverEnabled;
-    private boolean isAdminHoverEnabled;
-
-    private String hoverAction;
-    private String adminHoverAction;
-
-    private String hoverValue;
-    private String adminHoverValue;
-
-    private String hoverText;
-    private String adminHoverText;
-
     private Colorizer formatsColorizer;
 
     private final PermissionsColorizer chatsColorizer;
 
     private boolean isCharsValidatorBlockMessage;
-    private boolean isCharsValidatorDenySoundEnabled;
-
     private boolean capsValidatorBlockMessageSend;
-    private boolean isCapsValidatorDenySoundEnabled;
-
     private boolean wordsValidatorBlockMessageSend;
-    private boolean isWordsValidatorDenySoundEnabled;
 
-    private Sound textValidatorDenySound;
-    private Sound capsValidatorDenySound;
-    private Sound wordsValidatorDenySound;
-
-    private float textValidatorDenySoundVolume;
-    private float textValidatorDenySoundPitch;
-
-    private float capsValidatorDenySoundVolume;
-    private float capsValidatorDenySoundPitch;
-
-    private float wordsValidatorDenySoundVolume;
-    private float wordsValidatorDenySoundPitch;
+    private DenySound charValidatorDenySound;
+    private DenySound capsValidatorDenySound;
+    private DenySound wordsValidatorDenySound;
 
     private final StringValidator stringValidator = new StringValidator();
 
@@ -85,8 +60,6 @@ public final class ChatValues {
 
         this.setupChats(config);
         this.setupSettings(config);
-        this.setupHover(config);
-        this.setupAdminHover(config);
         this.setupValidators(config);
     }
 
@@ -115,96 +88,30 @@ public final class ChatValues {
             MainCommandHandler.CHATS.clear();
             MainCommandHandler.CHATS.addAll(chatsKeys);
 
+            final DefaultChat defaultChatConstructor = ChatUtil.createDefaultChat(this.plugin, chatsSection);
             for (final String key : chatsKeys) {
+                if (key.equals("default")) {
+                    continue;
+                }
+
                 final ConfigurationSection keySection = chatsSection.getConfigurationSection(key);
                 if (keySection == null) {
                     this.plugin.getMyLogger().warning("Failed to load section \"chats." + key + "\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
                     this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
                     continue;
                 }
-                final String format = keySection.getString("format");
-                if (format == null) {
-                    throw new FormatNullException("Chat format cannot be null! Path: \"chats." + key + ".format\"");
-                }
+
+                final Chat chat = ChatUtil.createChat(this.plugin, keySection, key, defaultChatConstructor);
+
                 final String symbolString = keySection.getString("symbol");
-                final String spyFormat = keySection.getString("spy-format", null);
-                final String spyCommand = keySection.getString("spy-command", null);
-                final int distance = keySection.getInt("distance");
-                final int chatCooldown = keySection.getInt("chat-cooldown");
-                final int spyCooldown = keySection.getInt("spy-cooldown");
-
-                final ConfigurationSection noOneHeardYou = keySection.getConfigurationSection("no-one-heard-you");
-                boolean isNoOneHeardEnabled = false;
-                boolean isNoOneHeardHideHidden = true;
-                boolean isNoOneHeardHideVanished = true;
-                boolean isNoOneHeardHideSpectators = true;
-                if (noOneHeardYou != null) {
-                    isNoOneHeardEnabled = keySection.getBoolean("no-one-heard-you.enable");
-                    isNoOneHeardHideHidden = keySection.getBoolean("no-one-heard-you.hide-hidden");
-                    isNoOneHeardHideVanished = keySection.getBoolean("no-one-heard-you.hide-vanished");
-                    isNoOneHeardHideSpectators = keySection.getBoolean("no-one-heard-you.hide-spectators");
-                }
-
-                final Map<String, String> groupsColors = new Object2ObjectOpenHashMap<>();
-
-                final ConfigurationSection groupsColorsSection = keySection.getConfigurationSection("groups-colors");
-                if (groupsColorsSection != null) {
-                    for (final String groupKey : groupsColorsSection.getKeys(false)) {
-                        groupsColors.put(groupKey, groupsColorsSection.getString(groupKey));
-                    }
-                }
-
-                final Chat chat = Chat.builder()
-                        .setPlugin(this.plugin)
-                        .setName(key)
-                        .setFormat(format)
-                        .setSpyFormat(spyFormat)
-                        .setSpyCommand(spyCommand)
-                        .setDistance(distance)
-                        .setChatCooldown(chatCooldown)
-                        .setSpyCooldown(spyCooldown)
-                        .setIsNoOneHeardEnabled(isNoOneHeardEnabled)
-                        .setIsNoOneHeardHideHidden(isNoOneHeardHideHidden)
-                        .setIsNoOneHeardHideVanished(isNoOneHeardHideVanished)
-                        .setIsNoOneHeardHideSpectators(isNoOneHeardHideSpectators)
-                        .setGroupsColors(groupsColors)
-                        .build();
-
                 if (symbolString.equalsIgnoreCase("default")) {
                     this.defaultChat = chat;
                 } else {
-                    final char symbol = symbolString.charAt(0);
-                    this.chats.put(symbol, chat);
+                    chats.put(symbolString.charAt(0), chat);
                 }
             }
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"chats\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-        }
-    }
-
-    private void setupHover(final FileConfiguration config) {
-        final ConfigurationSection hover = config.getConfigurationSection("hover");
-        if (hover != null) {
-            this.isHoverEnabled = hover.getBoolean("enable");
-            this.hoverAction = hover.getString("click-action");
-            this.hoverValue = hover.getString("click-value");
-            this.hoverText = hover.getString("text");
-        } else {
-            this.plugin.getMyLogger().warning("Failed to load section \"hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-        }
-    }
-
-    private void setupAdminHover(final FileConfiguration config) {
-        final ConfigurationSection hover = config.getConfigurationSection("admin-hover");
-        if (hover != null) {
-            this.isAdminHoverEnabled = hover.getBoolean("enable");
-            this.adminHoverAction = hover.getString("click-action");
-            this.adminHoverValue = hover.getString("click-value");
-            this.adminHoverText = hover.getString("text");
-        } else {
-            this.plugin.getMyLogger().warning("Failed to load section \"admin-hover\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
         }
     }
@@ -276,15 +183,15 @@ public final class ChatValues {
         if (soundString == null) {
             this.plugin.getMyLogger().warning("Failed to load sound on path \"validators.chars.deny-sound\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-            this.isCharsValidatorDenySoundEnabled = false;
+            this.charValidatorDenySound = null;
         } else if (soundString.equalsIgnoreCase("disabled")) {
-            this.isCharsValidatorDenySoundEnabled = false;
+            this.charValidatorDenySound = null;
         } else {
             final String[] params = soundString.split(";");
-            this.textValidatorDenySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
-            this.textValidatorDenySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
-            this.textValidatorDenySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
-            this.isCharsValidatorDenySoundEnabled = true;
+            final Sound sound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            final float volume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            final float pitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
+            this.charValidatorDenySound = new DenySound(sound, volume, pitch);
         }
     }
 
@@ -293,15 +200,15 @@ public final class ChatValues {
         if (soundString == null) {
             this.plugin.getMyLogger().warning("Failed to load sound on path \"validators.caps.deny-sound\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-            this.isCapsValidatorDenySoundEnabled = false;
+            this.capsValidatorDenySound = null;
         } else if (soundString.equalsIgnoreCase("disabled")) {
-            this.isCapsValidatorDenySoundEnabled = false;
+            this.capsValidatorDenySound = null;
         } else {
             final String[] params = soundString.split(";");
-            this.capsValidatorDenySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
-            this.capsValidatorDenySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
-            this.capsValidatorDenySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
-            this.isCapsValidatorDenySoundEnabled = true;
+            final Sound sound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            final float volume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            final float pitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
+            this.capsValidatorDenySound = new DenySound(sound, volume, pitch);
         }
     }
 
@@ -310,15 +217,15 @@ public final class ChatValues {
         if (soundString == null) {
             this.plugin.getMyLogger().warning("Failed to load sound on path \"validators.words.deny-sound\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
-            this.isWordsValidatorDenySoundEnabled = false;
+            this.wordsValidatorDenySound = null;
         } else if (soundString.equalsIgnoreCase("disabled")) {
-            this.isWordsValidatorDenySoundEnabled = false;
+            this.wordsValidatorDenySound = null;
         } else {
             final String[] params = soundString.split(";");
-            this.wordsValidatorDenySound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
-            this.wordsValidatorDenySoundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
-            this.wordsValidatorDenySoundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
-            this.isWordsValidatorDenySoundEnabled = true;
+            final Sound sound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.ENTITY_VILLAGER_NO;
+            final float volume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
+            final float pitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
+            this.wordsValidatorDenySound = new DenySound(sound, volume, pitch);
         }
     }
 }

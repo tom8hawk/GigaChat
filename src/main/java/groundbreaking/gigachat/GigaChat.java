@@ -7,7 +7,6 @@ import groundbreaking.gigachat.collections.DisabledPrivateMessagesCollection;
 import groundbreaking.gigachat.collections.PmSoundsCollection;
 import groundbreaking.gigachat.commands.MainCommandHandler;
 import groundbreaking.gigachat.commands.args.*;
-import groundbreaking.gigachat.commands.other.BroadcastCommand;
 import groundbreaking.gigachat.commands.other.DisableAutoMessagesCommand;
 import groundbreaking.gigachat.commands.other.DisableOwnChatExecutor;
 import groundbreaking.gigachat.database.DatabaseHandler;
@@ -250,26 +249,32 @@ public final class GigaChat extends JavaPlugin {
     }
 
     public void registerPluginCommands() {
-        this.registerCommand("broadcast", BroadcastCommand.class, BroadcastCommand.class);
         this.registerCommand("disable-own-chat", DisableOwnChatExecutor.class, DisableOwnChatExecutor.class);
         this.registerCommand("disable-auto-messages", DisableAutoMessagesCommand.class, DisableAutoMessagesCommand.class);
     }
 
     private void registerCommand(final String configSectionName, final Class<? extends CommandExecutor> commandClass, final Class<? extends TabCompleter> commandTabClass) {
         final ConfigurationSection configSection = super.getConfig().getConfigurationSection(configSectionName);
+        this.registerCommand(configSection, commandClass, commandTabClass);
+    }
+
+    public boolean registerCommand(final ConfigurationSection configSection, final Class<? extends CommandExecutor> commandClass, final Class<? extends TabCompleter> commandTabClass) {
         if (configSection != null) {
             final String command = configSection.getString("command");
-            if (!command.isEmpty()) {
+            if (command != null && !command.isEmpty()) {
                 final List<String> aliases = configSection.getStringList("aliases");
                 try {
                     final CommandExecutor commandInstance = commandClass.getConstructor(GigaChat.class).newInstance(this);
                     final TabCompleter tabInstance = commandTabClass.getConstructor(GigaChat.class).newInstance(this);
                     this.commandRegisterer.register(command, aliases, commandInstance, tabInstance);
+                    return true;
                 } catch (final Exception ex) {
                     ex.printStackTrace();
                 }
             }
         }
+
+        return false;
     }
 
     public Colorizer getColorizer(final FileConfiguration config, final String configPath) {

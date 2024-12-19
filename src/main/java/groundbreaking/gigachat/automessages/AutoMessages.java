@@ -9,6 +9,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.List;
@@ -21,17 +22,23 @@ public final class AutoMessages {
 
     public final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
 
+    private BukkitTask task;
+
     public AutoMessages(final GigaChat plugin) {
         this.plugin = plugin;
         this.autoMessagesValues = plugin.getAutoMessagesValues();
     }
 
     public void run() {
-        (new BukkitRunnable() {
+        this.task = (new BukkitRunnable() {
             public void run() {
                 process();
             }
         }).runTaskTimerAsynchronously(this.plugin, 0L, this.autoMessagesValues.getSendInterval() * 20L);
+    }
+
+    public void cancel() {
+        this.task.cancel();
     }
 
     private void process() {

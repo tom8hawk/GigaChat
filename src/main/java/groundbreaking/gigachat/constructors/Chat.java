@@ -1,5 +1,6 @@
 package groundbreaking.gigachat.constructors;
 
+import com.google.common.collect.ImmutableMap;
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.collections.DisabledChatCollection;
 import groundbreaking.gigachat.collections.IgnoreCollections;
@@ -32,17 +33,16 @@ public final class Chat implements CommandExecutor, TabCompleter {
     private final String format;
     private final String spyFormat;
     private final String spyCommand;
+    private final Hover hover;
+    private final Hover adminHover;
     private final int distance;
     private final int chatCooldown;
     private final int spyCooldown;
-    private final boolean isNoOneHeardEnabled;
-    private final boolean isNoOneHeardHideHidden;
-    private final boolean isNoOneHeardHideVanished;
-    private final boolean isNoOneHeardHideSpectators;
-    private final Map<String, String> groupsColors;
+    private final NoOneHead noOneHeardYou;
+    private final Map<String, String> groupColors;
     private final ExpiringMap<UUID, Long> chatCooldowns;
     private final ExpiringMap<UUID, Long> spyCooldowns;
-    private final List<UUID> spyListeners;
+    private final Set<UUID> spyListeners;
     private final SpyModeCommand spyModeCommand;
 
     public Chat(
@@ -51,14 +51,13 @@ public final class Chat implements CommandExecutor, TabCompleter {
             final String format,
             final String spyFormat,
             final String spyCommand,
+            final Hover hover,
+            final Hover adminHover,
             final int distance,
             final int chatCooldown,
             final int spyCooldown,
-            final boolean isNoOneHeardEnabled,
-            final boolean isNoOneHeardHideHidden,
-            final boolean isNoOneHeardHideVanished,
-            final boolean isNoOneHeardHideSpectators,
-            final Map<String, String> groupsColors
+            final NoOneHead noOneHeardYou,
+            final Map<String, String> groupColors
     ) {
         this.plugin = plugin;
         this.name = name;
@@ -66,17 +65,16 @@ public final class Chat implements CommandExecutor, TabCompleter {
         this.format = format;
         this.spyFormat = spyFormat;
         this.spyCommand = spyCommand;
+        this.hover = hover;
+        this.adminHover = adminHover;
         this.distance = distance;
         this.chatCooldown = chatCooldown;
         this.spyCooldown = spyCooldown;
-        this.isNoOneHeardEnabled = isNoOneHeardEnabled;
-        this.isNoOneHeardHideHidden = isNoOneHeardHideHidden;
-        this.isNoOneHeardHideVanished = isNoOneHeardHideVanished;
-        this.isNoOneHeardHideSpectators = isNoOneHeardHideSpectators;
-        this.groupsColors = groupsColors;
+        this.noOneHeardYou = noOneHeardYou;
+        this.groupColors = groupColors;
         this.chatCooldowns = new ExpiringMap<>(chatCooldown, TimeUnit.MILLISECONDS);
         this.spyCooldowns = new ExpiringMap<>(chatCooldown, TimeUnit.MILLISECONDS);
-        this.spyListeners = new ArrayList<>();
+        this.spyListeners = new HashSet<>();
         this.spyModeCommand = new SpyModeCommand(this.plugin);
 
         if (spyCommand != null && !spyCommand.isEmpty()) {
@@ -84,8 +82,8 @@ public final class Chat implements CommandExecutor, TabCompleter {
         }
     }
 
-    public static ChatBuilder builder() {
-        return new ChatBuilder();
+    public static ChatBuilder builder(final GigaChat plugin) {
+        return new ChatBuilder(plugin);
     }
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
@@ -110,10 +108,10 @@ public final class Chat implements CommandExecutor, TabCompleter {
     }
 
     public String getColor(final String group) {
-        return this.groupsColors.getOrDefault(group, "");
+        return this.groupColors.getOrDefault(group, "");
     }
 
-    public List<Player> getRecipients(final Player sender) {
+    public Set<Player> getRecipients(final Player sender) {
         if (this.distance == -1) {
             return this.getSenderWorld(sender);
         }
@@ -122,7 +120,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
             return this.getNotIgnored(sender);
         }
 
-        final List<Player> playerList = new ArrayList<>();
+        final Set<Player> playerList = new HashSet<>();
         final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
         if (this.distance == -3) {
             playerList.addAll(onlinePlayers);
@@ -132,7 +130,6 @@ public final class Chat implements CommandExecutor, TabCompleter {
         final UUID senderUUID = sender.getUniqueId();
         final World senderWorld = sender.getWorld();
         final Location senderLocation = sender.getLocation();
-
 
         final double maxDist = Math.pow(this.distance, 2.0D);
         for (final Player target : onlinePlayers) {
@@ -154,11 +151,10 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return playerList;
     }
 
-    private List<Player> getNotIgnored(final Player sender) {
-        final List<Player> playerList = new ArrayList<>();
-        final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
+    private Set<Player> getNotIgnored(final Player sender) {
+        final Set<Player> playerList = new HashSet<>();
         final UUID senderUUID = sender.getUniqueId();
-        for (final Player target : onlinePlayers) {
+        for (final Player target : Bukkit.getOnlinePlayers()) {
             final UUID targetUUID = target.getUniqueId();
             if (!IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
                 playerList.add(target);
@@ -168,11 +164,10 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return playerList;
     }
 
-    private List<Player> getSenderWorld(final Player sender) {
-        final List<Player> playerList = new ArrayList<>();
-        final Collection<? extends Player> onlinePlayers = Bukkit.getOnlinePlayers();
+    private Set<Player> getSenderWorld(final Player sender) {
+        final Set<Player> playerList = new HashSet<>();
         final World senderWorld = sender.getWorld();
-        for (final Player target : onlinePlayers) {
+        for (final Player target : Bukkit.getOnlinePlayers()) {
             final World targetWorld = target.getWorld();
             if (senderWorld == targetWorld) {
                 playerList.add(target);
@@ -182,9 +177,9 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return playerList;
     }
 
-    public boolean isNoOneHeard(final Player sender, final List<Player> recipients, final VanishChecker vanishChecker) {
-        if (this.isNoOneHeardEnabled) {
-            final List<Player> validRecipients = new ArrayList<>(recipients);
+    public boolean isNoOneHeard(final Player sender, final Set<Player> recipients, final VanishChecker vanishChecker) {
+        if (this.noOneHeardYou.isEnabled()) {
+            final Set<Player> validRecipients = new HashSet<>(recipients);
             validRecipients.removeIf(recipient ->
                     !this.isRecipientValid(sender, recipient, vanishChecker)
             );
@@ -202,38 +197,33 @@ public final class Chat implements CommandExecutor, TabCompleter {
     }
 
     private boolean isRecipientVisible(final Player sender, final Player recipient) {
-        return !this.isNoOneHeardHideHidden || sender.canSee(recipient);
+        return !this.noOneHeardYou.hideHidden() || sender.canSee(recipient);
     }
 
     private boolean isRecipientNotVanished(final Player recipient, final VanishChecker vanishChecker) {
-        return !this.isNoOneHeardHideVanished || !vanishChecker.isVanished(recipient);
+        return !this.noOneHeardYou.hideVanished() || !vanishChecker.isVanished(recipient);
     }
 
     private boolean isRecipientNotSpectator(final Player recipient) {
-        return !this.isNoOneHeardHideSpectators || recipient.getGameMode() != GameMode.SPECTATOR;
+        return !this.noOneHeardYou.hideSpectators() || recipient.getGameMode() != GameMode.SPECTATOR;
     }
 
     public static class ChatBuilder {
-        private GigaChat plugin;
+        private final GigaChat plugin;
         private String name;
         private String format;
         private String spyFormat = null;
         private String spyCommand = null;
+        private Hover hover = null;
+        private Hover adminHover = null;
         private int distance;
-        private int chatCooldown = 1500;
-        private int spyCooldown = 1500;
-        private boolean isNoOneHeardEnabled;
-        private boolean isNoOneHeardHideHidden;
-        private boolean isNoOneHeardHideVanished;
-        private boolean isNoOneHeardHideSpectators;
-        private Map<String, String> groupsColors;
+        private int chatCooldown = 3000;
+        private int spyCooldown = 3000;
+        private NoOneHead noOneHeardYou;
+        private Map<String, String> groupColors;
 
-        ChatBuilder() {
-        }
-
-        public ChatBuilder setPlugin(final GigaChat plugin) {
+        ChatBuilder(final GigaChat plugin) {
             this.plugin = plugin;
-            return this;
         }
 
         public ChatBuilder setName(final String name) {
@@ -256,6 +246,16 @@ public final class Chat implements CommandExecutor, TabCompleter {
             return this;
         }
 
+        public ChatBuilder setHover(final Hover hover) {
+            this.hover = hover;
+            return this;
+        }
+
+        public ChatBuilder setAdminHover(final Hover adminHover) {
+            this.adminHover = adminHover;
+            return this;
+        }
+
         public ChatBuilder setDistance(final int distance) {
             this.distance = distance;
             return this;
@@ -271,33 +271,18 @@ public final class Chat implements CommandExecutor, TabCompleter {
             return this;
         }
 
-        public ChatBuilder setIsNoOneHeardEnabled(final boolean isNoOneHeardEnabled) {
-            this.isNoOneHeardEnabled = isNoOneHeardEnabled;
+        public ChatBuilder setNoOneHeard(final NoOneHead noOneHeardYou) {
+            this.noOneHeardYou = noOneHeardYou;
             return this;
         }
 
-        public ChatBuilder setIsNoOneHeardHideHidden(final boolean isNoOneHeardHideHidden) {
-            this.isNoOneHeardHideHidden = isNoOneHeardHideHidden;
-            return this;
-        }
-
-        public ChatBuilder setIsNoOneHeardHideVanished(final boolean isNoOneHeardHideVanished) {
-            this.isNoOneHeardHideVanished = isNoOneHeardHideVanished;
-            return this;
-        }
-
-        public ChatBuilder setIsNoOneHeardHideSpectators(final boolean isNoOneHeardHideSpectators) {
-            this.isNoOneHeardHideSpectators = isNoOneHeardHideSpectators;
-            return this;
-        }
-
-        public ChatBuilder setGroupsColors(final Map<String, String> groupsColors) {
-            this.groupsColors = groupsColors;
+        public ChatBuilder setGroupColors(final Map<String, String> groupColors) {
+            this.groupColors = ImmutableMap.copyOf(groupColors);
             return this;
         }
 
         public Chat build() {
-            return new Chat(plugin, name, format, spyFormat, spyCommand, distance, chatCooldown, spyCooldown, isNoOneHeardEnabled, isNoOneHeardHideHidden, isNoOneHeardHideVanished, isNoOneHeardHideSpectators, groupsColors);
+            return new Chat(plugin, name, format, spyFormat, spyCommand, hover, adminHover, distance, chatCooldown, spyCooldown, noOneHeardYou, groupColors);
         }
     }
 }

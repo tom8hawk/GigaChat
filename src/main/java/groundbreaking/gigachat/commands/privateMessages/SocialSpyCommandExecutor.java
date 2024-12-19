@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,12 +48,12 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
             return true;
         }
 
-        final UUID senderUUID = playerSender.getUniqueId();
-        if (this.hasCooldown(playerSender, senderUUID)) {
-            this.sendMessageHasCooldown(playerSender, senderUUID);
+        if (this.hasCooldown(playerSender)) {
+            this.sendMessageHasCooldown(playerSender);
             return true;
         }
 
+        final UUID senderUUID = playerSender.getUniqueId();
         if (SocialSpyCollection.contains(senderUUID)) {
             SocialSpyCollection.remove(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
@@ -82,20 +81,21 @@ public final class SocialSpyCommandExecutor implements CommandExecutor, TabCompl
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender, final UUID senderUUID) {
-        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.socialspy", this.cooldownCollections.getSpyCooldowns());
+    private boolean hasCooldown(final Player sender) {
+        return this.cooldownCollections.hasCooldown(sender, "gigachat.bypass.cooldown.socialspy", this.cooldownCollections.getSpyCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender, final UUID senderUUID) {
-        final long timeLeftInMillis = this.cooldownCollections.getSpyCooldowns().get(senderUUID) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player sender) {
+        final long timeLeftInMillis = this.cooldownCollections.getSpyCooldowns()
+                .get(sender.getUniqueId()) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getSpyCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
-        playerSender.sendMessage(message);
+        sender.sendMessage(message);
     }
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return Collections.emptyList();
+        return List.of();
     }
 }

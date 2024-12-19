@@ -21,7 +21,6 @@ public final class DisableServerChatArgument extends ArgsConstructor {
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
-
         if (chatDisabled) {
             sender.sendMessage(this.messages.getServerChatEnabled());
             chatDisabled = false;

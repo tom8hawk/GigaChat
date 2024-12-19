@@ -50,12 +50,12 @@ public final class CooldownCollections {
         this.broadcastCooldowns.remove(uuid);
     }
 
-    public boolean hasCooldown(final Player target, final UUID targetUUID, final String permission, final ExpiringMap<UUID, Long> playerCooldown) {
+    public boolean hasCooldown(final Player target, final String permission, final ExpiringMap<UUID, Long> cooldownMap) {
         if (target.hasPermission(permission)) {
             return false;
         }
 
-        return playerCooldown.containsKey(targetUUID);
+        return cooldownMap.containsKey(target.getUniqueId());
     }
 
     public void addCooldown(final UUID uuid, final ExpiringMap<UUID, Long> playerCooldown) {

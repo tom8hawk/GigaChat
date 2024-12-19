@@ -1,12 +1,15 @@
 package groundbreaking.gigachat.utils.config.values;
 
 import groundbreaking.gigachat.GigaChat;
+import groundbreaking.gigachat.commands.other.BroadcastCommand;
+import groundbreaking.gigachat.constructors.Hover;
 import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.BroadcastColorizer;
 import groundbreaking.gigachat.utils.colorizer.messages.PermissionsColorizer;
 import groundbreaking.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
+import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.Sound;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -23,11 +26,7 @@ public final class BroadcastValues {
 
     private int cooldown;
 
-    private boolean isHoverEnabled;
-
-    private String hoverAction;
-    private String hoverValue;
-    private String hoverText;
+    private Hover hover;
 
     private boolean isSoundEnabled;
 
@@ -54,6 +53,11 @@ public final class BroadcastValues {
             this.format = this.colorizer.colorize(broadcast.getString("format"));
             this.cooldown = broadcast.getInt("cooldown");
 
+            final boolean registered = this.plugin.registerCommand(broadcast, BroadcastCommand.class, BroadcastCommand.class);
+            if (!registered) {
+                return;
+            }
+
             this.setupHover(broadcast);
             this.setupSound(broadcast);
         } else {
@@ -65,10 +69,16 @@ public final class BroadcastValues {
     private void setupHover(final ConfigurationSection broadcast) {
         final ConfigurationSection hover = broadcast.getConfigurationSection("hover");
         if (hover != null) {
-            this.isHoverEnabled = hover.getBoolean("enable");
-            this.hoverAction = hover.getString("click-action");
-            this.hoverValue = hover.getString("click-value");
-            this.hoverText = hover.getString("text");
+            final boolean isHoverEnabled = hover.getBoolean("enable");
+            final String hoverAction = hover.getString("click-action");
+            final String hoverValue = hover.getString("click-value");
+            final String hoverText = hover.getString("text");
+
+            this.hover = new Hover(isHoverEnabled,
+                    ClickEvent.Action.valueOf(hoverAction),
+                    hoverValue,
+                    hoverText
+            );
         } else {
             this.plugin.getMyLogger().warning("Failed to load section \"settings.hover\" from file \"broadcast.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class SpyModeCommand {
@@ -50,7 +50,7 @@ public class SpyModeCommand {
         final String chatName = chat.getName();
         final String replacement = this.messages.getChatsNames().getOrDefault(chatName, chatName);
 
-        final List<UUID> players = chat.getSpyListeners();
+        final Set<UUID> players = chat.getSpyListeners();
         if (players.contains(senderUUID)) {
             sender.sendMessage(this.messages.getChatsSpyDisabled().replace("{chat}", replacement));
             players.remove(senderUUID);

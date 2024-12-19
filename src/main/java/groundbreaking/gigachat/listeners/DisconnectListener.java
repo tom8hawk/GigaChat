@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public final class DisconnectListener implements Listener {
@@ -62,11 +63,11 @@ public final class DisconnectListener implements Listener {
                 if (DatabaseQueries.containsPlayerInTable(DatabaseQueries.CHECK_IF_PLAYER_DISABLED_PRIVATE_MESSAGES, connection, playerUUID)) {
                     this.disabledPrivateMessagesCollection.add(playerUUID);
                 }
-                final List<UUID> ignoredChat = DatabaseQueries.getListOfIgnoredPlayers(DatabaseQueries.GET_IGNORED_PLAYERS_FROM_CHAT, connection, playerUUID);
+                final Set<UUID> ignoredChat = DatabaseQueries.getListOfIgnoredPlayers(DatabaseQueries.GET_IGNORED_PLAYERS_FROM_CHAT, connection, playerUUID);
                 if (!ignoredChat.isEmpty()) {
                     IgnoreCollections.addToIgnoredChat(playerUUID, ignoredChat);
                 }
-                final List<UUID> ignoredPrivate = DatabaseQueries.getListOfIgnoredPlayers(DatabaseQueries.GET_IGNORED_PRIVATE, connection, playerUUID);
+                final Set<UUID> ignoredPrivate = DatabaseQueries.getListOfIgnoredPlayers(DatabaseQueries.GET_IGNORED_PRIVATE, connection, playerUUID);
                 if (!ignoredPrivate.isEmpty()) {
                     IgnoreCollections.addToIgnoredPrivate(playerUUID, ignoredPrivate);
                 }

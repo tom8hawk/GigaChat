@@ -31,7 +31,6 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
         if (!(sender instanceof Player playerSender)) {
             sender.sendMessage(this.messages.getPlayerOnly());
             return true;

@@ -10,7 +10,6 @@ import groundbreaking.gigachat.utils.colorizer.basic.Colorizer;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import groundbreaking.gigachat.utils.config.values.PrivateMessagesValues;
 import groundbreaking.gigachat.utils.vanish.VanishChecker;
-import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -20,7 +19,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 public final class PrivateMessageCommandExecutor implements CommandExecutor, TabCompleter {
 
@@ -33,9 +35,6 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     private final DisabledPrivateMessagesCollection disabled;
     private final VanishChecker vanishChecker;
     private final ConsoleCommandSender consoleSender;
-
-    @Getter
-    private final String[] placeholders = {"{from-prefix}", "{from-name}", "{from-suffix}", "{to-prefix}", "{to-name}", "{to-suffix}"};
 
     public PrivateMessageCommandExecutor(final GigaChat plugin) {
         this.plugin = plugin;
@@ -51,7 +50,6 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
         if (!sender.hasPermission("gigachat.command.pm")) {
             sender.sendMessage(this.messages.getNoPermission());
             return true;
@@ -80,7 +78,6 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             return true;
         }
 
-        final String senderName = sender.getName();
         if (isPlayerSender && this.hasCooldown((Player) sender)) {
             this.sendMessageHasCooldown((Player) sender);
             return true;
@@ -116,26 +113,22 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             }
         }
 
-        final String recipientName = recipient.getName();
-        final String[] replacementList = getReplacements(sender, recipient, isPlayerSender, senderName, recipientName);
-
-        this.process(sender, recipient, recipientUUID, isPlayerSender, message, replacementList);
+        this.process(sender, recipient, recipientUUID, isPlayerSender, message);
 
         return true;
     }
 
-    private boolean hasCooldown(final Player playerSender) {
-        final UUID senderUUID = playerSender.getUniqueId();
-        return this.cooldownCollections.hasCooldown(playerSender, senderUUID, "gigachat.bypass.cooldown.pm", this.cooldownCollections.getPrivateCooldowns());
+    private boolean hasCooldown(final Player sender) {
+        return this.cooldownCollections.hasCooldown(sender, "gigachat.bypass.cooldown.pm", this.cooldownCollections.getPrivateCooldowns());
     }
 
-    private void sendMessageHasCooldown(final Player playerSender) {
-        final UUID senderUUID = playerSender.getUniqueId();
-        final long timeLeftInMillis = this.cooldownCollections.getPrivateCooldowns().get(senderUUID) - System.currentTimeMillis();
+    private void sendMessageHasCooldown(final Player sender) {
+        final long timeLeftInMillis = this.cooldownCollections.getPrivateCooldowns()
+                .get(sender.getUniqueId()) - System.currentTimeMillis();
         final int result = (int) (this.pmValues.getPmCooldown() / 1000 + timeLeftInMillis / 1000);
         final String restTime = Utils.getTime(result);
         final String message = this.messages.getCommandCooldownMessage().replace("{time}", restTime);
-        playerSender.sendMessage(message);
+        sender.sendMessage(message);
     }
 
     private void processDisable(final Player sender) {
@@ -161,20 +154,6 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             });
             sender.sendMessage(this.messages.getPmEnabled());
         }
-    }
-
-    private String[] getReplacements(final CommandSender sender, final Player recipient, final boolean isPlayerSender, final String senderName, final String recipientName) {
-        String senderPrefix = "", senderSuffix = "";
-        if (isPlayerSender) {
-            final Player player = (Player) sender;
-            senderPrefix = this.plugin.getChat().getPlayerPrefix(player);
-            senderSuffix = this.plugin.getChat().getPlayerSuffix(player);
-        }
-
-        final String recipientPrefix = this.plugin.getChat().getPlayerPrefix(recipient);
-        final String recipientSuffix = this.plugin.getChat().getPlayerSuffix(recipient);
-
-        return new String[]{senderPrefix, senderName, senderSuffix, recipientPrefix, recipientName, recipientSuffix};
     }
 
     private String getValidMessage(final Player sender, String message) {
@@ -255,47 +234,71 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private void process(final CommandSender sender, final Player recipient,
-                         final UUID recipientUUID, final boolean isPlayerSender, final String message, final String[] replacementList) {
-        final String formattedMessageForSender, formattedMessageForRecipient, formattedMessageForConsole, formattedMessageForSocialSpy;
+                         final UUID recipientUUID, final boolean isPlayerSender, final String message) {
+        final String recipientPrefix = this.plugin.getChat().getPlayerPrefix(recipient);
+        final String recipientSuffix = this.plugin.getChat().getPlayerSuffix(recipient);
+
+        final String formattedMessageForSender;
+        final String formattedMessageForRecipient;
+        final String formattedMessageForConsole;
+        final String formattedMessageForSocialSpy;
         if (isPlayerSender) {
             final Player playerSender = (Player) sender;
-            formattedMessageForSender = getFormattedMessage(playerSender, message, this.pmValues.getSenderFormat(), replacementList);
-            formattedMessageForRecipient = getFormattedMessage(playerSender, message, this.pmValues.getRecipientFormat(), replacementList);
-            formattedMessageForConsole = getFormattedMessage(playerSender, message, this.pmValues.getConsoleFormat(), replacementList);
-            formattedMessageForSocialSpy = getFormattedMessage(playerSender, message, this.pmValues.getSocialSpyFormat(), replacementList);
+            final String senderPrefix = this.plugin.getChat().getPlayerPrefix(playerSender);
+            final String senderSuffix = this.plugin.getChat().getPlayerSuffix(playerSender);
+            
+            formattedMessageForSender = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getSenderFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
+            formattedMessageForRecipient = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getRecipientFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
+            formattedMessageForConsole = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getConsoleFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
+            formattedMessageForSocialSpy = this.getFormattedMessage(playerSender, recipient, message, this.pmValues.getSocialSpyFormat(), senderPrefix, senderSuffix, recipientPrefix, recipientSuffix);
 
             final UUID senderUUID = ((Player) sender).getUniqueId();
             ReplyCollection.add(recipientUUID, senderUUID);
-            processLogs(formattedMessageForConsole);
+            this.processLogs(formattedMessageForConsole);
             SocialSpyCollection.sendAll(playerSender, recipient, formattedMessageForSocialSpy);
         } else {
-            formattedMessageForSender = getFormattedMessage(message, this.pmValues.getSenderFormat(), replacementList);
-            formattedMessageForRecipient = getFormattedMessage(message, this.pmValues.getRecipientFormat(), replacementList);
+            formattedMessageForSender = this.getFormattedMessage(sender, recipient, message, this.pmValues.getSenderFormat(), recipientPrefix, recipientSuffix);
+            formattedMessageForRecipient = this.getFormattedMessage(sender, recipient, message, this.pmValues.getRecipientFormat(), recipientPrefix, recipientSuffix);
         }
 
         sender.sendMessage(formattedMessageForSender);
         recipient.sendMessage(formattedMessageForRecipient);
 
-        playSound(recipient);
+        this.playSound(recipient);
     }
 
-    public String getFormattedMessage(final Player player, final String message, final String format, final String[] replacementList) {
+    public String getFormattedMessage(final Player player, final Player recipient,
+                                      final String message, final String format,
+                                      final String senderPrefix, final String senderSuffix,
+                                      final String recipientPrefix, final String recipientSuffix) {
         final String formatted = this.hexColorizer.colorize(
                 Utils.replacePlaceholders(
                         player,
-                        Utils.replaceEach(format, this.placeholders, replacementList)
+                        format.replace("{from-prefix}", senderPrefix)
+                                .replace("{from-name}", player.getName())
+                                .replace("{from-suffix}", senderSuffix)
+                                .replace("{to-prefix}", recipientPrefix)
+                                .replace("{to-name}", recipient.getName())
+                                .replace("{to-suffix}", recipientSuffix)
                 )
         );
 
-        return formatted.replace("{message}", message).replace("%", "%%");
+        return formatted.replace("{message}", message);
     }
 
-    public String getFormattedMessage(final String message, final String format, final String[] replacementList) {
+    public String getFormattedMessage(final CommandSender sender, final Player recipient, 
+                                      final String message, final String format, 
+                                      final String recipientPrefix, final String recipientSuffix) {
         final String formatted = this.hexColorizer.colorize(
-                Utils.replaceEach(format, this.placeholders, replacementList)
+                format.replace("{from-prefix}", "")
+                        .replace("{from-name}", sender.getName())
+                        .replace("{from-suffix}", "")
+                        .replace("{to-prefix}", recipientPrefix)
+                        .replace("{to-name}", recipient.getName())
+                        .replace("{to-suffix}", recipientSuffix)
         );
 
-        return formatted.replace("{message}", message).replace("%", "%%");
+        return formatted.replace("{message}", message);
     }
 
     private String getMessage(final CommandSender sender, final String[] args, final boolean isPlayerSender) {
@@ -327,38 +330,38 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if (args.length == 1) {
-            final String input = args[0].toLowerCase();
-            final List<String> players = new ArrayList<>();
+            final String input = args[0];
+            final List<String> completions = new ArrayList<>();
 
             if (sender instanceof final Player playerSender) {
                 final UUID senderUUID = playerSender.getUniqueId();
                 for (final Player target : Bukkit.getOnlinePlayers()) {
                     final UUID targetUUID = target.getUniqueId();
-                    if (IgnoreCollections.isIgnoredChat(senderUUID, targetUUID) || IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
+                    if (IgnoreCollections.isIgnoredPrivate(senderUUID, targetUUID) || IgnoreCollections.isIgnoredPrivate(targetUUID, senderUUID)) {
                         continue;
                     }
 
-                    final String playerName = target.getName();
-                    if (playerName.toLowerCase().startsWith(input) && !this.vanishChecker.isVanished(target)) {
-                        players.add(playerName);
+                    final String targetName = target.getName();
+                    if (Utils.startsWithIgnoreCase(input, targetName) && !this.vanishChecker.isVanished(target)) {
+                        completions.add(targetName);
                     }
+                }
+
+                if (sender.hasPermission("gigachat.disable.pm") && Utils.startsWithIgnoreCase(input, "disable")) {
+                    completions.add("disable");
                 }
             } else {
                 for (final Player target : Bukkit.getOnlinePlayers()) {
                     final String targetName = target.getName();
-                    if (targetName.toLowerCase().startsWith(input)) {
-                        players.add(targetName);
+                    if (Utils.startsWithIgnoreCase(input, targetName)) {
+                        completions.add(targetName);
                     }
                 }
             }
 
-            if ("disable".startsWith(input) && sender.hasPermission("gigachat.disable.pm")) {
-                players.add("disable");
-            }
-
-            return players;
+            return completions;
         }
 
-        return Collections.emptyList();
+        return List.of();
     }
 }

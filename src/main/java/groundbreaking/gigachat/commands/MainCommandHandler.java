@@ -2,6 +2,7 @@ package groundbreaking.gigachat.commands;
 
 import groundbreaking.gigachat.GigaChat;
 import groundbreaking.gigachat.constructors.ArgsConstructor;
+import groundbreaking.gigachat.utils.Utils;
 import groundbreaking.gigachat.utils.config.values.Messages;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Bukkit;
@@ -26,11 +27,10 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
     }
 
     public void registerArgument(final ArgsConstructor argument) {
-        this.arguments.put(argument.getName(), argument);
+        this.arguments.put(argument.name, argument);
     }
 
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command cmd, @NotNull String commandlabel, @NotNull String[] args) {
-
         if (args.length < 1) {
             if (this.hasAnyPluginPermission(sender)) {
                 sender.sendMessage(this.messages.getNonExistArgument());
@@ -47,7 +47,7 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
             return true;
         }
 
-        if (!sender.hasPermission(argument.getPermission())) {
+        if (!sender.hasPermission(argument.permission)) {
             sender.sendMessage(this.messages.getNoPermission());
             return true;
         }
@@ -70,75 +70,95 @@ public final class MainCommandHandler implements CommandExecutor, TabCompleter {
 
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        final List<String> list = new ArrayList<>();
+        final List<String> completions = new ArrayList<>();
         final String input = args[args.length - 1].toUpperCase();
 
         if (args.length == 1) {
-            if (sender.hasPermission("gigachat.command.clearchat") && "clearchat".startsWith(input)) {
-                list.add("clearchat");
+            if (sender.hasPermission("gigachat.command.clearchat") && Utils.startsWithIgnoreCase(input, "clearchat")) {
+                completions.add("clearchat");
             }
-            if (sender.hasPermission("gigachat.command.disableam.other") && "disableam".startsWith(input)) {
-                list.add("disableam");
+            if (sender.hasPermission("gigachat.command.disableam.other") && Utils.startsWithIgnoreCase(input, "disableam")) {
+                completions.add("disableam");
             }
-            if (sender.hasPermission("gigachat.command.disablechat") && "disablechat".startsWith(input)) {
-                list.add("disablechat");
+            if (sender.hasPermission("gigachat.command.disablechat") && Utils.startsWithIgnoreCase(input, "disablechat")) {
+                completions.add("disablechat");
             }
-            if (sender.hasPermission("gigachat.command.reload") && "reload".startsWith(input)) {
-                list.add("reload");
+            if (sender.hasPermission("gigachat.command.reload") && Utils.startsWithIgnoreCase(input, "reload")) {
+                completions.add("reload");
             }
-            if (sender.hasPermission("gigachat.command.setpmsound") && "setpmsound".startsWith(input)) {
-                list.add("setpmsound");
+            if (sender.hasPermission("gigachat.command.setpmsound") && Utils.startsWithIgnoreCase(input, "setpmsound")) {
+                completions.add("setpmsound");
             }
-            if (sender.hasPermission("gigachat.command.spy.other") && "spy".startsWith(input)) {
-                list.add("spy");
+            if (sender.hasPermission("gigachat.command.spy.other") && Utils.startsWithIgnoreCase(input, "spy")) {
+                completions.add("spy");
             }
-            if (sender instanceof ConsoleCommandSender && "update".startsWith(input)) {
-                list.add("update");
+            if (sender instanceof ConsoleCommandSender && Utils.startsWithIgnoreCase(input, "update")) {
+                completions.add("update");
             }
 
-            return list;
+            return completions;
         }
 
         if (args.length == 2) {
-            final boolean hasAnyPerm = sender.hasPermission("gigachat.command.disableam")
-                    || sender.hasPermission("gigachat.command.setpmsound")
-                    || sender.hasPermission("gigachat.command.spy.other");
-            if (hasAnyPerm) {
-                final List<String> playerNames = this.getPlayers(input);
-                list.addAll(playerNames);
+            if (sender.hasPermission("gigachat.command.reload") && args[0].equalsIgnoreCase("reload")) {
+                this.reloadCompletion(input, completions);
+            } else if (sender.hasPermission("gigachat.command.disableam")
+                        || sender.hasPermission("gigachat.command.setpmsound")
+                        || sender.hasPermission("gigachat.command.spy.other")) {
+                    this.playersCompletion(input, completions);
             }
         }
 
         if (args[0].equalsIgnoreCase("setpmsound")) {
-            final boolean hasPerm = sender.hasPermission("gigachat.command.setpmsound");
-            if (args.length == 3 && hasPerm) {
-                if ("none".startsWith(input.toLowerCase())) {
-                    list.add("none");
+            if (args.length == 3 && sender.hasPermission("gigachat.command.setpmsound")) {
+                if (Utils.startsWithIgnoreCase(input, "none")) {
+                    completions.add("none");
                 }
 
                 for (final Sound sound : Sound.values()) {
                     final String soundName = sound.name();
-                    if (soundName.startsWith(input)) {
-                        list.add(soundName);
+                    if (Utils.startsWithIgnoreCase(input, soundName)) {
+                        completions.add(soundName);
                     }
                 }
             }
-        } else if (args[0].equalsIgnoreCase("spy.other")) {
+        } else if (args[0].equalsIgnoreCase("spy")) {
             return CHATS;
         }
 
-        return list;
+        return completions;
     }
 
-    private List<String> getPlayers(final String input) {
-        final List<String> players = new ArrayList<>();
+    private void reloadCompletion(final String input, final List<String> completions) {
+        if (Utils.startsWithIgnoreCase(input, "auto-messages")) {
+            completions.add("auto-messages");
+        }
+        if (Utils.startsWithIgnoreCase(input, "broadcast")) {
+            completions.add("broadcast");
+        }
+        if (Utils.startsWithIgnoreCase(input, "chats")) {
+            completions.add("chats");
+        }
+        if (Utils.startsWithIgnoreCase(input, "config")) {
+            completions.add("config");
+        }
+        if (Utils.startsWithIgnoreCase(input, "messages")) {
+            completions.add("messages");
+        }
+        if (Utils.startsWithIgnoreCase(input, "newbie")) {
+            completions.add("newbie");
+        }
+        if (Utils.startsWithIgnoreCase(input, "private-messages")) {
+            completions.add("private-messages");
+        }
+    }
+
+    private void playersCompletion(final String input, final List<String> completions) {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             final String playerName = player.getName();
-            if (playerName.toLowerCase().startsWith(input)) {
-                players.add(playerName);
+            if (Utils.startsWithIgnoreCase(input, playerName)) {
+                completions.add(playerName);
             }
         }
-
-        return players;
     }
 }
