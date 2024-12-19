@@ -36,7 +36,7 @@
                     <relocations>
                         <relocation>
                             <pattern>org.bstats</pattern>
-                            <shadedPattern>groundbreaking.gigachat.utils.metrics</shadedPattern>
+                            <shadedPattern>com.github.groundbreakingmc.gigachat.utils.metrics</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

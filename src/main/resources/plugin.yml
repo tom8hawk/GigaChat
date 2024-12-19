@@ -1,6 +1,6 @@
 name: GigaChat
 version: ${project.version}
-main: groundbreaking.gigachat.GigaChat
+main: com.github.groundbreakingmc.gigachat.GigaChat
 api-version: 1.13
 depend: [ PlaceholderAPI, Vault, LuckPerms ]
 softdepend: [ Essentials, CMI, SuperVanish ]
