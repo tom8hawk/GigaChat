@@ -7,7 +7,7 @@ import com.github.groundbreakingmc.gigachat.commands.privateMessages.ReplyComman
 import com.github.groundbreakingmc.gigachat.commands.privateMessages.SocialSpyCommandExecutor;
 import com.github.groundbreakingmc.gigachat.utils.StringValidator;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.basic.Colorizer;
-import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionsColorizer;
+import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionColorizer;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PrivateMessagesColorizer;
 import com.github.groundbreakingmc.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
@@ -60,7 +60,7 @@ public final class PrivateMessagesValues {
 
     public Colorizer formatsColorizer;
 
-    public final PermissionsColorizer messagesColorizer;
+    public final PermissionColorizer messagesColorizer;
 
     private final StringValidator stringValidator = new StringValidator();
 

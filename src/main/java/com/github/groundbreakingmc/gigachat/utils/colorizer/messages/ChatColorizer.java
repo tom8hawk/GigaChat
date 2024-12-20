@@ -3,7 +3,7 @@ package com.github.groundbreakingmc.gigachat.utils.colorizer.messages;
 import com.github.groundbreakingmc.gigachat.GigaChat;
 import org.bukkit.entity.Player;
 
-public final class ChatColorizer extends PermissionsColorizer {
+public final class ChatColorizer extends PermissionColorizer {
 
     public ChatColorizer(final GigaChat plugin) {
         super(plugin);

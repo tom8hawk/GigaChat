@@ -5,7 +5,7 @@ import com.github.groundbreakingmc.gigachat.commands.other.BroadcastCommand;
 import com.github.groundbreakingmc.gigachat.constructors.Hover;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.basic.Colorizer;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.BroadcastColorizer;
-import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionsColorizer;
+import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionColorizer;
 import com.github.groundbreakingmc.gigachat.utils.config.ConfigLoader;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public final class BroadcastValues {
 
     private Colorizer colorizer;
 
-    private final PermissionsColorizer messageColorizer;
+    private final PermissionColorizer messageColorizer;
 
     public BroadcastValues(final GigaChat plugin) {
         this.plugin = plugin;

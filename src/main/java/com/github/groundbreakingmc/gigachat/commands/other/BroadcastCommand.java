@@ -6,7 +6,7 @@ import com.github.groundbreakingmc.gigachat.constructors.Hover;
 import com.github.groundbreakingmc.gigachat.utils.HoverUtils;
 import com.github.groundbreakingmc.gigachat.utils.Utils;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.basic.Colorizer;
-import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionsColorizer;
+import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionColorizer;
 import com.github.groundbreakingmc.gigachat.utils.config.values.BroadcastValues;
 import com.github.groundbreakingmc.gigachat.utils.config.values.Messages;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -97,7 +97,7 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
         String prefix = "";
         String suffix = "";
 
-        final PermissionsColorizer colorizer = this.broadcastValues.getMessageColorizer();
+        final PermissionColorizer colorizer = this.broadcastValues.getMessageColorizer();
         if (sender instanceof final Player player) {
             message = colorizer.colorize((Player) sender, String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
             prefix = this.plugin.getChat().getPlayerPrefix(player);

@@ -6,7 +6,7 @@ import it.unimi.dsi.fastutil.chars.CharOpenHashSet;
 import it.unimi.dsi.fastutil.chars.CharSet;
 import org.bukkit.entity.Player;
 
-public abstract class PermissionsColorizer {
+public abstract class PermissionColorizer {
 
     protected static final CharSet COLOR_CODES = new CharOpenHashSet(new char[]{
             '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -23,7 +23,7 @@ public abstract class PermissionsColorizer {
     protected static final char COLOR_CHAR = '&';
     protected static final char MINECRAFT_COLOR_CHAR = '§';
 
-    public PermissionsColorizer(final GigaChat plugin) {
+    public PermissionColorizer(final GigaChat plugin) {
         this.messagesColorizer = plugin.getColorizerByVersion();
     }
 

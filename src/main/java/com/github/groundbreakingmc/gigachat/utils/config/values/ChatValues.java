@@ -11,7 +11,7 @@ import com.github.groundbreakingmc.gigachat.utils.ListenerRegisterUtil;
 import com.github.groundbreakingmc.gigachat.utils.StringValidator;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.basic.Colorizer;
 import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.ChatColorizer;
-import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionsColorizer;
+import com.github.groundbreakingmc.gigachat.utils.colorizer.messages.PermissionColorizer;
 import com.github.groundbreakingmc.gigachat.utils.config.ConfigLoader;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import lombok.AccessLevel;
@@ -35,7 +35,7 @@ public final class ChatValues {
 
     private Colorizer formatsColorizer;
 
-    private final PermissionsColorizer chatsColorizer;
+    private final PermissionColorizer chatsColorizer;
 
     private boolean isCharsValidatorBlockMessage;
     private boolean capsValidatorBlockMessageSend;
