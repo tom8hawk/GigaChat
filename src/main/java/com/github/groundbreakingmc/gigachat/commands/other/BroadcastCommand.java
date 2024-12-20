@@ -106,11 +106,14 @@ public final class BroadcastCommand implements CommandExecutor, TabCompleter {
             message = colorizer.colorize(String.join(" ", Arrays.copyOfRange(args, 0, args.length)).trim());
         }
 
-        return this.broadcastValues.getFormat()
-                .replace("{player}", sender.getName())
-                .replace("{prefix}", prefix)
-                .replace("{suffix}", suffix)
-                .replace("{message}", message);
+        return Utils.replacePlaceholders(
+                sender,
+                this.broadcastValues.getFormat()
+                        .replace("{player}", sender.getName())
+                        .replace("{prefix}", prefix)
+                        .replace("{suffix}", suffix)
+                        .replace("{message}", message)
+        );
     }
 
     private void sendHover(final Player sender, final String message) {
