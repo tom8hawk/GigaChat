@@ -24,6 +24,7 @@ public final class ClearChatArgument extends ArgsConstructor {
         for (final Player player : Bukkit.getOnlinePlayers()) {
             if (player.hasPermission("gigachat.bypass.clearchat") || player.equals(sender)) {
                 player.sendMessage(this.messages.getChatHasBeenClearedByAdministrator());
+                continue;
             }
 
             player.sendMessage(this.clearMessage);
