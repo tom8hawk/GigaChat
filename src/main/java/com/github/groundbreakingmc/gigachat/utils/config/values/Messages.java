@@ -27,6 +27,7 @@ public final class Messages {
     private String commandCooldownMessage;
     private String pmUsageError;
     private String ignoreUsageError;
+    private String enchantedIgnoreUsageError;
     private String replyUsageError;
     private String setpmsoundUsageError;
     private String broadcastUsageError;
@@ -108,6 +109,7 @@ public final class Messages {
         this.commandCooldownMessage = this.getMessage(config, "command-cooldown-message", colorizer);
         this.pmUsageError = this.getMessage(config, "pm-usage-error", colorizer);
         this.ignoreUsageError = this.getMessage(config, "ignore-usage-error", colorizer);
+        this.enchantedIgnoreUsageError = this.getMessage(config, "enchanted-ignore-usage-error", colorizer);
         this.replyUsageError = this.getMessage(config, "reply-usage-error", colorizer);
         this.setpmsoundUsageError = this.getMessage(config, "setpmsound-usage-error", colorizer);
         this.broadcastUsageError = this.getMessage(config, "broadcast-usage-error", colorizer);

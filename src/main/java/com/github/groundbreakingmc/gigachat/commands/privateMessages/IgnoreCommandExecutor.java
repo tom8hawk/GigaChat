@@ -39,7 +39,6 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
 
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-
         if (!(sender instanceof Player playerSender)) {
             sender.sendMessage(this.messages.getPlayerOnly());
             return true;
@@ -53,29 +52,33 @@ public final class IgnoreCommandExecutor implements CommandExecutor, TabComplete
         final boolean hasChatIgnorePerm = sender.hasPermission("gigachat.command.ignore.chat");
         final boolean hasPrivateIgnorePerm = sender.hasPermission("gigachat.command.ignore.private");
 
-        int argsLength = 1;
-        IgnoreType ignoreType = hasChatIgnorePerm ? IgnoreType.CHAT : IgnoreType.PRIVATE;
+        final IgnoreType ignoreType;
+        final Player target;
 
         if (hasChatIgnorePerm && hasPrivateIgnorePerm) {
-            argsLength = 2;
+            if (args.length < 2) {
+                sender.sendMessage(this.messages.getEnchantedIgnoreUsageError());
+                return true;
+            }
 
             switch (args[0].toLowerCase()) {
-                case "chat" -> {
-                }
+                case "chat" ->  ignoreType = IgnoreType.CHAT;
                 case "private" -> ignoreType = IgnoreType.PRIVATE;
                 default -> {
                     playerSender.sendMessage(this.messages.getIgnoreUsageError());
                     return true;
                 }
             }
-        }
+            target = Bukkit.getPlayer(args[1]);
+        } else {
+            if (args.length < 1) {
+                sender.sendMessage(this.messages.getIgnoreUsageError());
+                return true;
+            }
 
-        if (args.length < argsLength) {
-            sender.sendMessage(this.messages.getIgnoreUsageError());
-            return true;
+            ignoreType = hasChatIgnorePerm ? IgnoreType.CHAT : IgnoreType.PRIVATE;
+            target = Bukkit.getPlayer(args[0]);
         }
-
-        final Player target = Bukkit.getPlayer(args[argsLength - 1]);
 
         if (target == null || !playerSender.canSee(target) || this.vanishChecker.isVanished(target)) {
             playerSender.sendMessage(this.messages.getPlayerNotFound());
