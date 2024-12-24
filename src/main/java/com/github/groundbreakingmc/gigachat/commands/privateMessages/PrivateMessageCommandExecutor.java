@@ -55,9 +55,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             return true;
         }
 
-        final boolean isPlayerSender = sender instanceof Player;
-        if (args.length == 1 && isPlayerSender && args[0].equalsIgnoreCase("disable")) {
-            this.processDisable((Player) sender);
+        if (args.length == 1 && args[0].equalsIgnoreCase("disable")) {
+            this.processDisable(sender);
             return true;
         }
 
@@ -68,6 +67,7 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
 
         final Player recipient = Bukkit.getPlayer(args[0]);
 
+        final boolean isPlayerSender = sender instanceof Player;
         if (recipient == null || (isPlayerSender && !((Player) sender).canSee(recipient)) || this.vanishChecker.isVanished(recipient)) {
             sender.sendMessage(this.messages.getPlayerNotFound());
             return true;
@@ -131,8 +131,13 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
         sender.sendMessage(message);
     }
 
-    private void processDisable(final Player sender) {
-        final UUID senderUUID = sender.getUniqueId();
+    private void processDisable(final CommandSender sender) {
+        if (!(sender instanceof final Player player)) {
+            sender.sendMessage(this.messages.getPlayerOnly());
+            return;
+        }
+
+        final UUID senderUUID = player.getUniqueId();
         if (this.disabled.contains(senderUUID)) {
             this.disabled.remove(senderUUID);
             Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
