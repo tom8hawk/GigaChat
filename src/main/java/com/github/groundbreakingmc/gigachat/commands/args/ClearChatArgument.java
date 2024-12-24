@@ -22,14 +22,17 @@ public final class ClearChatArgument extends ArgsConstructor {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String[] args) {
         for (final Player player : Bukkit.getOnlinePlayers()) {
-            if (player.hasPermission("gigachat.bypass.clearchat") || player.equals(sender)) {
-                player.sendMessage(this.messages.getChatHasBeenClearedByAdministrator());
+            if (player.equals(sender)) {
                 continue;
             }
 
-            player.sendMessage(this.clearMessage);
+            if (!player.hasPermission("gigachat.bypass.clearchat")) {
+                player.sendMessage(this.clearMessage);
+            }
+            player.sendMessage(this.messages.getChatHasBeenClearedByAdministrator());
         }
 
+        sender.sendMessage(this.messages.getChatHasBeenCleared());
         return true;
     }
 }
