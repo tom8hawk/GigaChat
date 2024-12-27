@@ -99,9 +99,7 @@ public final class GigaChat extends JavaPlugin {
 
         this.autoMessages.run();
 
-        final ServicesManager servicesManager = super.getServer().getServicesManager();
-        this.setupChat(servicesManager);
-        this.setupPerms(servicesManager);
+        this.setupProviders();
 
         this.registerEvents();
         this.registerMainPluginCommand();
@@ -142,18 +140,15 @@ public final class GigaChat extends JavaPlugin {
                 : new BukkitLogger(this);
     }
 
-    private void setupChat(final ServicesManager servicesManager) {
-        final RegisteredServiceProvider<Chat> chatProvider = servicesManager.getRegistration(Chat.class);
-        if (chatProvider != null) {
-            this.chat = chatProvider.getProvider();
-        }
+    private void setupProviders() {
+        final ServicesManager servicesManager = super.getServer().getServicesManager();
+        this.chat = this.getProvider(servicesManager, Chat.class);
+        this.perms = this.getProvider(servicesManager, Permission.class);
     }
 
-    private void setupPerms(final ServicesManager servicesManager) {
-        final RegisteredServiceProvider<Permission> permissionProvider = servicesManager.getRegistration(Permission.class);
-        if (permissionProvider != null) {
-            this.perms = permissionProvider.getProvider();
-        }
+    private <T> T getProvider(final ServicesManager servicesManager, final Class<T> clazz) {
+        final RegisteredServiceProvider<T> provider = servicesManager.getRegistration(clazz);
+        return provider != null ? provider.getProvider() : null;
     }
 
     private void loadClasses() {
