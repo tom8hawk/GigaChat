@@ -117,6 +117,10 @@ public final class ChatListener implements Listener {
     }
 
     private Chat getChat(final String message) {
+        if (message.length() == 1) {
+            return this.chatValues.getDefaultChat();
+        }
+
         final char firstChar = message.charAt(0);
         return this.chatValues.getChats().getOrDefault(firstChar, this.chatValues.getDefaultChat());
     }
