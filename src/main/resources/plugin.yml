@@ -293,7 +293,7 @@ permissions:
   gigachat.style.chat.bold:
     default: op
     children:
-      gigachat.style.chat.b: true
+      gigachat.style.chat.l: true
 
   gigachat.style.chat.strikethrough:
     default: op
