@@ -1,6 +1,5 @@
 package com.github.groundbreakingmc.gigachat;
 
-import com.earth2me.essentials.libs.bstats.bukkit.Metrics;
 import com.github.groundbreakingmc.gigachat.automessages.AutoMessages;
 import com.github.groundbreakingmc.gigachat.collections.CooldownCollections;
 import com.github.groundbreakingmc.gigachat.collections.DisabledPrivateMessagesCollection;
@@ -28,6 +27,7 @@ import com.github.groundbreakingmc.gigachat.utils.vanish.VanishChecker;
 import lombok.Getter;
 import net.milkbowl.vault.chat.Chat;
 import net.milkbowl.vault.permission.Permission;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.TabCompleter;
