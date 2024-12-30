@@ -162,8 +162,13 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
     }
 
     private String getValidMessage(final Player sender, String message) {
+        if (sender.hasPermission("gigachat.bypass.validator.pm.*")) {
+            return message;
+        }
+
         final StringValidator stringValidator = this.pmValues.getStringValidator();
-        if (stringValidator.hasBlockedChars(message)) {
+        if (!sender.hasPermission("gigachat.bypass.validator.pm.chars")
+                && stringValidator.hasBlockedChars(message)) {
             if (this.pmValues.isCharsValidatorBlockMessage()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -176,7 +181,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             message = stringValidator.getFormattedCharsMessage(message);
         }
 
-        if (stringValidator.isUpperCasePercentageExceeded(message)) {
+        if (!sender.hasPermission("gigachat.bypass.validator.pm.caps")
+                && stringValidator.isUpperCasePercentageExceeded(message)) {
             if (this.pmValues.isCapsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -189,7 +195,8 @@ public final class PrivateMessageCommandExecutor implements CommandExecutor, Tab
             message = message.toLowerCase();
         }
 
-        if (stringValidator.hasBlockedWords(message)) {
+        if (!sender.hasPermission("gigachat.bypass.validator.pm.words")
+                && stringValidator.hasBlockedWords(message)) {
             if (this.pmValues.isWordsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getWordsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {

@@ -20,6 +20,24 @@ commands:
     aliases: [ "gc", "gchat" ]
 
 permissions:
+  gigachat.bypass.validator.chat.chars:
+    default: op
+
+  gigachat.bypass.validator.chat.caps:
+    default: op
+
+  gigachat.bypass.validator.chat.words:
+    default: op
+
+  gigachat.bypass.validator.pm.chars:
+    default: op
+
+  gigachat.bypass.validator.pm.caps:
+    default: op
+
+  gigachat.bypass.validator.pm.words:
+    default: op
+
   gigachat.adminhover:
     default: op
 

@@ -126,8 +126,13 @@ public final class ChatListener implements Listener {
     }
 
     private String getValidMessage(final Player sender, String message, final AsyncPlayerChatEvent event) {
+        if (sender.hasPermission("gigachat.bypass.validator.chat.*")) {
+            return message;
+        }
+
         final StringValidator stringValidator = this.chatValues.getStringValidator();
-        if (stringValidator.hasBlockedChars(message)) {
+        if (!sender.hasPermission("gigachat.bypass.validator.chat.chars")
+                && stringValidator.hasBlockedChars(message)) {
             if (this.chatValues.isCharsValidatorBlockMessage()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -141,7 +146,8 @@ public final class ChatListener implements Listener {
             message = stringValidator.getFormattedCharsMessage(message);
         }
 
-        if (stringValidator.isUpperCasePercentageExceeded(message)) {
+        if (!sender.hasPermission("gigachat.bypass.validator.chat.caps")
+                && stringValidator.isUpperCasePercentageExceeded(message)) {
             if (this.chatValues.isCapsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getCharsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
@@ -155,7 +161,8 @@ public final class ChatListener implements Listener {
             message = message.toLowerCase();
         }
 
-        if (stringValidator.hasBlockedWords(message)) {
+        if (!sender.hasPermission("gigachat.bypass.validator.chat.words")
+                && stringValidator.hasBlockedWords(message)) {
             if (this.chatValues.isWordsValidatorBlockMessageSend()) {
                 final String denyMessage = this.messages.getWordsValidationFailedMessage();
                 if (!denyMessage.isEmpty()) {
