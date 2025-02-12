@@ -40,6 +40,10 @@
                             <pattern>org.bstats</pattern>
                             <shadedPattern>com.github.groundbreakingmc.gigachat.utils.metrics</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>com.github.groundbreakingmc.mylib</pattern>
+                            <shadedPattern>com.github.groundbreakingmc.gigachat.mylib</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -158,6 +162,12 @@
             <version>3.1.0</version>
             <scope>compile</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.github.groundbreakingmc</groupId>
+            <artifactId>MyLib</artifactId>
+            <version>1.0</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

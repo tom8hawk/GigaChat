@@ -1,7 +1,8 @@
 package com.github.groundbreakingmc.gigachat.utils;
 
 import com.github.groundbreakingmc.gigachat.constructors.Hover;
-import com.github.groundbreakingmc.gigachat.utils.colorizer.basic.Colorizer;
+import com.github.groundbreakingmc.mylib.colorizer.Colorizer;
+import lombok.experimental.UtilityClass;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
@@ -9,13 +10,14 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import org.bukkit.entity.Player;
 
+@UtilityClass
 public final class HoverUtils {
 
-    private HoverUtils() {
-
-    }
-
-    public static BaseComponent[] get(final Player sender, final Hover hover, final String hoverText, final String message, final Colorizer colorizer) {
+    public static BaseComponent[] get(final Player sender,
+                                      final Hover hover,
+                                      final String hoverText,
+                                      final String message,
+                                      final Colorizer colorizer) {
         final String hoverString = colorizer.colorize(
                 Utils.replacePlaceholders(sender, hoverText)
         );

@@ -110,6 +110,9 @@ permissions:
   gigachat.command.broadcast:
     default: op
 
+  gigachat.color.chat.hex:
+    default: op
+
   gigachat.color.private.hex:
     default: op
 

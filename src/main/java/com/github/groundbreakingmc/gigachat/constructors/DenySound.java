@@ -11,6 +11,6 @@ public record DenySound(
 ) {
     public void play(final Player player) {
         final Location location = player.getLocation();
-        player.playSound(location, sound, volume, pitch);
+        player.playSound(location, this.sound, this.volume, this.pitch);
     }
 }

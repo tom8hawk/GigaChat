@@ -1,10 +1,12 @@
 package com.github.groundbreakingmc.gigachat.collections;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import lombok.experimental.UtilityClass;
 
 import java.util.Set;
 import java.util.UUID;
 
+@UtilityClass
 public final class AutoMessagesCollection {
 
     private static final Set<UUID> players = new ObjectOpenHashSet<>();

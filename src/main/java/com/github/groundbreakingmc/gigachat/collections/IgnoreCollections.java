@@ -46,12 +46,22 @@ public final class IgnoreCollections {
                 && !ignoredPrivate.get(targetUUID).isEmpty();
     }
 
-    public static boolean ignoredChatContains(final UUID searchUUID, final UUID targetUuid) {
-        return !ignoredChat.isEmpty() && ignoredChat.get(searchUUID).contains(targetUuid);
+    public static boolean ignoredChatContains(final UUID searchUUID, final UUID targetUUID) {
+        if (ignoredChat.isEmpty()) {
+            return false;
+        }
+
+        final Set<UUID> temp = ignoredChat.get(searchUUID);
+        return !temp.isEmpty() && temp.contains(targetUUID);
     }
 
-    public static boolean ignoredPrivateContains(final UUID searchUUID, final UUID targetUuid) {
-        return !ignoredPrivate.isEmpty() && ignoredPrivate.get(searchUUID).contains(targetUuid);
+    public static boolean ignoredPrivateContains(final UUID searchUUID, final UUID targetUUID) {
+        if (ignoredPrivate.isEmpty()) {
+            return false;
+        }
+
+        final Set<UUID> temp = ignoredPrivate.get(searchUUID);
+        return !temp.isEmpty() && temp.contains(targetUUID);
     }
 
     public static void addToIgnoredChat(final UUID targetUuid, final Set<UUID> list) {
@@ -64,11 +74,11 @@ public final class IgnoreCollections {
     }
 
     public static void addToIgnoredChat(final UUID searchUuid, final UUID targetUuid) {
-        ignoredChat.get(searchUuid).add(targetUuid);
+        ignoredChat.computeIfAbsent(searchUuid, value -> new HashSet<>()).add(targetUuid);
     }
 
     public static void addToIgnoredPrivate(final UUID searchUuid, final UUID targetUuid) {
-        ignoredPrivate.get(searchUuid).add(targetUuid);
+        ignoredPrivate.computeIfAbsent(searchUuid, value -> new HashSet<>()).add(targetUuid);
     }
 
     public static void removeFromIgnoredChat(final UUID targetUuid) {

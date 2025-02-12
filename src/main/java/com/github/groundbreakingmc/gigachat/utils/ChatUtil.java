@@ -5,9 +5,8 @@ import com.github.groundbreakingmc.gigachat.constructors.Chat;
 import com.github.groundbreakingmc.gigachat.constructors.DefaultChat;
 import com.github.groundbreakingmc.gigachat.constructors.Hover;
 import com.github.groundbreakingmc.gigachat.constructors.NoOneHead;
-import com.github.groundbreakingmc.gigachat.exceptions.FormatNullException;
+import com.github.groundbreakingmc.gigachat.exceptions.InvalidFormatException;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.md_5.bungee.api.chat.ClickEvent;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Map;
@@ -23,24 +22,24 @@ public class ChatUtil {
 
         final String format = chatSection.getString("format");
         if (format == null) {
-            throw new FormatNullException("Chat format cannot be null! Path: \"chats." + chatKey + ".format\"");
+            throw new InvalidFormatException("Chat format cannot be null! Path: \"chats." + chatKey + ".format\"");
         }
 
-        chatBuilder.setFormat(format);
+        chatBuilder.format(format);
 
-        chatBuilder.setHover(getHover(chatSection, "hover", defaultChat.hover()));
-        chatBuilder.setAdminHover(getHover(chatSection, "admin-hover", defaultChat.adminHover()));
+        chatBuilder.hover(Hover.get(chatSection.getConfigurationSection("hover"), defaultChat.hover()));
+        chatBuilder.adminHover(Hover.get(chatSection.getConfigurationSection("admin-hover"), defaultChat.adminHover()));
 
-        chatBuilder.setDistance(chatSection.getInt("distance"));
-        chatBuilder.setChatCooldown(chatSection.getInt("chat-cooldown", defaultChat.chatCooldown()));
+        chatBuilder.distance(chatSection.getInt("distance"));
+        chatBuilder.chatCooldown(chatSection.getInt("chat-cooldown", defaultChat.chatCooldown()));
 
-        chatBuilder.setSpyFormat(chatSection.getString("spy-format"));
-        chatBuilder.setSpyCommand(chatSection.getString("spy-command"));
-        chatBuilder.setSpyCooldown(chatSection.getInt("spy-cooldown", defaultChat.spyCooldown()));
+        chatBuilder.spyFormat(chatSection.getString("spy-format"));
+        chatBuilder.spyCommand(chatSection.getString("spy-command"));
+        chatBuilder.spyCooldown(chatSection.getInt("spy-cooldown", defaultChat.spyCooldown()));
 
-        chatBuilder.setGroupColors(getGroupColors(chatSection, defaultChat.groupColors()));
+        chatBuilder.groupColors(getGroupColors(chatSection, defaultChat.groupColors()));
 
-        chatBuilder.setNoOneHeard(getNoOneHeard(chatSection, defaultChat.noOneHead()));
+        chatBuilder.noOneHeard(getNoOneHeard(chatSection, defaultChat.noOneHead()));
 
         return chatBuilder.build();
     }
@@ -53,15 +52,15 @@ public class ChatUtil {
 
             final NoOneHead noOneHeard = getNoOneHeard(defaultChatSection, null);
 
-            final Hover hover = getHover(defaultChatSection, "hover", null);
-            final Hover adminHover = getHover(defaultChatSection, "admin-hover", null);
+            final Hover hover = Hover.get(defaultChatSection.getConfigurationSection("hover"), null);
+            final Hover adminHover = Hover.get(defaultChatSection.getConfigurationSection("admin-hover"), null);
 
             final Map<String, String> groupColors = getGroupColors(defaultChatSection, null);
 
             return new DefaultChat(spyCooldown, chatCooldown, groupColors, noOneHeard, hover, adminHover);
         } else {
-            plugin.getMyLogger().warning("Failed to load section \"chats.default\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
-            plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            plugin.getCustomLogger().warn("Failed to load section \"chats.default\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
+            plugin.getCustomLogger().warn("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             return null;
         }
     }
@@ -78,20 +77,6 @@ public class ChatUtil {
         }
 
         return defaultNoOneHeard;
-    }
-
-    private static Hover getHover(final ConfigurationSection chatSection, final String sectionName, final Hover defaultHover) {
-        final ConfigurationSection hoverSection = chatSection.getConfigurationSection(sectionName);
-        if (hoverSection != null) {
-            final boolean isEnabled = hoverSection.getBoolean("enable", defaultHover != null && defaultHover.isEnabled());
-            final ClickEvent.Action clickAction = ClickEvent.Action.valueOf(hoverSection.getString("click-action", defaultHover != null ? defaultHover.clickAction().name() : null));
-            final String clickValue = hoverSection.getString("click-value", defaultHover != null ? defaultHover.clickValue() : null);
-            final String hoverText = hoverSection.getString("text", defaultHover != null ? defaultHover.hoverText() : null);
-
-            return new Hover(isEnabled, clickAction, clickValue, hoverText);
-        }
-
-        return defaultHover;
     }
 
     private static Map<String, String> getGroupColors(final ConfigurationSection chatSection, final Map<String, String> defaultGroupColors) {

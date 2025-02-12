@@ -2,31 +2,31 @@ package com.github.groundbreakingmc.gigachat.commands.other;
 
 import com.github.groundbreakingmc.gigachat.GigaChat;
 import com.github.groundbreakingmc.gigachat.collections.DisabledChatCollection;
-import com.github.groundbreakingmc.gigachat.database.DatabaseHandler;
-import com.github.groundbreakingmc.gigachat.database.DatabaseQueries;
-import com.github.groundbreakingmc.gigachat.utils.config.values.Messages;
+import com.github.groundbreakingmc.gigachat.database.Database;
+import com.github.groundbreakingmc.gigachat.utils.configvalues.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Consumer;
 
-public final class DisableOwnChatExecutor implements CommandExecutor, TabCompleter {
+public final class DisableOwnChatExecutor implements TabExecutor {
 
     private final GigaChat plugin;
     private final Messages messages;
+    private final Database database;
 
     public DisableOwnChatExecutor(final GigaChat plugin) {
         this.plugin = plugin;
         this.messages = plugin.getMessages();
+        this.database = plugin.getDatabase();
     }
 
     @Override
@@ -47,32 +47,43 @@ public final class DisableOwnChatExecutor implements CommandExecutor, TabComplet
     private boolean processDisable(final Player sender) {
         final UUID senderUUID = sender.getUniqueId();
         if (DisabledChatCollection.contains(senderUUID)) {
-            sender.sendMessage(this.messages.getOwnChatDisabled());
-            DisabledChatCollection.remove(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                try (final Connection connection = DatabaseHandler.getConnection()) {
-                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.REMOVE_PLAYER_FROM_DISABLED_CHAT, connection, senderUUID.toString());
-                } catch (final SQLException ex) {
-                    ex.printStackTrace();
-                }
-            });
-        } else {
-            sender.sendMessage(this.messages.getOwnChatEnabled());
-            DisabledChatCollection.add(senderUUID);
-            Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
-                try (final Connection connection = DatabaseHandler.getConnection()) {
-                    DatabaseQueries.executeUpdateQuery(DatabaseQueries.ADD_PLAYER_TO_DISABLED_CHAT, connection, senderUUID.toString());
-                } catch (final SQLException ex) {
-                    ex.printStackTrace();
-                }
-            });
+            return this.process(
+                    DisabledChatCollection::remove,
+                    sender,
+                    senderUUID,
+                    Database.REMOVE_PLAYER_FROM_DISABLED_CHAT,
+                    this.messages.getOwnChatDisabled()
+            );
         }
 
+        return this.process(
+                DisabledChatCollection::add,
+                sender,
+                senderUUID,
+                Database.ADD_PLAYER_TO_DISABLED_CHAT,
+                this.messages.getOwnChatEnabled()
+        );
+    }
+
+    private boolean process(
+            final Consumer<UUID> consumer,
+            final Player sender, final UUID senderUUID,
+            final String query, final String message) {
+        consumer.accept(senderUUID);
+        Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
+            try (final Connection connection = this.database.getConnection()) {
+                this.database.executeUpdateQuery(query, connection, senderUUID.toString());
+            } catch (final SQLException ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        sender.sendMessage(message);
         return true;
     }
 
     @Override
     public @NotNull List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return Collections.emptyList();
+        return List.of();
     }
 }

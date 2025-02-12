@@ -1,7 +1,7 @@
 package com.github.groundbreakingmc.gigachat.collections;
 
 import com.github.groundbreakingmc.gigachat.GigaChat;
-import com.github.groundbreakingmc.gigachat.utils.map.ExpiringMap;
+import com.github.groundbreakingmc.mylib.collections.expiring.ExpiringMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.entity.Player;

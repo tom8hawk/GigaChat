@@ -32,13 +32,13 @@ public final class UpdatesChecker {
     public void check() {
         final ConfigurationSection updates = this.plugin.getConfig().getConfigurationSection("updates");
         if (updates == null) {
-            this.plugin.getMyLogger().warning("Failed to load section \"updates\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
-            this.plugin.getMyLogger().warning("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+            this.plugin.getCustomLogger().warn("Failed to load section \"updates\" from file \"config.yml\". Please check your configuration file, or delete it and restart your server!");
+            this.plugin.getCustomLogger().warn("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
             return;
         }
 
         if (!updates.getBoolean("check")) {
-            this.plugin.getMyLogger().warning("Updates checker was disabled, but it's not recommend by the author to do it!");
+            this.plugin.getCustomLogger().warn("Updates checker was disabled, but it's not recommend by the author to do it!");
             return;
         }
 
@@ -55,7 +55,7 @@ public final class UpdatesChecker {
                 final String[] versionInfo = body[0].split("->");
                 if (this.isHigher(versionInfo[0])) {
                     hasUpdate = true;
-                    this.plugin.getMyLogger().info(body[1]);
+                    this.plugin.getCustomLogger().info(body[1]);
                     downloadLink = versionInfo[1];
                     if (!updates.getBoolean("auto-download")) {
                         this.downloadJar();
@@ -63,10 +63,10 @@ public final class UpdatesChecker {
                     return;
                 }
 
-                this.plugin.getMyLogger().info("\u001b[92mNo updates were found!\u001b[0m");
+                this.plugin.getCustomLogger().info("\u001b[92mNo updates were found!\u001b[0m");
             } else {
-                this.plugin.getMyLogger().warning("\u001b[31mCheck was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
-                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
+                this.plugin.getCustomLogger().warn("\u001b[31mCheck was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
+                this.plugin.getCustomLogger().warn("\u001b[31mPlease create an issue \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
             }
         }).join();
     }
@@ -85,12 +85,12 @@ public final class UpdatesChecker {
 
     public void downloadJar() {
         if (downloadLink == null) {
-            this.plugin.getMyLogger().warning("No link to download update were found!");
-            this.plugin.getMyLogger().warning("Enable \"updates.check\" in \"config.yml\" and restart your server!");
+            this.plugin.getCustomLogger().warn("No link to download update were found!");
+            this.plugin.getCustomLogger().warn("Enable \"updates.check\" in \"config.yml\" and restart your server!");
             return;
         } else if (downloadLink.isEmpty()) {
-            this.plugin.getMyLogger().warning("\u001b[31mDownload link for new version of the plugin is empty!.\u001b[0m");
-            this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
+            this.plugin.getCustomLogger().warn("\u001b[31mDownload link for new version of the plugin is empty!.\u001b[0m");
+            this.plugin.getCustomLogger().warn("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
             return;
         }
 
@@ -125,16 +125,16 @@ public final class UpdatesChecker {
                         if (totalSize > 0) {
                             int progress = (int) ((downloaded / (double) totalSize) * 100);
                             if (progress % 10 == 0) {
-                                this.plugin.getMyLogger().info("Downloaded: " + (downloaded / 1024) + " / " + (totalSize / 1024) + " KB (" + progress + "%)");
+                                this.plugin.getCustomLogger().info("Downloaded: " + (downloaded / 1024) + " / " + (totalSize / 1024) + " KB (" + progress + "%)");
                             }
                         }
                     }
 
-                    this.plugin.getMyLogger().info("Update downloaded successfully.");
+                    this.plugin.getCustomLogger().info("Update downloaded successfully.");
                 }
             } else {
-                this.plugin.getMyLogger().warning("\u001b[31mJar downloading was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
-                this.plugin.getMyLogger().warning("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
+                this.plugin.getCustomLogger().warn("\u001b[31mJar downloading was canceled with response code: \u001b[91m" + response.statusCode() + "\u001b[31m.\u001b[0m");
+                this.plugin.getCustomLogger().warn("\u001b[31mPlease create an issue at \u001b[94https://github.com/groundbreakingmc/GigaChat/issues \u001b[31mand report this error.\u001b[0m");
             }
         } catch (final IOException | InterruptedException ex) {
             ex.printStackTrace();

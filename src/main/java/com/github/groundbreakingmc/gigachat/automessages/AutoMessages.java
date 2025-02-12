@@ -1,26 +1,25 @@
 package com.github.groundbreakingmc.gigachat.automessages;
 
 import com.github.groundbreakingmc.gigachat.GigaChat;
-import com.github.groundbreakingmc.gigachat.collections.AutoMessagesCollection;
-import com.github.groundbreakingmc.gigachat.constructors.AutoMessageConstructor;
-import com.github.groundbreakingmc.gigachat.utils.config.values.AutoMessagesValues;
+import com.github.groundbreakingmc.gigachat.utils.configvalues.AutoMessagesValues;
+import com.github.groundbreakingmc.mylib.collections.cases.Pair;
+import com.github.groundbreakingmc.mylib.utils.player.PlayerUtils;
+import com.github.groundbreakingmc.mylib.utils.player.settings.SoundSettings;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Bukkit;
-import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 public final class AutoMessages {
 
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
 
-    public final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
+    private final List<Pair<String, SoundSettings>> autoMessagesClone = new ObjectArrayList<>();
 
     private BukkitTask task;
 
@@ -32,7 +31,14 @@ public final class AutoMessages {
     public void run() {
         this.task = (new BukkitRunnable() {
             public void run() {
-                process();
+                final Pair<String, SoundSettings> autoMessageConstructor = AutoMessages.this.getAutoMessage();
+                if (autoMessageConstructor == null) {
+                    return;
+                }
+
+                final String autoMessage = autoMessageConstructor.getLeft();
+                final SoundSettings sound = autoMessageConstructor.getRight();
+                AutoMessages.this.send(autoMessage, sound);
             }
         }).runTaskTimerAsynchronously(this.plugin, 0L, this.autoMessagesValues.getSendInterval() * 20L);
     }
@@ -41,59 +47,35 @@ public final class AutoMessages {
         this.task.cancel();
     }
 
-    private void process() {
-        final AutoMessageConstructor autoMessageConstructor = this.getAutoMessage();
-        final List<String> autoMessage = autoMessageConstructor.autoMessage();
-        final String sound = autoMessageConstructor.sound();
-        if (!this.sendWithSound(autoMessage, sound)) {
-            this.sendSimple(autoMessage);
-        }
-    }
-
-    private boolean sendWithSound(final List<String> autoMessages, final String soundString) {
-        if (soundString == null || soundString.equalsIgnoreCase("disabled")) {
-            return false;
-        }
-
-        final String[] params = soundString.split(";");
-        final Sound sound = params.length >= 1 ? Sound.valueOf(params[0].toUpperCase(Locale.ENGLISH)) : Sound.BLOCK_BREWING_STAND_BREW;
-        final float soundVolume = params.length >= 2 ? Float.parseFloat(params[1]) : 1.0f;
-        final float soundPitch = params.length >= 3 ? Float.parseFloat(params[2]) : 1.0f;
-
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            if (AutoMessagesCollection.contains(player.getUniqueId())) {
-                continue;
-            }
-
-            for (int i = 0; i < autoMessages.size(); i++) {
-                player.sendMessage(autoMessages.get(i));
-                player.playSound(player.getLocation(), sound, soundVolume, soundPitch);
-            }
-        }
-
-        return true;
-    }
-
-    private void sendSimple(final List<String> autoMessages) {
-        for (final Player player : Bukkit.getOnlinePlayers()) {
-            for (int i = 0; i < autoMessages.size(); i++) {
-                player.sendMessage(autoMessages.get(i));
+    private void send(final String autoMessage, final SoundSettings soundSettings) {
+        for (final Player target : Bukkit.getOnlinePlayers()) {
+            target.sendMessage(autoMessage);
+            if (soundSettings != null) {
+                PlayerUtils.playSound(target, soundSettings);
             }
         }
     }
 
-    private AutoMessageConstructor getAutoMessage() {
+    private Pair<String, SoundSettings> getAutoMessage() {
         if (this.autoMessagesClone.isEmpty()) {
-            final List<AutoMessageConstructor> autoMessages = this.autoMessagesValues.getAutoMessages();
+            final List<Pair<String, SoundSettings>> autoMessages = this.autoMessagesValues.getAutoMessages();
+            if (autoMessages == null || autoMessages.isEmpty()) {
+                this.plugin.getCustomLogger().warn("Failed to load \"auto-messages\". Please check your configuration file, or delete it and restart your server!");
+                this.plugin.getCustomLogger().warn("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");
+                cancel();
+                return null;
+            }
+
             this.autoMessagesClone.addAll(autoMessages);
             if (this.autoMessagesValues.isRandom()) {
-                Collections.shuffle(autoMessages);
+                Collections.shuffle(this.autoMessagesClone);
             }
         }
 
-        final AutoMessageConstructor autoMessage = this.autoMessagesClone.get(0);
-        this.autoMessagesClone.remove(0);
+        return this.autoMessagesClone.remove(0);
+    }
 
-        return autoMessage;
+    public void clearClonedAutoMessages() {
+        this.autoMessagesClone.clear();
     }
 }

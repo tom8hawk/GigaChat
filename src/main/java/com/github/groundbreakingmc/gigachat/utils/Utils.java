@@ -1,15 +1,13 @@
 package com.github.groundbreakingmc.gigachat.utils;
 
-import com.github.groundbreakingmc.gigachat.utils.config.values.Messages;
+import com.github.groundbreakingmc.gigachat.utils.configvalues.Messages;
+import lombok.experimental.UtilityClass;
 import me.clip.placeholderapi.PlaceholderAPI;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+@UtilityClass
 public final class Utils {
-
-    private Utils() {
-
-    }
 
     public static String replacePlaceholders(final CommandSender sender, final String string) {
         if (sender instanceof final Player player) {
@@ -21,14 +19,6 @@ public final class Utils {
 
     public static String replacePlaceholders(final Player player, final String string) {
         return PlaceholderAPI.setPlaceholders(player, string);
-    }
-
-    public static boolean startsWithIgnoreCase(final String input, final String completion) {
-        if (completion == null || input == null) {
-            return false;
-        }
-
-        return completion.regionMatches(true, 0, input, 0, input.length());
     }
 
     public static String getTime(final int totalSeconds) {
@@ -46,7 +36,9 @@ public final class Utils {
             result.append(minutes).append(Messages.getMinutes());
         }
 
-        result.append(seconds).append(Messages.getSeconds());
+        if (seconds > 0) {
+            result.append(seconds).append(Messages.getSeconds());
+        }
 
         return result.toString();
     }

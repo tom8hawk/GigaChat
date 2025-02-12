@@ -1,6 +1,7 @@
 package com.github.groundbreakingmc.gigachat.utils.colorizer.messages;
 
 import com.github.groundbreakingmc.gigachat.GigaChat;
+import com.github.groundbreakingmc.gigachat.utils.colorizer.ColorizerUtils;
 import org.bukkit.entity.Player;
 
 public final class ChatColorizer extends PermissionColorizer {
@@ -11,7 +12,7 @@ public final class ChatColorizer extends PermissionColorizer {
 
     @Override
     public String colorize(final Player player, final String message) {
-        if (player.hasPermission("gigachat.chat.hex")) {
+        if (player.hasPermission("gigachat.color.chat.hex")) {
             return super.messagesColorizer.colorize(message);
         }
 
@@ -19,8 +20,8 @@ public final class ChatColorizer extends PermissionColorizer {
         for (int i = 0; i < letters.length - 1; i++) {
             if (letters[i] == COLOR_CHAR) {
                 final char code = letters[i + 1];
-                if ((COLOR_CODES.contains(code) && player.hasPermission("gigachat.color.chat." + code)) ||
-                        (STYLE_CODES.contains(code) && player.hasPermission("gigachat.style.chat." + code))) {
+                if (ColorizerUtils.isColorCharacter(code) && player.hasPermission("gigachat.color.chat." + code)
+                        || ColorizerUtils.isStyleCharacter(code) && player.hasPermission("gigachat.style.chat." + code)) {
                     letters[i++] = MINECRAFT_COLOR_CHAR;
                     letters[i] = Character.toLowerCase(letters[i]);
                 }

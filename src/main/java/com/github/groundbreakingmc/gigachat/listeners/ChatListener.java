@@ -1,22 +1,23 @@
 package com.github.groundbreakingmc.gigachat.listeners;
 
 import com.github.groundbreakingmc.gigachat.GigaChat;
-import com.github.groundbreakingmc.gigachat.commands.args.DisableServerChatArgument;
+import com.github.groundbreakingmc.gigachat.commands.main.arguments.DisableServerChatArgument;
 import com.github.groundbreakingmc.gigachat.constructors.Chat;
-import com.github.groundbreakingmc.gigachat.constructors.DenySound;
 import com.github.groundbreakingmc.gigachat.constructors.Hover;
 import com.github.groundbreakingmc.gigachat.utils.HoverUtils;
 import com.github.groundbreakingmc.gigachat.utils.StringValidator;
 import com.github.groundbreakingmc.gigachat.utils.Utils;
-import com.github.groundbreakingmc.gigachat.utils.colorizer.basic.Colorizer;
-import com.github.groundbreakingmc.gigachat.utils.config.values.ChatValues;
-import com.github.groundbreakingmc.gigachat.utils.config.values.Messages;
+import com.github.groundbreakingmc.gigachat.utils.configvalues.ChatValues;
+import com.github.groundbreakingmc.gigachat.utils.configvalues.Messages;
+import com.github.groundbreakingmc.mylib.colorizer.Colorizer;
+import com.github.groundbreakingmc.mylib.utils.player.PlayerUtils;
 import net.md_5.bungee.api.chat.BaseComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -29,8 +30,6 @@ public final class ChatListener implements Listener {
     private final GigaChat plugin;
     private final ChatValues chatValues;
     private final Messages messages;
-
-    private boolean isRegistered = false;
 
     public ChatListener(final GigaChat plugin) {
         this.plugin = plugin;
@@ -54,8 +53,9 @@ public final class ChatListener implements Listener {
             return;
         }
 
-        message = this.getValidMessage(sender, message, event);
+        message = this.getValidMessage(sender, message);
         if (message == null) {
+            event.setCancelled(true);
             return;
         }
 
@@ -101,7 +101,7 @@ public final class ChatListener implements Listener {
             event.getRecipients().addAll(recipients);
             event.setFormat(formattedMessage);
         }
-        if (chat.isNoOneHeard(sender, recipients, this.plugin.getVanishChecker())) {
+        if (chat.isNoOneHeard(sender, recipients)) {
             sender.sendMessage(this.messages.getNoOneHear());
         }
     }
@@ -125,7 +125,8 @@ public final class ChatListener implements Listener {
         return this.chatValues.getChats().getOrDefault(firstChar, this.chatValues.getDefaultChat());
     }
 
-    private String getValidMessage(final Player sender, String message, final AsyncPlayerChatEvent event) {
+    @Nullable // TODO Remove this shit
+    private String getValidMessage(final Player sender, String message) {
         if (sender.hasPermission("gigachat.bypass.validator.chat.*")) {
             return message;
         }
@@ -138,8 +139,9 @@ public final class ChatListener implements Listener {
                 if (!denyMessage.isEmpty()) {
                     sender.sendMessage(denyMessage);
                 }
-                this.playDenySound(sender, this.chatValues.getCharValidatorDenySound());
-                event.setCancelled(true);
+                if (this.chatValues.getCapsValidatorDenySound() != null) {
+                    PlayerUtils.playSound(sender, this.chatValues.getCharValidatorDenySound());
+                }
                 return null;
             }
 
@@ -153,8 +155,9 @@ public final class ChatListener implements Listener {
                 if (!denyMessage.isEmpty()) {
                     sender.sendMessage(denyMessage);
                 }
-                this.playDenySound(sender, this.chatValues.getCapsValidatorDenySound());
-                event.setCancelled(true);
+                if (this.chatValues.getCapsValidatorDenySound() != null) {
+                    PlayerUtils.playSound(sender, this.chatValues.getCapsValidatorDenySound());
+                }
                 return null;
             }
 
@@ -168,8 +171,9 @@ public final class ChatListener implements Listener {
                 if (!denyMessage.isEmpty()) {
                     sender.sendMessage(denyMessage);
                 }
-                this.playDenySound(sender, this.chatValues.getWordsValidatorDenySound());
-                event.setCancelled(true);
+                if (this.chatValues.getWordsValidatorDenySound() != null) {
+                    PlayerUtils.playSound(sender, this.chatValues.getWordsValidatorDenySound());
+                }
                 return null;
             }
 
@@ -179,12 +183,6 @@ public final class ChatListener implements Listener {
         return message;
     }
 
-    private void playDenySound(final Player player, final DenySound denySound) {
-        if (denySound != null) {
-            denySound.play(player);
-        }
-    }
-
     private void sendHover(final Player sender, final String message, final Hover hover, final Set<Player> recipients,
                            final String prefix, final String suffix, final String color) {
         final String hoverText = hover.hoverText()
@@ -192,14 +190,16 @@ public final class ChatListener implements Listener {
                 .replace("{prefix}", prefix)
                 .replace("{suffix}", suffix)
                 .replace("{color}", color);
-        final Colorizer colorizer = this.chatValues.getFormatsColorizer();
+        final Colorizer colorizer = this.chatValues.getFormatColorizer();
         final BaseComponent[] components = HoverUtils.get(sender, hover, hoverText, message, colorizer);
         for (final Player recipient : recipients) {
             recipient.spigot().sendMessage(components);
         }
     }
 
-    private void sendSpy(final Player sender, final Chat chat, final String message, final String spyFormat, final Set<Player> recipients,
+    private void sendSpy(final Player sender, final Chat chat,
+                         final String message, final String spyFormat,
+                         final Set<Player> recipients,
                          final String prefix, final String suffix, final String color) {
         final String formattedMessage = this.getFormattedMessage(sender, message, spyFormat, prefix, suffix, color);
 
@@ -229,7 +229,7 @@ public final class ChatListener implements Listener {
 
     public String getFormattedMessage(final Player sender, String message, final String format,
                                       final String prefix, final String suffix, final String color) {
-        final String formattedMessage = this.chatValues.getFormatsColorizer().colorize(
+        final String formattedMessage = this.chatValues.getFormatColorizer().colorize(
                 Utils.replacePlaceholders(
                         sender,
                         format.replace("{player}", sender.getName())

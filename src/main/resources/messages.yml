@@ -12,7 +12,7 @@ settings:
   # LEGACY_ADVANCED - улучшенный аналог legacy с поддержкой &## формата hex (&##123 = &#112233) (Работает только на: 1.16+)
   # MINIMESSAGE - цвет через <цвет></цвет> (Работает только на: 1.17+)
   # VANILLA - дефолтное форматирование через &
-  serializer: LEGACY
+  colorizer-mode: LEGACY
 
   # Не трогать.
   config-version: 1.0

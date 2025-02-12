@@ -3,11 +3,12 @@ package com.github.groundbreakingmc.gigachat.constructors;
 import com.github.groundbreakingmc.gigachat.GigaChat;
 import com.github.groundbreakingmc.gigachat.collections.DisabledChatCollection;
 import com.github.groundbreakingmc.gigachat.collections.IgnoreCollections;
-import com.github.groundbreakingmc.gigachat.commands.other.SpyModeCommand;
+import com.github.groundbreakingmc.gigachat.commands.other.ChatSpyExecutor;
 import com.github.groundbreakingmc.gigachat.utils.Utils;
-import com.github.groundbreakingmc.gigachat.utils.config.values.Messages;
-import com.github.groundbreakingmc.gigachat.utils.map.ExpiringMap;
-import com.github.groundbreakingmc.gigachat.utils.vanish.VanishChecker;
+import com.github.groundbreakingmc.gigachat.utils.configvalues.Messages;
+import com.github.groundbreakingmc.mylib.collections.expiring.ExpiringMap;
+import com.github.groundbreakingmc.mylib.utils.command.CommandRuntimeUtils;
+import com.github.groundbreakingmc.mylib.utils.player.PlayerUtils;
 import com.google.common.collect.ImmutableMap;
 import lombok.Getter;
 import org.bukkit.Bukkit;
@@ -15,9 +16,8 @@ import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import org.bukkit.command.TabExecutor;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +25,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Getter
-public final class Chat implements CommandExecutor, TabCompleter {
+public final class Chat implements TabExecutor {
 
     private final GigaChat plugin;
     private final String name;
@@ -43,7 +43,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
     private final ExpiringMap<UUID, Long> chatCooldowns;
     private final ExpiringMap<UUID, Long> spyCooldowns;
     private final Set<UUID> spyListeners;
-    private final SpyModeCommand spyModeCommand;
+    private final ChatSpyExecutor chatSpyExecutor;
 
     public Chat(
             final GigaChat plugin,
@@ -61,7 +61,7 @@ public final class Chat implements CommandExecutor, TabCompleter {
     ) {
         this.plugin = plugin;
         this.name = name;
-        this.bypassCooldownPermission = "gigachat.bypass.cooldown.chat" + name;
+        this.bypassCooldownPermission = "gigachat.bypass.cooldown.chat." + name;
         this.format = format;
         this.spyFormat = spyFormat;
         this.spyCommand = spyCommand;
@@ -75,10 +75,10 @@ public final class Chat implements CommandExecutor, TabCompleter {
         this.chatCooldowns = new ExpiringMap<>(chatCooldown, TimeUnit.MILLISECONDS);
         this.spyCooldowns = new ExpiringMap<>(chatCooldown, TimeUnit.MILLISECONDS);
         this.spyListeners = new HashSet<>();
-        this.spyModeCommand = new SpyModeCommand(this.plugin);
+        this.chatSpyExecutor = new ChatSpyExecutor(this.plugin);
 
         if (spyCommand != null && !spyCommand.isEmpty()) {
-            this.plugin.getCommandRegisterer().register(spyCommand, Collections.emptyList(), this, this);
+            CommandRuntimeUtils.register(plugin, spyCommand, List.of(), this);
         }
     }
 
@@ -86,12 +86,14 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return new ChatBuilder(plugin);
     }
 
+    @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        return spyModeCommand.execute(sender, this, spyCooldowns, spyCooldown);
+        return this.chatSpyExecutor.execute(sender, this, this.spyCooldowns, this.spyCooldown);
     }
 
+    @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-        return Collections.emptyList();
+        return List.of();
     }
 
     public boolean hasCooldown(final Player sender, final Messages messages) {
@@ -181,11 +183,11 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return playerList;
     }
 
-    public boolean isNoOneHeard(final Player sender, final Set<Player> recipients, final VanishChecker vanishChecker) {
+    public boolean isNoOneHeard(final Player sender, final Set<Player> recipients) {
         if (this.noOneHeardYou.isEnabled()) {
             final Set<Player> validRecipients = new HashSet<>(recipients);
             validRecipients.removeIf(recipient ->
-                    !this.isRecipientValid(sender, recipient, vanishChecker)
+                    !this.isRecipientValid(sender, recipient)
             );
 
             return validRecipients.size() == 1;
@@ -194,9 +196,9 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return false;
     }
 
-    private boolean isRecipientValid(final Player sender, final Player recipient, final VanishChecker vanishChecker) {
+    private boolean isRecipientValid(final Player sender, final Player recipient) {
         return this.isRecipientVisible(sender, recipient)
-                && this.isRecipientNotVanished(recipient, vanishChecker)
+                && this.isRecipientNotVanished(recipient)
                 && this.isRecipientNotSpectator(recipient);
     }
 
@@ -204,15 +206,17 @@ public final class Chat implements CommandExecutor, TabCompleter {
         return !this.noOneHeardYou.hideHidden() || sender.canSee(recipient);
     }
 
-    private boolean isRecipientNotVanished(final Player recipient, final VanishChecker vanishChecker) {
-        return !this.noOneHeardYou.hideVanished() || !vanishChecker.isVanished(recipient);
+    private boolean isRecipientNotVanished(final Player recipient) {
+        return !this.noOneHeardYou.hideVanished() || !PlayerUtils.isVanished(recipient);
     }
 
     private boolean isRecipientNotSpectator(final Player recipient) {
         return !this.noOneHeardYou.hideSpectators() || recipient.getGameMode() != GameMode.SPECTATOR;
     }
 
+    @SuppressWarnings("unused")
     public static class ChatBuilder {
+
         private final GigaChat plugin;
         private String name;
         private String format;
@@ -230,63 +234,120 @@ public final class Chat implements CommandExecutor, TabCompleter {
             this.plugin = plugin;
         }
 
-        public ChatBuilder setName(final String name) {
+        public ChatBuilder name(final String name) {
             this.name = name;
             return this;
         }
 
-        public ChatBuilder setFormat(final String format) {
+        public String name() {
+            return this.name;
+        }
+
+        public ChatBuilder format(final String format) {
             this.format = format;
             return this;
         }
 
-        public ChatBuilder setSpyFormat(final String spyFormat) {
+        public String format() {
+            return this.format;
+        }
+
+        public ChatBuilder spyFormat(final String spyFormat) {
             this.spyFormat = spyFormat;
             return this;
         }
 
-        public ChatBuilder setSpyCommand(final String spyCommand) {
+        public String spyFormat() {
+            return this.spyFormat;
+        }
+
+        public ChatBuilder spyCommand(final String spyCommand) {
             this.spyCommand = spyCommand;
             return this;
         }
 
-        public ChatBuilder setHover(final Hover hover) {
+        public String spyCommand() {
+            return this.spyCommand;
+        }
+
+        public ChatBuilder hover(final Hover hover) {
             this.hover = hover;
             return this;
         }
 
-        public ChatBuilder setAdminHover(final Hover adminHover) {
+        public Hover hover() {
+            return this.hover;
+        }
+
+        public ChatBuilder adminHover(final Hover adminHover) {
             this.adminHover = adminHover;
             return this;
         }
 
-        public ChatBuilder setDistance(final int distance) {
+        public Hover adminHover() {
+            return this.adminHover;
+        }
+
+        public ChatBuilder distance(final int distance) {
             this.distance = distance;
             return this;
         }
 
-        public ChatBuilder setChatCooldown(final int chatCooldown) {
+        public int distance() {
+            return this.distance;
+        }
+
+        public ChatBuilder chatCooldown(final int chatCooldown) {
             this.chatCooldown = chatCooldown;
             return this;
         }
 
-        public ChatBuilder setSpyCooldown(final int spyCooldown) {
+        public int chatCooldown() {
+            return this.chatCooldown;
+        }
+
+        public ChatBuilder spyCooldown(final int spyCooldown) {
             this.spyCooldown = spyCooldown;
             return this;
         }
 
-        public ChatBuilder setNoOneHeard(final NoOneHead noOneHeardYou) {
+        public int spyCooldown() {
+            return this.spyCooldown;
+        }
+
+        public ChatBuilder noOneHeard(final NoOneHead noOneHeardYou) {
             this.noOneHeardYou = noOneHeardYou;
             return this;
         }
 
-        public ChatBuilder setGroupColors(final Map<String, String> groupColors) {
+        public NoOneHead noOneHeard() {
+            return this.noOneHeardYou;
+        }
+
+        public ChatBuilder groupColors(final Map<String, String> groupColors) {
             this.groupColors = ImmutableMap.copyOf(groupColors);
             return this;
         }
 
+        public Map<String, String> groupColors() {
+            return this.groupColors;
+        }
+
         public Chat build() {
-            return new Chat(plugin, name, format, spyFormat, spyCommand, hover, adminHover, distance, chatCooldown, spyCooldown, noOneHeardYou, groupColors);
+            return new Chat(
+                    this.plugin,
+                    this.name,
+                    this.format,
+                    this.spyFormat,
+                    this.spyCommand,
+                    this.hover,
+                    this.adminHover,
+                    this.distance,
+                    this.chatCooldown,
+                    this.spyCooldown,
+                    this.noOneHeardYou,
+                    this.groupColors
+            );
         }
     }
 }
