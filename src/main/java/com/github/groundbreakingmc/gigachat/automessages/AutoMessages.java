@@ -35,6 +35,10 @@ public final class AutoMessages {
     }
 
     public void run() {
+        if (!autoMessagesValues.isEnabled()) {
+            return;
+        }
+
         lock.lock();
         try {
             if (task != null && !task.isCancelled()) {
