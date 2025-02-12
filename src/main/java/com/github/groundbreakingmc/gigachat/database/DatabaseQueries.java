@@ -201,7 +201,11 @@ public final class DatabaseQueries {
         try (final PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
             try (final ResultSet result = statement.executeQuery()) {
-                return result.getBoolean(1);
+                if (result.next()) {
+                    return result.getBoolean(1);
+                } else {
+                    return false;
+                }
             }
         }
     }
@@ -211,6 +215,9 @@ public final class DatabaseQueries {
         try (final PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
             try (final ResultSet result = statement.executeQuery()) {
+                if (!result.isBeforeFirst()) {
+                    return ignoredPlayers;
+                }
                 while (result.next()) {
                     final String string = result.getString("ignoredUUID");
                     final UUID ignoredUUID = UUID.fromString(string);
@@ -236,11 +243,11 @@ public final class DatabaseQueries {
                 if (result.next()) {
                     final String string = result.getString("soundName");
                     return Sound.valueOf(string);
+                } else {
+                    return null;
                 }
             }
         }
-
-        return null;
     }
 
     /**
@@ -255,6 +262,9 @@ public final class DatabaseQueries {
         try (final PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setString(1, playerUUID.toString());
             try (final ResultSet result = statement.executeQuery()) {
+                if (!result.isBeforeFirst()) {
+                    return chats;
+                }
                 while (result.next()) {
                     final String chatName = result.getString("chatName");
                     chats.add(chatName);
