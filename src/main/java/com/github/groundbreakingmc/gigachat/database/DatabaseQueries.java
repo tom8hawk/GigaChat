@@ -145,21 +145,22 @@ public final class DatabaseQueries {
      */
     public static void createDatabaseTables() {
         final String[] queries = {
-                "CREATE TABLE IF NOT EXISTS disabledChat(playerUUID TEXT NOT NULL UNIQUE);",
-                "CREATE TABLE IF NOT EXISTS disabledPrivateMessages(playerUUID TEXT NOT NULL UNIQUE);",
-                "CREATE TABLE IF NOT EXISTS ignoreChat(playerUUID TEXT NOT NULL, ignoredUUID TEXT NOT NULL, PRIMARY KEY(playerUUID, ignoredUUID));",
-                "CREATE TABLE IF NOT EXISTS ignorePrivate(playerUUID TEXT NOT NULL, ignoredUUID TEXT NOT NULL, PRIMARY KEY(playerUUID, ignoredUUID));",
-                "CREATE TABLE IF NOT EXISTS privateMessagesSounds(playerUUID TEXT NOT NULL UNIQUE, soundName TEXT NOT NULL);",
-                "CREATE TABLE IF NOT EXISTS socialSpy(playerUUID TEXT NOT NULL UNIQUE);",
-                "CREATE TABLE IF NOT EXISTS autoMessages(playerUUID TEXT NOT NULL UNIQUE);",
-                "CREATE TABLE IF NOT EXISTS chatListeners (playerUUID TEXT NOT NULL, chatName TEXT NOT NULL, PRIMARY KEY(playerUUID, chatName));"
+                "CREATE TABLE IF NOT EXISTS disabledChat(playerUUID VARCHAR(36) NOT NULL PRIMARY KEY);",
+                "CREATE TABLE IF NOT EXISTS disabledPrivateMessages(playerUUID VARCHAR(36) NOT NULL PRIMARY KEY);",
+                "CREATE TABLE IF NOT EXISTS ignoreChat(playerUUID VARCHAR(36) NOT NULL, ignoredUUID VARCHAR(36) NOT NULL, PRIMARY KEY(playerUUID, ignoredUUID));",
+                "CREATE TABLE IF NOT EXISTS ignorePrivate(playerUUID VARCHAR(36) NOT NULL, ignoredUUID VARCHAR(36) NOT NULL, PRIMARY KEY(playerUUID, ignoredUUID));",
+                "CREATE TABLE IF NOT EXISTS privateMessagesSounds(playerUUID VARCHAR(36) NOT NULL PRIMARY KEY, soundName VARCHAR(255) NOT NULL);",
+                "CREATE TABLE IF NOT EXISTS socialSpy(playerUUID VARCHAR(36) NOT NULL PRIMARY KEY);",
+                "CREATE TABLE IF NOT EXISTS autoMessages(playerUUID VARCHAR(36) NOT NULL PRIMARY KEY);",
+                "CREATE TABLE IF NOT EXISTS chatListeners (playerUUID VARCHAR(36) NOT NULL, chatName VARCHAR(255) NOT NULL, PRIMARY KEY(playerUUID, chatName));"
         };
 
         try (final Connection connection = DatabaseHandler.getConnection();
              final Statement statement = connection.createStatement()) {
-            for (int i = 0; i < queries.length; i++) {
-                statement.execute(queries[i]);
+            for (String query : queries) {
+                statement.addBatch(query);
             }
+            statement.executeBatch();
         } catch (final SQLException ex) {
             ex.printStackTrace();
         }
