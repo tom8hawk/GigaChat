@@ -22,12 +22,10 @@ public final class ReloadArgument extends ArgsConstructor {
         final long startTime = System.currentTimeMillis();
 
         this.plugin.getCommandRegisterer().unregisterCustomCommand();
-        this.plugin.getAutoMessages().autoMessagesClone.clear();
+        this.plugin.getAutoMessages().restart();
         this.plugin.reloadConfig();
         this.plugin.setupConfigValues();
         this.plugin.getCooldownCollections().setCooldowns();
-        this.plugin.getAutoMessages().cancel();
-        this.plugin.getAutoMessages().run();
         this.plugin.registerPluginCommands();
 
         final String reloadTime = String.valueOf(System.currentTimeMillis() - startTime);

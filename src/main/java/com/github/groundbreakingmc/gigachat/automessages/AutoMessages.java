@@ -8,21 +8,26 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 public final class AutoMessages {
 
     private final GigaChat plugin;
     private final AutoMessagesValues autoMessagesValues;
 
-    public final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
+    private final List<AutoMessageConstructor> autoMessagesClone = new ObjectArrayList<>();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    private BukkitTask task;
+    private ScheduledFuture<?> task;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public AutoMessages(final GigaChat plugin) {
         this.plugin = plugin;
@@ -30,15 +35,43 @@ public final class AutoMessages {
     }
 
     public void run() {
-        this.task = (new BukkitRunnable() {
-            public void run() {
-                process();
+        lock.lock();
+        try {
+            if (task != null && !task.isCancelled()) {
+                return;
             }
-        }).runTaskTimerAsynchronously(this.plugin, 0L, this.autoMessagesValues.getSendInterval() * 20L);
+
+            int interval = this.autoMessagesValues.getSendInterval();
+            task = scheduler.scheduleWithFixedDelay(this::process, 0, interval, TimeUnit.SECONDS);
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public void restart() {
+        scheduler.execute(() -> {
+            lock.lock();
+            try {
+                cancel();
+                run();
+            } finally {
+                lock.unlock();
+            }
+        });
     }
 
     public void cancel() {
-        this.task.cancel();
+        lock.lock();
+        try {
+            if (task != null) {
+                task.cancel(false);
+                autoMessagesClone.clear();
+
+                task = null;
+            }
+        } finally {
+            lock.unlock();
+        }
     }
 
     private void process() {
@@ -87,13 +120,9 @@ public final class AutoMessages {
             final List<AutoMessageConstructor> autoMessages = this.autoMessagesValues.getAutoMessages();
             this.autoMessagesClone.addAll(autoMessages);
             if (this.autoMessagesValues.isRandom()) {
-                Collections.shuffle(autoMessages);
+                Collections.shuffle(autoMessagesClone);
             }
         }
-
-        final AutoMessageConstructor autoMessage = this.autoMessagesClone.get(0);
-        this.autoMessagesClone.remove(0);
-
-        return autoMessage;
+        return autoMessagesClone.remove(0);
     }
 }
