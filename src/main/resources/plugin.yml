@@ -21,430 +21,430 @@ commands:
 
 permissions:
   gigachat.bypass.validator.chat.chars:
-    default: op
+    default: false
 
   gigachat.bypass.validator.chat.caps:
-    default: op
+    default: false
 
   gigachat.bypass.validator.chat.words:
-    default: op
+    default: false
 
   gigachat.bypass.validator.pm.chars:
-    default: op
+    default: false
 
   gigachat.bypass.validator.pm.caps:
-    default: op
+    default: false
 
   gigachat.bypass.validator.pm.words:
-    default: op
+    default: false
 
   gigachat.adminhover:
-    default: op
+    default: false
 
   gigachat.hex:
-    default: op
+    default: false
 
   gigachat.bypass.cooldown.socialspy:
-    default: op
+    default: false
 
   gigachat.bypass.cooldown.broadcast:
-    default: op
+    default: false
 
   gigachat.bypass.cooldown.ignore:
-    default: op
+    default: false
 
   gigachat.bypass.cooldown.pm:
-    default: op
+    default: false
 
   gigachat.bypass.chatnewbie:
-    default: op
+    default: false
 
   gigachat.bypass.commandsnewbie:
-    default: op
+    default: false
 
   gigachat.bypass.clearchat:
-    default: op
+    default: false
 
   gigachat.bypass.disabledchat:
-    default: op
+    default: false
 
   gigachat.bypass.ignore.private:
-    default: op
+    default: false
 
   gigachat.command.pm:
-    default: op
+    default: false
 
   gigachat.command.ignore.chat:
-    default: op
+    default: false
 
   gigachat.command.ignore.private:
-    default: op
+    default: false
 
   gigachat.command.socialspy:
-    default: op
+    default: false
 
   gigachat.command.reply:
-    default: op
+    default: false
 
   gigachat.command.setpmsound:
-    default: op
+    default: false
 
   gigachat.command.disableam.own:
-    default: op
+    default: false
 
   gigachat.command.disableam.other:
-    default: op
+    default: false
 
   gigachat.command.disablechat:
-    default: op
+    default: false
 
   gigachat.command.disableownchat:
-    default: op
+    default: false
 
   gigachat.command.clearchat:
-    default: op
+    default: false
 
   gigachat.command.spy.other:
-    default: op
+    default: false
 
   gigachat.command.broadcast:
-    default: op
+    default: false
 
   gigachat.color.chat.hex:
-    default: op
+    default: false
 
   gigachat.color.private.hex:
-    default: op
+    default: false
 
   gigachat.color.private.black:
-    default: op
+    default: false
     children:
       gigachat.color.private.0: true
 
   gigachat.color.private.dark_blue:
-    default: op
+    default: false
     children:
       gigachat.color.private.1: true
 
   gigachat.color.private.dark_green:
-    default: op
+    default: false
     children:
       gigachat.color.private.2: true
 
   gigachat.color.private.dark_aqua:
-    default: op
+    default: false
     children:
       gigachat.color.private.3: true
 
   gigachat.color.private.dark_red:
-    default: op
+    default: false
     children:
       gigachat.color.private.4: true
 
   gigachat.color.private.dark_purple:
-    default: op
+    default: false
     children:
       gigachat.color.private.5: true
 
   gigachat.color.private.gold:
-    default: op
+    default: false
     children:
       gigachat.color.private.6: true
 
   gigachat.color.private.gray:
-    default: op
+    default: false
     children:
       gigachat.color.private.7: true
 
   gigachat.color.private.dark_gray:
-    default: op
+    default: false
     children:
       gigachat.color.private.8: true
 
   gigachat.color.private.blue:
-    default: op
+    default: false
     children:
       gigachat.color.private.9: true
 
   gigachat.color.private.green:
-    default: op
+    default: false
     children:
       gigachat.color.private.a: true
 
   gigachat.color.private.aqua:
-    default: op
+    default: false
     children:
       gigachat.color.private.b: true
 
   gigachat.color.private.red:
-    default: op
+    default: false
     children:
       gigachat.color.private.c: true
 
   gigachat.color.private.light_purple:
-    default: op
+    default: false
     children:
       gigachat.color.private.d: true
 
   gigachat.color.private.yellow:
-    default: op
+    default: false
     children:
       gigachat.color.private.e: true
 
   gigachat.color.private.white:
-    default: op
+    default: false
     children:
       gigachat.color.private.f: true
 
   gigachat.style.private.obfuscated:
-    default: op
+    default: false
     children:
       gigachat.style.private.k: true
 
   gigachat.style.private.bold:
-    default: op
+    default: false
     children:
       gigachat.style.private.b: true
 
   gigachat.style.private.strikethrough:
-    default: op
+    default: false
     children:
       gigachat.style.private.m: true
 
   gigachat.style.private.underline:
-    default: op
+    default: false
     children:
       gigachat.style.private.n: true
 
   gigachat.style.private.italic:
-    default: op
+    default: false
     children:
       gigachat.style.private.o: true
 
   gigachat.style.private.reset:
-    default: op
+    default: false
     children:
       gigachat.style.private.r: true
 
   gigachat.color.chat.black:
-    default: op
+    default: false
     children:
       gigachat.color.chat.0: true
 
   gigachat.color.chat.dark_blue:
-    default: op
+    default: false
     children:
       gigachat.color.chat.1: true
 
   gigachat.color.chat.dark_green:
-    default: op
+    default: false
     children:
       gigachat.color.chat.2: true
 
   gigachat.color.chat.dark_aqua:
-    default: op
+    default: false
     children:
       gigachat.color.chat.3: true
 
   gigachat.color.chat.dark_red:
-    default: op
+    default: false
     children:
       gigachat.color.chat.4: true
 
   gigachat.color.chat.dark_purple:
-    default: op
+    default: false
     children:
       gigachat.color.chat.5: true
 
   gigachat.color.chat.gold:
-    default: op
+    default: false
     children:
       gigachat.color.chat.6: true
 
   gigachat.color.chat.gray:
-    default: op
+    default: false
     children:
       gigachat.color.chat.7: true
 
   gigachat.color.chat.dark_gray:
-    default: op
+    default: false
     children:
       gigachat.color.chat.8: true
 
   gigachat.color.chat.blue:
-    default: op
+    default: false
     children:
       gigachat.color.chat.9: true
 
   gigachat.color.chat.green:
-    default: op
+    default: false
     children:
       gigachat.color.chat.a: true
 
   gigachat.color.chat.aqua:
-    default: op
+    default: false
     children:
       gigachat.color.chat.b: true
 
   gigachat.color.chat.red:
-    default: op
+    default: false
     children:
       gigachat.color.chat.c: true
 
   gigachat.color.chat.light_purple:
-    default: op
+    default: false
     children:
       gigachat.color.chat.d: true
 
   gigachat.color.chat.yellow:
-    default: op
+    default: false
     children:
       gigachat.color.chat.e: true
 
   gigachat.color.chat.white:
-    default: op
+    default: false
     children:
       gigachat.color.chat.f: true
 
   gigachat.style.chat.obfuscated:
-    default: op
+    default: false
     children:
       gigachat.style.chat.k: true
 
   gigachat.style.chat.bold:
-    default: op
+    default: false
     children:
       gigachat.style.chat.l: true
 
   gigachat.style.chat.strikethrough:
-    default: op
+    default: false
     children:
       gigachat.style.chat.m: true
 
   gigachat.style.chat.underline:
-    default: op
+    default: false
     children:
       gigachat.style.chat.n: true
 
   gigachat.style.chat.italic:
-    default: op
+    default: false
     children:
       gigachat.style.chat.o: true
 
   gigachat.style.chat.reset:
-    default: op
+    default: false
     children:
       gigachat.style.chat.r: true
   
   gigachat.color.broadcast.hex:
-    default: op
+    default: false
 
   gigachat.color.broadcast.black:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.0: true
 
   gigachat.color.broadcast.dark_blue:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.1: true
 
   gigachat.color.broadcast.dark_green:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.2: true
 
   gigachat.color.broadcast.dark_aqua:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.3: true
 
   gigachat.color.broadcast.dark_red:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.4: true
 
   gigachat.color.broadcast.dark_purple:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.5: true
 
   gigachat.color.broadcast.gold:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.6: true
 
   gigachat.color.broadcast.gray:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.7: true
 
   gigachat.color.broadcast.dark_gray:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.8: true
 
   gigachat.color.broadcast.blue:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.9: true
 
   gigachat.color.broadcast.green:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.a: true
 
   gigachat.color.broadcast.aqua:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.b: true
 
   gigachat.color.broadcast.red:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.c: true
 
   gigachat.color.broadcast.light_purple:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.d: true
 
   gigachat.color.broadcast.yellow:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.e: true
 
   gigachat.color.broadcast.white:
-    default: op
+    default: false
     children:
       gigachat.color.broadcast.f: true
 
   gigachat.style.broadcast.obfuscated:
-    default: op
+    default: false
     children:
       gigachat.style.broadcast.k: true
 
   gigachat.style.broadcast.bold:
-    default: op
+    default: false
     children:
       gigachat.style.broadcast.b: true
 
   gigachat.style.broadcast.strikethrough:
-    default: op
+    default: false
     children:
       gigachat.style.broadcast.m: true
 
   gigachat.style.broadcast.underline:
-    default: op
+    default: false
     children:
       gigachat.style.broadcast.n: true
 
   gigachat.style.broadcast.italic:
-    default: op
+    default: false
     children:
       gigachat.style.broadcast.o: true
 
   gigachat.style.broadcast.reset:
-    default: op
+    default: false
     children:
       gigachat.style.broadcast.r: true

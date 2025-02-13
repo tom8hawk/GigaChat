@@ -7,6 +7,8 @@
 #
 # /gigachat help - чтобы увидеть все доступные команды
 #
+settings:
+  config-version: 1.0
 
 # Настройка авто-абновлений
 updates:

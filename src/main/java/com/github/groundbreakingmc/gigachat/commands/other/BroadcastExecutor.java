@@ -126,7 +126,7 @@ public final class BroadcastExecutor implements TabExecutor {
                 .replace("{player}", sender.getName())
                 .replace("{prefix}", chat.getPlayerPrefix(sender))
                 .replace("{suffix}", chat.getPlayerSuffix(sender));
-        final Colorizer colorizer = this.broadcastValues.getColorizer();
+        final Colorizer colorizer = this.broadcastValues.getFormatColorizer();
         final BaseComponent[] components = HoverUtils.get(sender, hover, hoverText, message, colorizer);
         for (final Player recipient : Bukkit.getOnlinePlayers()) {
             recipient.spigot().sendMessage(components);

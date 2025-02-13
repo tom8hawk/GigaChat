@@ -66,7 +66,7 @@ public final class SocialSpyExecutor implements TabExecutor {
                     SocialSpyCollection::remove,
                     sender, senderUUID,
                     Database.REMOVE_PLAYER_FROM_SOCIAL_SPY,
-                    this.messages.getSpyEnabled()
+                    this.messages.getSpyDisabled()
             );
             return;
         }
@@ -75,7 +75,7 @@ public final class SocialSpyExecutor implements TabExecutor {
                 SocialSpyCollection::add,
                 sender, senderUUID,
                 Database.ADD_PLAYER_TO_SOCIAL_SPY,
-                this.messages.getSpyDisabled()
+                this.messages.getSpyEnabled()
         );
     }
 

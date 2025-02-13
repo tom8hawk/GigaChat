@@ -29,7 +29,7 @@ public final class BroadcastValues {
 
     private Hover hover;
 
-    private Colorizer colorizer;
+    private Colorizer formatColorizer;
 
     private final PermissionColorizer messageColorizer;
 
@@ -54,8 +54,8 @@ public final class BroadcastValues {
     private void setupSettings(final FileConfiguration config) {
         final ConfigurationSection broadcast = config.getConfigurationSection("settings");
 
-        this.colorizer = ColorizerFactory.createColorizer(config.getString("settings.colorizer-mode"));
-        this.format = this.colorizer.colorize(broadcast.getString("format"));
+        this.formatColorizer = ColorizerFactory.createColorizer(config.getString("settings.colorizer-mode"));
+        this.format = this.formatColorizer.colorize(broadcast.getString("format"));
         this.cooldown = broadcast.getInt("cooldown");
 
         this.soundSettings = SoundSettings.get(broadcast.getString("sound"));

@@ -140,17 +140,16 @@ public final class PrivateMessageExecutor implements TabExecutor {
     }
 
     private boolean processDisable(final CommandSender sender) {
-        if (!(sender instanceof final Player player)) {
+        if (!(sender instanceof final Player playerSender)) {
             sender.sendMessage(this.messages.getPlayerOnly());
             return true;
         }
 
-        final UUID senderUUID = player.getUniqueId();
+        final UUID senderUUID = playerSender.getUniqueId();
         if (this.disabled.contains(senderUUID)) {
             return this.process(
                     this.disabled::remove,
-                    sender,
-                    senderUUID,
+                    playerSender, senderUUID,
                     Database.REMOVE_PLAYER_FROM_DISABLED_PRIVATE_MESSAGES,
                     this.messages.getPmDisabled()
             );
@@ -158,14 +157,15 @@ public final class PrivateMessageExecutor implements TabExecutor {
 
         return this.process(
                 this.disabled::add,
-                sender,
-                senderUUID,
+                playerSender, senderUUID,
                 Database.ADD_PLAYER_TO_DISABLED_PRIVATE_MESSAGES,
                 this.messages.getPmEnabled()
         );
     }
 
-    private boolean process(final Consumer<UUID> function, final CommandSender sender, final UUID senderUUID, final String query, final String message) {
+    private boolean process(final Consumer<UUID> function,
+                            final Player sender, final UUID senderUUID,
+                            final String query, final String message) {
         function.accept(senderUUID);
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (final Connection connection = this.database.getConnection()) {

@@ -47,6 +47,7 @@ public final class DisableOwnChatExecutor implements TabExecutor {
     private boolean processDisable(final Player sender) {
         final UUID senderUUID = sender.getUniqueId();
         if (DisabledChatCollection.contains(senderUUID)) {
+            this.plugin.getCustomLogger().info(sender.getName() +  " removed");
             return this.process(
                     DisabledChatCollection::remove,
                     sender,
@@ -56,6 +57,7 @@ public final class DisableOwnChatExecutor implements TabExecutor {
             );
         }
 
+        this.plugin.getCustomLogger().info(sender.getName() +  " added");
         return this.process(
                 DisabledChatCollection::add,
                 sender,

@@ -14,7 +14,7 @@ import com.github.groundbreakingmc.mylib.config.ConfigLoader;
 import com.github.groundbreakingmc.mylib.utils.event.ListenerRegisterUtil;
 import com.github.groundbreakingmc.mylib.utils.player.settings.SoundSettings;
 import com.google.common.collect.ImmutableList;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import com.google.common.collect.ImmutableMap;
 import lombok.AccessLevel;
 import lombok.Getter;
 import org.bukkit.configuration.ConfigurationSection;
@@ -22,7 +22,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
@@ -45,7 +47,7 @@ public final class ChatValues {
 
     private final StringValidator stringValidator = new StringValidator();
 
-    private final Object2ObjectOpenHashMap<Character, Chat> chats = new Object2ObjectOpenHashMap<>();
+    private Map<Character, Chat> chats;
     private Chat defaultChat;
 
     public ChatValues(final GigaChat plugin) {
@@ -97,10 +99,14 @@ public final class ChatValues {
     private void setupChats(final FileConfiguration config) {
         final ConfigurationSection chatsSection = config.getConfigurationSection("chats");
         if (chatsSection != null) {
+
+            final Map<Character, Chat> chatsTemp = new HashMap<>();
+
             final Set<String> chatsKeys = chatsSection.getKeys(false);
             MainCommandExecutor.setChats(ImmutableList.copyOf(chatsKeys));
 
             final DefaultChat defaultChatConstructor = ChatUtil.createDefaultChat(this.plugin, chatsSection);
+
             for (final String key : chatsKeys) {
                 if (key.equals("default")) {
                     continue;
@@ -119,9 +125,11 @@ public final class ChatValues {
                 if (symbolString.equalsIgnoreCase("default")) {
                     this.defaultChat = chat;
                 } else {
-                    chats.put(symbolString.charAt(0), chat);
+                    chatsTemp.put(symbolString.charAt(0), chat);
                 }
             }
+
+            this.chats = ImmutableMap.copyOf(chatsTemp);
         } else {
             this.plugin.getCustomLogger().warn("Failed to load section \"chats\" from file \"chats.yml\". Please check your configuration file, or delete it and restart your server!");
             this.plugin.getCustomLogger().warn("If you think this is a plugin error, leave a issue on the https://github.com/grounbreakingmc/GigaChat/issues");

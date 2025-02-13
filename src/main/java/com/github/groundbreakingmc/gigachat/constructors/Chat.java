@@ -140,7 +140,7 @@ public final class Chat implements TabExecutor {
         final double maxDist = Math.pow(this.distance, 2.0D);
         for (final Player target : onlinePlayers) {
             final UUID targetUUID = target.getUniqueId();
-            if (IgnoreCollections.isIgnoredChat(targetUUID, senderUUID) || DisabledChatCollection.contains(targetUUID)) {
+            if (DisabledChatCollection.contains(targetUUID) || IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
                 continue;
             }
 
@@ -162,7 +162,7 @@ public final class Chat implements TabExecutor {
         final UUID senderUUID = sender.getUniqueId();
         for (final Player target : Bukkit.getOnlinePlayers()) {
             final UUID targetUUID = target.getUniqueId();
-            if (!IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
+            if (DisabledChatCollection.contains(targetUUID) || !IgnoreCollections.isIgnoredChat(targetUUID, senderUUID)) {
                 playerList.add(target);
             }
         }

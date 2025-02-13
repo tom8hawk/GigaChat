@@ -58,6 +58,7 @@ public final class DisconnectListener implements Listener {
         Bukkit.getScheduler().runTaskAsynchronously(this.plugin, () -> {
             try (final Connection connection = this.database.getConnection()) {
                 if (this.database.containsInTable(Database.DISABLED_CHAT_CONTAINS_PLAYER, connection, playerUUID)) {
+                    this.plugin.getCustomLogger().info(Bukkit.getPlayer(playerUUID).getName() + " added");
                     DisabledChatCollection.add(playerUUID);
                 }
                 if (this.database.containsInTable(Database.CHECK_IF_PLAYER_DISABLED_PRIVATE_MESSAGES, connection, playerUUID)) {

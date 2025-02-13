@@ -38,10 +38,12 @@ public final class ConfigValues {
     private void checkForUpdates(final FileConfiguration config) {
         final ConfigurationSection updates = config.getConfigurationSection("updates");
         final boolean check = updates.getBoolean("check");
-        final boolean download = updates.getBoolean("auto-download");
-        this.plugin.getServer().getScheduler().runTaskLaterAsynchronously(this.plugin, () ->
-                this.plugin.getUpdatesChecker().check(check, download), 300L
-        );
+        if (check) {
+            final boolean download = updates.getBoolean("auto-download");
+            this.plugin.getServer().getScheduler().runTaskLaterAsynchronously(this.plugin, () ->
+                    this.plugin.getUpdatesChecker().check(download, true), 300L
+            );
+        }
     }
 
     private void processCommands(final FileConfiguration config) {

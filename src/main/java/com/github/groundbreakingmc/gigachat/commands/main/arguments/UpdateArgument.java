@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.jetbrains.annotations.NotNull;
 
-public class UpdateArgument extends Argument {
+public final class UpdateArgument extends Argument {
 
     public UpdateArgument(final GigaChat plugin) {
         super(plugin, "update", "gigachat.command.spy.other");

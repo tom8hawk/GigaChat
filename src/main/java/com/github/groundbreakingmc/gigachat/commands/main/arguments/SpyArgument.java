@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.Set;
 import java.util.UUID;
 
-public class SpyArgument extends Argument {
+public final class SpyArgument extends Argument {
 
     private final ChatValues chatValues;
 

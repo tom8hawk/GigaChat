@@ -3,7 +3,7 @@ package com.github.groundbreakingmc.gigachat.exceptions;
 import com.github.groundbreakingmc.gigachat.GigaChat;
 import org.bukkit.Bukkit;
 
-public class NotPaperException extends RuntimeException {
+public final class NotPaperException extends RuntimeException {
 
     public NotPaperException(final GigaChat plugin) {
         Bukkit.getPluginManager().disablePlugin(plugin);
